@@ -1,0 +1,395 @@
+{
+ "module": "braindrift",
+ "version": 1,
+ "product": "BrainDrift: brain fluid-shift gate (Model B live brain map, Model A precomputed PVS map, simulated flight)",
+ "live": "models/braindrift_anat.onnx (Model B) runs in the browser; everything else is precomputed",
+ "ids": "flight-f000..f100 = 5 frames of one held-out OASIS test brain (flight-brain); brain-small / brain-large = smallest / largest ventricles of the 40-brain test set; pvs-low / pvs-mid / pvs-high = 3 held-out HCP-Aging test people (neutral ids; no subject ids, ages or sexes shipped)",
+ "licence_data": "OASIS-1 (Marcus et al. 2007) via neurite-oasis (Hoopes et al. 2021): OASIS Data Use Terms (cite; no re-identification; skull-stripped crops only). OpenNeuro ds005595 (Chai et al.): CC0, NIA U01AG052564 acknowledgement. Repeat-scan numbers: OpenNeuro ds000239 (Maclaren et al. 2014), CC0.",
+ "privacy": "no faces (skull-stripped / brain-masked, axial slices above the eyes), no raw HCP T2, no OASIS orig, no ages or sexes, no subject ids, no QA overlay PNGs",
+ "total_bytes": 52551867,
+ "files": [
+  {
+   "path": "models/braindrift_anat.onnx",
+   "role": "model",
+   "bytes": 16147741,
+   "sha256": "4516f08b1d23db813ded77d8f3083f0a8e9bd8b84f5f2bc888182650bc3c0249",
+   "source": "work/braindrift/out/braindrift_anat.onnx",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024)",
+   "note": "input slices float32 [N,3,176,176] = uint8/255; output logits float32 [N,6,176,176]"
+  },
+  {
+   "path": "flight/flight_f000.u8.gz",
+   "role": "input",
+   "bytes": 1426506,
+   "sha256": "14ee54d443fe30337689b45ce6e679ec592eace4d46ecc7f83616eaa58b10840",
+   "source": "work/braindrift/out/flight_f000.u8.gz",
+   "credit": "Derived from OASIS-1 (Marcus et al. 2007, OASIS Data Use Terms: cite, no re-identification) via neurite-oasis (Hoopes et al. 2021, arXiv:2101.01035); skull-stripped 'norm' crop only, no face",
+   "note": "uint8 [176,176,208] C order, LIA"
+  },
+  {
+   "path": "flight/flight_f000_seg.u8.gz",
+   "role": "precomputed",
+   "bytes": 178672,
+   "sha256": "0e51452b865b0018dc64190ffde5bd77728a9124eaec5d714ddf3d8216f2771b",
+   "source": "work/braindrift/out/flight_f000_seg.u8.gz",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024)",
+   "note": "Model B argmax (classes 0-5), browser slice rule; replay + parity reference"
+  },
+  {
+   "path": "flight/flight_vent_f000.glb",
+   "role": "mesh",
+   "bytes": 721264,
+   "sha256": "600f88d9c5a2f24e02df286d73400ae3915b680adac6cb2389b16443d3b77441",
+   "source": "work/braindrift/out/flight_vent_f000.glb",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024); mesh by trimesh (MIT)",
+   "note": "Model B ventricle surface, crop-centre mm frame"
+  },
+  {
+   "path": "flight/flight_f025.u8.gz",
+   "role": "input",
+   "bytes": 1439156,
+   "sha256": "a0d2ea5b6c4a5fa40ecc63b7cbef7e7a7ff3acfee599ceabc268b87aafd8425e",
+   "source": "work/braindrift/out/flight_f025.u8.gz",
+   "credit": "Derived from OASIS-1 (Marcus et al. 2007, OASIS Data Use Terms: cite, no re-identification) via neurite-oasis (Hoopes et al. 2021, arXiv:2101.01035); skull-stripped 'norm' crop only, no face; warped: SIMULATION built by team SuperHumans from two published numbers: Wang et al. PNAS 2026 (doi 10.1073/pnas.2505682122, 2.52 mm) and Roberts et al. AJNR 2019 (doi 10.3174/ajnr.A6249, +10.7%)",
+   "note": "uint8 [176,176,208] C order, LIA"
+  },
+  {
+   "path": "flight/flight_f025_seg.u8.gz",
+   "role": "precomputed",
+   "bytes": 178670,
+   "sha256": "489e9405f0a37d20af5c49b902d4d08a6054f92f0cd5ea993e4cb6d2d6b5cda2",
+   "source": "work/braindrift/out/flight_f025_seg.u8.gz",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024)",
+   "note": "Model B argmax (classes 0-5), browser slice rule; replay + parity reference"
+  },
+  {
+   "path": "flight/flight_vent_f025.glb",
+   "role": "mesh",
+   "bytes": 721380,
+   "sha256": "781f068e46c4fde13e266c5d7f20a8bf35e9d53c403d2b79d5f4405376e926fd",
+   "source": "work/braindrift/out/flight_vent_f025.glb",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024); mesh by trimesh (MIT)",
+   "note": "Model B ventricle surface, crop-centre mm frame"
+  },
+  {
+   "path": "flight/flight_f050.u8.gz",
+   "role": "input",
+   "bytes": 1442216,
+   "sha256": "52c758c2ed4c81fd993368f174bf7432f9fe3152cad47576165aaa2b56571d16",
+   "source": "work/braindrift/out/flight_f050.u8.gz",
+   "credit": "Derived from OASIS-1 (Marcus et al. 2007, OASIS Data Use Terms: cite, no re-identification) via neurite-oasis (Hoopes et al. 2021, arXiv:2101.01035); skull-stripped 'norm' crop only, no face; warped: SIMULATION built by team SuperHumans from two published numbers: Wang et al. PNAS 2026 (doi 10.1073/pnas.2505682122, 2.52 mm) and Roberts et al. AJNR 2019 (doi 10.3174/ajnr.A6249, +10.7%)",
+   "note": "uint8 [176,176,208] C order, LIA"
+  },
+  {
+   "path": "flight/flight_f050_seg.u8.gz",
+   "role": "precomputed",
+   "bytes": 178749,
+   "sha256": "c2650af9b9fda173a0ca493b038b4b04a14bbd75b45a4bf4438c748a464b332e",
+   "source": "work/braindrift/out/flight_f050_seg.u8.gz",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024)",
+   "note": "Model B argmax (classes 0-5), browser slice rule; replay + parity reference"
+  },
+  {
+   "path": "flight/flight_vent_f050.glb",
+   "role": "mesh",
+   "bytes": 721328,
+   "sha256": "3a34ae1a5c2865a2b667ba1b1f8118e3eca6b185500a64adedf7450d100a0e42",
+   "source": "work/braindrift/out/flight_vent_f050.glb",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024); mesh by trimesh (MIT)",
+   "note": "Model B ventricle surface, crop-centre mm frame"
+  },
+  {
+   "path": "flight/flight_f075.u8.gz",
+   "role": "input",
+   "bytes": 1444404,
+   "sha256": "b61e6c8b8cba37007a635cb85e47cf870a5433eca3089de8b2cd195481af4638",
+   "source": "work/braindrift/out/flight_f075.u8.gz",
+   "credit": "Derived from OASIS-1 (Marcus et al. 2007, OASIS Data Use Terms: cite, no re-identification) via neurite-oasis (Hoopes et al. 2021, arXiv:2101.01035); skull-stripped 'norm' crop only, no face; warped: SIMULATION built by team SuperHumans from two published numbers: Wang et al. PNAS 2026 (doi 10.1073/pnas.2505682122, 2.52 mm) and Roberts et al. AJNR 2019 (doi 10.3174/ajnr.A6249, +10.7%)",
+   "note": "uint8 [176,176,208] C order, LIA"
+  },
+  {
+   "path": "flight/flight_f075_seg.u8.gz",
+   "role": "precomputed",
+   "bytes": 179185,
+   "sha256": "2d160740b6a1bdb82c03606d1090a992b9f3ab52233aa06e0f94b0c7f4e5781a",
+   "source": "work/braindrift/out/flight_f075_seg.u8.gz",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024)",
+   "note": "Model B argmax (classes 0-5), browser slice rule; replay + parity reference"
+  },
+  {
+   "path": "flight/flight_vent_f075.glb",
+   "role": "mesh",
+   "bytes": 721440,
+   "sha256": "27ad438bd1b5a524dcb6f9c28b5ae55439550b6c20a6defdb15c751b409dc62a",
+   "source": "work/braindrift/out/flight_vent_f075.glb",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024); mesh by trimesh (MIT)",
+   "note": "Model B ventricle surface, crop-centre mm frame"
+  },
+  {
+   "path": "flight/flight_f100.u8.gz",
+   "role": "input",
+   "bytes": 1453901,
+   "sha256": "bd9c33a8098d7fb4c48decbdb5d5dbeb444268f60f2a3b4bbcb9944c81ac7618",
+   "source": "work/braindrift/out/flight_f100.u8.gz",
+   "credit": "Derived from OASIS-1 (Marcus et al. 2007, OASIS Data Use Terms: cite, no re-identification) via neurite-oasis (Hoopes et al. 2021, arXiv:2101.01035); skull-stripped 'norm' crop only, no face; warped: SIMULATION built by team SuperHumans from two published numbers: Wang et al. PNAS 2026 (doi 10.1073/pnas.2505682122, 2.52 mm) and Roberts et al. AJNR 2019 (doi 10.3174/ajnr.A6249, +10.7%)",
+   "note": "uint8 [176,176,208] C order, LIA"
+  },
+  {
+   "path": "flight/flight_f100_seg.u8.gz",
+   "role": "precomputed",
+   "bytes": 179642,
+   "sha256": "8d098b6ffcd28ff30c9b6e988a1e2e30803b8f2acf7c50ba5a2c5446bebbc36d",
+   "source": "work/braindrift/out/flight_f100_seg.u8.gz",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024)",
+   "note": "Model B argmax (classes 0-5), browser slice rule; replay + parity reference"
+  },
+  {
+   "path": "flight/flight_vent_f100.glb",
+   "role": "mesh",
+   "bytes": 721420,
+   "sha256": "72b71bb1817d213827cb9cd3054facc0f6f178a0722ce6de630be02e14887ef7",
+   "source": "work/braindrift/out/flight_vent_f100.glb",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024); mesh by trimesh (MIT)",
+   "note": "Model B ventricle surface, crop-centre mm frame"
+  },
+  {
+   "path": "flight/flight_field_mm.u8.gz",
+   "role": "precomputed",
+   "bytes": 390698,
+   "sha256": "d3ee1bf0800ea402c47d7f4be070e567c882b77e440dad3c3e8e697f9f8f3465",
+   "source": "work/braindrift/out/flight_field_mm.u8.gz",
+   "credit": "SIMULATION built by team SuperHumans from two published numbers: Wang et al. PNAS 2026 (doi 10.1073/pnas.2505682122, 2.52 mm) and Roberts et al. AJNR 2019 (doi 10.3174/ajnr.A6249, +10.7%)",
+   "note": "injected displacement magnitude at f=1, value*0.02 = mm; SIMULATION, not a model output"
+  },
+  {
+   "path": "flight/flight_brain.glb",
+   "role": "mesh",
+   "bytes": 1666936,
+   "sha256": "a1779af18a08b26f5bf29ceabe38051b8de9d511d3e490c900d6fe3f28c9d47d",
+   "source": "work/braindrift/out/flight_brain.glb",
+   "credit": "SIMULATION built by team SuperHumans from two published numbers: Wang et al. PNAS 2026 (doi 10.1073/pnas.2505682122, 2.52 mm) and Roberts et al. AJNR 2019 (doi 10.3174/ajnr.A6249, +10.7%); surface from Model B; trimesh (MIT)",
+   "note": "frame-0 brain surface; vertex attribute _DISP_MM = injected displacement (SIMULATION); COLOR_0 inferno ramp"
+  },
+  {
+   "path": "compare/brain-small.u8.gz",
+   "role": "input",
+   "bytes": 1201410,
+   "sha256": "3c2de8556a3c6fea214d88154fbe6313846e0de4510e2d740be3810f0ce6a859",
+   "source": "r2 output in work/braindrift/out for the smallest-ventricle test brain, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Derived from OASIS-1 (Marcus et al. 2007, OASIS Data Use Terms: cite, no re-identification) via neurite-oasis (Hoopes et al. 2021, arXiv:2101.01035); skull-stripped 'norm' crop only, no face",
+   "note": "uint8 [176,176,208] C order, LIA"
+  },
+  {
+   "path": "compare/brain-small_seg.u8.gz",
+   "role": "precomputed",
+   "bytes": 164280,
+   "sha256": "d051fbbd77e2cca57d4622eae210ab57d7a4021df87c0b82beeff9bde8e860b6",
+   "source": "r2 output in work/braindrift/out for the smallest-ventricle test brain, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024)"
+  },
+  {
+   "path": "compare/brain-small_vent.glb",
+   "role": "mesh",
+   "bytes": 608480,
+   "sha256": "b74d76aabb9f071d07fd73e5448fe542467b06b434fd06557c980cabe17fd2d9",
+   "source": "r2 output in work/braindrift/out for the smallest-ventricle test brain, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024); trimesh (MIT)"
+  },
+  {
+   "path": "compare/brain-large.u8.gz",
+   "role": "input",
+   "bytes": 1669399,
+   "sha256": "c97866ea72e34b42115678b6c08734669ade7b4d50c74d10b6896e981a9a3488",
+   "source": "r2 output in work/braindrift/out for the largest-ventricle test brain, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Derived from OASIS-1 (Marcus et al. 2007, OASIS Data Use Terms: cite, no re-identification) via neurite-oasis (Hoopes et al. 2021, arXiv:2101.01035); skull-stripped 'norm' crop only, no face",
+   "note": "uint8 [176,176,208] C order, LIA"
+  },
+  {
+   "path": "compare/brain-large_seg.u8.gz",
+   "role": "precomputed",
+   "bytes": 186224,
+   "sha256": "e6b0f393fa517a8ab8e08629554b3d6e28031dcf6a8580068dcd69051c83aa7e",
+   "source": "r2 output in work/braindrift/out for the largest-ventricle test brain, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024)"
+  },
+  {
+   "path": "compare/brain-large_vent.glb",
+   "role": "mesh",
+   "bytes": 721228,
+   "sha256": "a3ffe0683877b07b40f37ba8cc1bd797afd932fe0dcac1446e3f0739ee1cba56",
+   "source": "r2 output in work/braindrift/out for the largest-ventricle test brain, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Model B (brain map) trained by team SuperHumans (NASA Space Apps 2026) with an AI assistant (Claude); MIT (team SuperHumans); MobileNetV4-Conv-Small ImageNet weights timm/mobilenetv4_conv_small.e2400_r224_in1k (Apache-2.0, Qin et al. ECCV 2024); trimesh (MIT)"
+  },
+  {
+   "path": "pvs/pvs-low_model.glb",
+   "role": "mesh",
+   "bytes": 206276,
+   "sha256": "c538dfbf251da2ce6f31534f7f1e46e376642f19489b2fab95a22a49fc13bf50",
+   "source": "r2 output in work/braindrift/out for the low-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Model A (PVS finder, nnU-Net ResEnc-L, encoder from MIC-DKFZ/ResEncL-OpenMind-MAE, CC-BY-4.0, Wald et al. 2025) trained by team SuperHumans; output precomputed on the GPU VM; HD-BET shell (Isensee et al. 2019, Apache-2.0); meshes by trimesh (MIT)",
+   "note": "Model A PVS surface (P>=0.5), subject-centroid mm frame"
+  },
+  {
+   "path": "pvs/pvs-low_expert.glb",
+   "role": "mesh",
+   "bytes": 178632,
+   "sha256": "7ff8dc9068b84519a6227e88096104f9f1111719ead4fa3a9508744b6de678d3",
+   "source": "r2 output in work/braindrift/out for the low-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Derived from OpenNeuro ds005595 (Chai et al., HCP-Aging PVS masks, CC0, doi 10.18112/openneuro.ds005595.v1.0.0); supported by the National Institute on Aging of the NIH under Award Number U01AG052564; brain-masked only, no face",
+   "note": "expert-corrected PVS label surface"
+  },
+  {
+   "path": "pvs/pvs-low_shell.glb",
+   "role": "mesh",
+   "bytes": 1441128,
+   "sha256": "f6994d46a24de4a5cdc76d3e5663112212475da0b5405a3c089b7d8dab2d683c",
+   "source": "r2 output in work/braindrift/out for the low-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Model A (PVS finder, nnU-Net ResEnc-L, encoder from MIC-DKFZ/ResEncL-OpenMind-MAE, CC-BY-4.0, Wald et al. 2025) trained by team SuperHumans; output precomputed on the GPU VM; HD-BET shell (Isensee et al. 2019, Apache-2.0); meshes by trimesh (MIT)",
+   "note": "HD-BET brain-mask surface (glass shell)"
+  },
+  {
+   "path": "pvs/pvs-low_axial_model.webp",
+   "role": "media",
+   "bytes": 147082,
+   "sha256": "bc9f96b6dcb4fa10b8cb1dd19fa0112d01deae47a8a715d604433923692e5f88",
+   "source": "r2 output in work/braindrift/out for the low-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Model A (PVS finder, nnU-Net ResEnc-L, encoder from MIC-DKFZ/ResEncL-OpenMind-MAE, CC-BY-4.0, Wald et al. 2025) trained by team SuperHumans; output precomputed on the GPU VM; HD-BET shell (Isensee et al. 2019, Apache-2.0); meshes by trimesh (MIT); Derived from OpenNeuro ds005595 (Chai et al., HCP-Aging PVS masks, CC0, doi 10.18112/openneuro.ds005595.v1.0.0); supported by the National Institute on Aging of the NIH under Award Number U01AG052564; brain-masked only, no face",
+   "note": "12 brain-masked axial slices, 4x3 grid, Model A PVS overlay"
+  },
+  {
+   "path": "pvs/pvs-low_axial_expert.webp",
+   "role": "media",
+   "bytes": 145446,
+   "sha256": "a1bec06b946646c05eb87b354da5274382244248ec714df64578c61bfa5a07a2",
+   "source": "r2 output in work/braindrift/out for the low-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Derived from OpenNeuro ds005595 (Chai et al., HCP-Aging PVS masks, CC0, doi 10.18112/openneuro.ds005595.v1.0.0); supported by the National Institute on Aging of the NIH under Award Number U01AG052564; brain-masked only, no face",
+   "note": "same 12 slices, expert PVS overlay"
+  },
+  {
+   "path": "pvs/pvs-mid_model.glb",
+   "role": "mesh",
+   "bytes": 1097544,
+   "sha256": "729cfa61f347a12e81e745704f9573d542c4f0bf163fdd75d163753eb74e3b2d",
+   "source": "r2 output in work/braindrift/out for the median-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Model A (PVS finder, nnU-Net ResEnc-L, encoder from MIC-DKFZ/ResEncL-OpenMind-MAE, CC-BY-4.0, Wald et al. 2025) trained by team SuperHumans; output precomputed on the GPU VM; HD-BET shell (Isensee et al. 2019, Apache-2.0); meshes by trimesh (MIT)",
+   "note": "Model A PVS surface (P>=0.5), subject-centroid mm frame"
+  },
+  {
+   "path": "pvs/pvs-mid_expert.glb",
+   "role": "mesh",
+   "bytes": 1025596,
+   "sha256": "fdb2c82294b7b47bbb40fde141cf931736cb4730234f7993d8b0037615a3a6b6",
+   "source": "r2 output in work/braindrift/out for the median-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Derived from OpenNeuro ds005595 (Chai et al., HCP-Aging PVS masks, CC0, doi 10.18112/openneuro.ds005595.v1.0.0); supported by the National Institute on Aging of the NIH under Award Number U01AG052564; brain-masked only, no face",
+   "note": "expert-corrected PVS label surface"
+  },
+  {
+   "path": "pvs/pvs-mid_shell.glb",
+   "role": "mesh",
+   "bytes": 1441036,
+   "sha256": "0f29685504fc9d83c1c8f95a0b28ec3b9a840bd4ceeb08001b2813c02dd1f2fc",
+   "source": "r2 output in work/braindrift/out for the median-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Model A (PVS finder, nnU-Net ResEnc-L, encoder from MIC-DKFZ/ResEncL-OpenMind-MAE, CC-BY-4.0, Wald et al. 2025) trained by team SuperHumans; output precomputed on the GPU VM; HD-BET shell (Isensee et al. 2019, Apache-2.0); meshes by trimesh (MIT)",
+   "note": "HD-BET brain-mask surface (glass shell)"
+  },
+  {
+   "path": "pvs/pvs-mid_axial_model.webp",
+   "role": "media",
+   "bytes": 195344,
+   "sha256": "1e9e1f9183c6ba4dbf4233031b9ee1a701a0330302823982895aa771dd3db991",
+   "source": "r2 output in work/braindrift/out for the median-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Model A (PVS finder, nnU-Net ResEnc-L, encoder from MIC-DKFZ/ResEncL-OpenMind-MAE, CC-BY-4.0, Wald et al. 2025) trained by team SuperHumans; output precomputed on the GPU VM; HD-BET shell (Isensee et al. 2019, Apache-2.0); meshes by trimesh (MIT); Derived from OpenNeuro ds005595 (Chai et al., HCP-Aging PVS masks, CC0, doi 10.18112/openneuro.ds005595.v1.0.0); supported by the National Institute on Aging of the NIH under Award Number U01AG052564; brain-masked only, no face",
+   "note": "12 brain-masked axial slices, 4x3 grid, Model A PVS overlay"
+  },
+  {
+   "path": "pvs/pvs-mid_axial_expert.webp",
+   "role": "media",
+   "bytes": 192290,
+   "sha256": "c040b22a779ed06a95acd1f180aae5047d325f51e41e4a3f5f5ae6b7fc8d271b",
+   "source": "r2 output in work/braindrift/out for the median-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Derived from OpenNeuro ds005595 (Chai et al., HCP-Aging PVS masks, CC0, doi 10.18112/openneuro.ds005595.v1.0.0); supported by the National Institute on Aging of the NIH under Award Number U01AG052564; brain-masked only, no face",
+   "note": "same 12 slices, expert PVS overlay"
+  },
+  {
+   "path": "pvs/pvs-high_model.glb",
+   "role": "mesh",
+   "bytes": 4595460,
+   "sha256": "5b3acb43103cd50e76c4f3f8eb78896f8a829618fe58fe8c02b1c6b6160378d1",
+   "source": "r2 output in work/braindrift/out for the highest-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Model A (PVS finder, nnU-Net ResEnc-L, encoder from MIC-DKFZ/ResEncL-OpenMind-MAE, CC-BY-4.0, Wald et al. 2025) trained by team SuperHumans; output precomputed on the GPU VM; HD-BET shell (Isensee et al. 2019, Apache-2.0); meshes by trimesh (MIT)",
+   "note": "Model A PVS surface (P>=0.5), subject-centroid mm frame"
+  },
+  {
+   "path": "pvs/pvs-high_expert.glb",
+   "role": "mesh",
+   "bytes": 4478628,
+   "sha256": "93ee0106def81d9d316725fcde9da73dc30aa3a92598b41474291e1857c2ef63",
+   "source": "r2 output in work/braindrift/out for the highest-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Derived from OpenNeuro ds005595 (Chai et al., HCP-Aging PVS masks, CC0, doi 10.18112/openneuro.ds005595.v1.0.0); supported by the National Institute on Aging of the NIH under Award Number U01AG052564; brain-masked only, no face",
+   "note": "expert-corrected PVS label surface"
+  },
+  {
+   "path": "pvs/pvs-high_shell.glb",
+   "role": "mesh",
+   "bytes": 1441036,
+   "sha256": "a7e376ba1aae942da258c36410b3137427313eab0ff35fad712d5c1783d2d953",
+   "source": "r2 output in work/braindrift/out for the highest-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Model A (PVS finder, nnU-Net ResEnc-L, encoder from MIC-DKFZ/ResEncL-OpenMind-MAE, CC-BY-4.0, Wald et al. 2025) trained by team SuperHumans; output precomputed on the GPU VM; HD-BET shell (Isensee et al. 2019, Apache-2.0); meshes by trimesh (MIT)",
+   "note": "HD-BET brain-mask surface (glass shell)"
+  },
+  {
+   "path": "pvs/pvs-high_axial_model.webp",
+   "role": "media",
+   "bytes": 225816,
+   "sha256": "6e13a18c07e8e5c2582469da81e136de0b2d7275ca7f11a1c787c4da8cf2dffc",
+   "source": "r2 output in work/braindrift/out for the highest-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Model A (PVS finder, nnU-Net ResEnc-L, encoder from MIC-DKFZ/ResEncL-OpenMind-MAE, CC-BY-4.0, Wald et al. 2025) trained by team SuperHumans; output precomputed on the GPU VM; HD-BET shell (Isensee et al. 2019, Apache-2.0); meshes by trimesh (MIT); Derived from OpenNeuro ds005595 (Chai et al., HCP-Aging PVS masks, CC0, doi 10.18112/openneuro.ds005595.v1.0.0); supported by the National Institute on Aging of the NIH under Award Number U01AG052564; brain-masked only, no face",
+   "note": "12 brain-masked axial slices, 4x3 grid, Model A PVS overlay"
+  },
+  {
+   "path": "pvs/pvs-high_axial_expert.webp",
+   "role": "media",
+   "bytes": 217112,
+   "sha256": "509016f1be46576d6b9a51eaa8c456bad7977ba88e23e5bb416e87f9da76c4c8",
+   "source": "r2 output in work/braindrift/out for the highest-load PVS test person, renamed to a neutral id (the original file name carries a dataset subject id and is not shipped)",
+   "credit": "Derived from OpenNeuro ds005595 (Chai et al., HCP-Aging PVS masks, CC0, doi 10.18112/openneuro.ds005595.v1.0.0); supported by the National Institute on Aging of the NIH under Award Number U01AG052564; brain-masked only, no face",
+   "note": "same 12 slices, expert PVS overlay"
+  },
+  {
+   "path": "meta/braindrift.json",
+   "role": "meta",
+   "bytes": 22824,
+   "sha256": "ad4ececdecc4e3471f9bd21bec6bc68ba4b85faf2b33cc9ba8850e730464e9db",
+   "source": "derived (r3) from work/braindrift/out/bd_flight.json, bd_pvs.json, bd_reference.json, bd_metrics.json, bd_realcheck.json, bd_assets.json",
+   "credit": "Team SuperHumans; numbers from the r2 runs; neutral ids only (no subject ids, ages or sexes); citations inside",
+   "note": "samples, stored readouts, simulation recipe and citations, reference distributions (199 PVS volumes, 414 ventricle volumes), metrics, repeat-scan summary"
+  },
+  {
+   "path": "parity/ref_f000_k104_softmax.f32",
+   "role": "meta",
+   "bytes": 743424,
+   "sha256": "159234b7d9c50fe1368833ea26204b1f7811ee0c9b6692ae8731e099b5664a2f",
+   "source": "generated r3 with onnxruntime 1.32 CPU (Python) from work/braindrift/out/braindrift_anat.onnx + flight frames, browser slice rule",
+   "credit": "Team SuperHumans",
+   "note": "parity reference only (softmax [6,176,176] float32 LE of coronal slice 104 of flight f000); not needed by screens"
+  },
+  {
+   "path": "parity/ref_f000_top.f32",
+   "role": "meta",
+   "bytes": 146432,
+   "sha256": "428905635442363c970275674688b5ee61c7fa8115c4f51615b62f8150fdcdf1",
+   "source": "generated r3 with onnxruntime 1.32 CPU (Python) from work/braindrift/out/braindrift_anat.onnx + flight frames, browser slice rule",
+   "credit": "Team SuperHumans",
+   "note": "parity reference only (top-surface height [176,208] float32 LE of flight f000 (-1 = none)); not needed by screens"
+  },
+  {
+   "path": "parity/ref_f100_top.f32",
+   "role": "meta",
+   "bytes": 146432,
+   "sha256": "6b982e723fa9761e09309fc2c0fc40634ee399e044ddb0675219364b6c3d939f",
+   "source": "generated r3 with onnxruntime 1.32 CPU (Python) from work/braindrift/out/braindrift_anat.onnx + flight frames, browser slice rule",
+   "credit": "Team SuperHumans",
+   "note": "parity reference only (top-surface height [176,208] float32 LE of flight f100 (-1 = none)); not needed by screens"
+  }
+ ]
+}

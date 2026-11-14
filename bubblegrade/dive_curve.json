@@ -1,0 +1,441 @@
+{
+"diver": "one diver from the shipped model's test fold (fold 4), one study",
+"source": "out-of-fold outputs of the shipped model (rotation 4) on its test fold",
+"tau": 0.0853833860717713,
+"nClips": 54,
+"nTimes": 7,
+"points": [
+{
+"minutesAfterSurfacing": 9.0,
+"site": "SC",
+"technicianGrade": 0,
+"E": 0.1125,
+"A": 0.0087,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 9.0,
+"site": "SC",
+"technicianGrade": 1,
+"E": 0.047,
+"A": 0.0035,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 9.0,
+"site": "SC",
+"technicianGrade": 1,
+"E": 0.2015,
+"A": 0.0186,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 9.0,
+"site": "PC",
+"technicianGrade": 0,
+"E": 0.729,
+"A": 0.0768,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 9.0,
+"site": "PC",
+"technicianGrade": 2,
+"E": 0.3786,
+"A": 0.0409,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 9.0,
+"site": "PC",
+"technicianGrade": 2,
+"E": 1.3919,
+"A": 0.2532,
+"g": 1
+},
+{
+"minutesAfterSurfacing": 9.0,
+"site": "PC",
+"technicianGrade": 2,
+"E": 2.0017,
+"A": 0.4456,
+"g": 2
+},
+{
+"minutesAfterSurfacing": 9.0,
+"site": "PC",
+"technicianGrade": 2,
+"E": 1.5652,
+"A": 0.2908,
+"g": 2
+},
+{
+"minutesAfterSurfacing": 43.0,
+"site": "SC",
+"technicianGrade": 1,
+"E": 1.38,
+"A": 0.2101,
+"g": 1
+},
+{
+"minutesAfterSurfacing": 43.0,
+"site": "SC",
+"technicianGrade": 1,
+"E": 0.4601,
+"A": 0.0463,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 43.0,
+"site": "SC",
+"technicianGrade": 2,
+"E": 1.3305,
+"A": 0.1945,
+"g": 1
+},
+{
+"minutesAfterSurfacing": 43.0,
+"site": "PC",
+"technicianGrade": 3,
+"E": 1.7633,
+"A": 0.3512,
+"g": 2
+},
+{
+"minutesAfterSurfacing": 43.0,
+"site": "PC",
+"technicianGrade": 3,
+"E": 3.3409,
+"A": 0.9321,
+"g": 3
+},
+{
+"minutesAfterSurfacing": 43.0,
+"site": "PC",
+"technicianGrade": 3,
+"E": 3.3894,
+"A": 0.9338,
+"g": 3
+},
+{
+"minutesAfterSurfacing": 43.0,
+"site": "PC",
+"technicianGrade": 1,
+"E": 3.357,
+"A": 0.9277,
+"g": 3
+},
+{
+"minutesAfterSurfacing": 78.0,
+"site": "SC",
+"technicianGrade": 0,
+"E": 0.0897,
+"A": 0.0074,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 78.0,
+"site": "SC",
+"technicianGrade": 1,
+"E": 0.0835,
+"A": 0.0064,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 78.0,
+"site": "SC",
+"technicianGrade": 1,
+"E": 0.5218,
+"A": 0.0562,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 78.0,
+"site": "PC",
+"technicianGrade": 2,
+"E": 0.8154,
+"A": 0.0903,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 78.0,
+"site": "PC",
+"technicianGrade": 3,
+"E": 1.6951,
+"A": 0.3894,
+"g": 2
+},
+{
+"minutesAfterSurfacing": 78.0,
+"site": "PC",
+"technicianGrade": 3,
+"E": 3.1056,
+"A": 0.8651,
+"g": 3
+},
+{
+"minutesAfterSurfacing": 78.0,
+"site": "PC",
+"technicianGrade": 3,
+"E": 3.1149,
+"A": 0.8812,
+"g": 3
+},
+{
+"minutesAfterSurfacing": 78.0,
+"site": "PC",
+"technicianGrade": 3,
+"E": 3.0516,
+"A": 0.8581,
+"g": 3
+},
+{
+"minutesAfterSurfacing": 78.0,
+"site": "PC",
+"technicianGrade": 1,
+"E": 3.3773,
+"A": 0.936,
+"g": 3
+},
+{
+"minutesAfterSurfacing": 128.0,
+"site": "SC",
+"technicianGrade": 1,
+"E": 0.2549,
+"A": 0.0298,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 128.0,
+"site": "SC",
+"technicianGrade": 0,
+"E": 0.0803,
+"A": 0.0063,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 128.0,
+"site": "SC",
+"technicianGrade": 0,
+"E": 0.0469,
+"A": 0.0035,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 128.0,
+"site": "PC",
+"technicianGrade": 2,
+"E": 1.2019,
+"A": 0.2085,
+"g": 1
+},
+{
+"minutesAfterSurfacing": 128.0,
+"site": "PC",
+"technicianGrade": 3,
+"E": 2.4717,
+"A": 0.6228,
+"g": 3
+},
+{
+"minutesAfterSurfacing": 128.0,
+"site": "PC",
+"technicianGrade": 3,
+"E": 2.7221,
+"A": 0.7313,
+"g": 3
+},
+{
+"minutesAfterSurfacing": 200.0,
+"site": "SC",
+"technicianGrade": 0,
+"E": 2.4958,
+"A": 0.6271,
+"g": 3
+},
+{
+"minutesAfterSurfacing": 200.0,
+"site": "SC",
+"technicianGrade": 0,
+"E": 0.0403,
+"A": 0.003,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 200.0,
+"site": "SC",
+"technicianGrade": 1,
+"E": 0.1209,
+"A": 0.0094,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 200.0,
+"site": "PC",
+"technicianGrade": 1,
+"E": 0.0731,
+"A": 0.0057,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 200.0,
+"site": "PC",
+"technicianGrade": 2,
+"E": 0.308,
+"A": 0.041,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 200.0,
+"site": "PC",
+"technicianGrade": 2,
+"E": 0.3234,
+"A": 0.0367,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 200.0,
+"site": "PC",
+"technicianGrade": 0,
+"E": 1.1173,
+"A": 0.1753,
+"g": 1
+},
+{
+"minutesAfterSurfacing": 200.0,
+"site": "PC",
+"technicianGrade": 0,
+"E": 0.8643,
+"A": 0.1188,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 262.0,
+"site": "SC",
+"technicianGrade": 0,
+"E": 1.6733,
+"A": 0.2923,
+"g": 2
+},
+{
+"minutesAfterSurfacing": 262.0,
+"site": "SC",
+"technicianGrade": 0,
+"E": 0.0723,
+"A": 0.0055,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 262.0,
+"site": "SC",
+"technicianGrade": 1,
+"E": 0.1049,
+"A": 0.0081,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 262.0,
+"site": "SC",
+"technicianGrade": 0,
+"E": 0.2746,
+"A": 0.0269,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 262.0,
+"site": "PC",
+"technicianGrade": 0,
+"E": 0.0544,
+"A": 0.0041,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 262.0,
+"site": "PC",
+"technicianGrade": 1,
+"E": 0.0321,
+"A": 0.0024,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 262.0,
+"site": "PC",
+"technicianGrade": 0,
+"E": 0.045,
+"A": 0.0034,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 262.0,
+"site": "PC",
+"technicianGrade": 0,
+"E": 0.0081,
+"A": 0.0006,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 321.0,
+"site": "SC",
+"technicianGrade": 0,
+"E": 0.0142,
+"A": 0.001,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 321.0,
+"site": "SC",
+"technicianGrade": 0,
+"E": 0.0783,
+"A": 0.006,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 321.0,
+"site": "SC",
+"technicianGrade": 0,
+"E": 0.0414,
+"A": 0.0031,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 321.0,
+"site": "SC",
+"technicianGrade": 0,
+"E": 0.0478,
+"A": 0.0036,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 321.0,
+"site": "PC",
+"technicianGrade": 0,
+"E": 0.1513,
+"A": 0.0122,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 321.0,
+"site": "PC",
+"technicianGrade": 0,
+"E": 0.1103,
+"A": 0.0086,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 321.0,
+"site": "PC",
+"technicianGrade": 0,
+"E": 0.0676,
+"A": 0.0052,
+"g": 0
+},
+{
+"minutesAfterSurfacing": 321.0,
+"site": "PC",
+"technicianGrade": 0,
+"E": 0.0185,
+"A": 0.0014,
+"g": 0
+}
+]
+}

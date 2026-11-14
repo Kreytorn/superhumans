@@ -1,0 +1,68 @@
+{
+ "module": "garnmeter",
+ "label": "Garn Meter",
+ "tier": "C",
+ "files": [
+  {
+   "path": "models/garn.onnx",
+   "bytes": 522182,
+   "sha256": "0a933015d0d5ff234d4f8d4615c3710eabe6d99044596b4f1be8007e4275e828",
+   "role": "model",
+   "what": "CorrFuse-EEG, opset 17, input eeg float32 [N,14,512], outputs p_cum [N,3], garn [N,1], coupling [N,14,14]",
+   "source": "work/GarnMeter/out/garn.onnx",
+   "licence": "MIT (project licence)",
+   "credit": "CorrFuse-EEG by team SuperHumans: CorrFuse (a team member's own prior code, first written June 2026 for TEKNOFEST 2026 Healthcare-AI ECG, not built for Space Apps), adapted to 14-channel EEG; trained on the Hacettepe data above. Methods: S4D (Gu et al. 2022), GSS (Mehta et al. 2023), GeM (Radenovic et al. 2019), CORAL (Cao et al. 2020)."
+  },
+  {
+   "path": "demo/session_eeg.bin",
+   "bytes": 1605632,
+   "sha256": "52234dc31fc91aab09537917c192d8a06e56573f9547242fc78bd0d1e5b0caa4",
+   "role": "input",
+   "what": "float32 LE channel-major [14][28672] microvolts at 128 Hz after 1-45 Hz band-pass + 50 Hz notch: 8 s baseline + 27 trials x 8 s",
+   "source": "work/GarnMeter/out/garn_demo_user19_s3.bin",
+   "licence": "no licence stated by the dataset authors; cited",
+   "credit": "Hacettepe VR-sickness EEG: Ozkan, Uyan & Celikcan 2023, Displays, DOI 10.1016/j.displa.2023.102415; Uyan & Celikcan 2024, Displays, DOI 10.1016/j.displa.2024.102704. No licence stated; cited as the authors request. One anonymised 224 s excerpt (test person USER19, session 3)."
+  },
+  {
+   "path": "demo/session.json",
+   "bytes": 4181,
+   "sha256": "e23d58561c172c190dfe490c18ba485731174941eddd6cfc631adca96024aef8",
+   "role": "meta",
+   "what": "channels, sigma_c, trial table (cue, level, reported IDS, reported Garn), electrode 2-D positions, cut-offs",
+   "source": "work/GarnMeter/out/garn_demo_user19_s3.json (file names neutralised)",
+   "licence": "no licence stated by the dataset authors; cited",
+   "credit": "Hacettepe VR-sickness EEG: Ozkan, Uyan & Celikcan 2023, Displays, DOI 10.1016/j.displa.2023.102415; Uyan & Celikcan 2024, Displays, DOI 10.1016/j.displa.2024.102704. No licence stated; cited as the authors request. One anonymised 224 s excerpt (test person USER19, session 3)."
+  },
+  {
+   "path": "precomputed/outputs.json.gz",
+   "bytes": 138738,
+   "sha256": "f3134a8e3498bbb2a1245c273829e9457f91844951b3ed751c62c692b497841b",
+   "role": "precomputed",
+   "what": "PyTorch outputs (p_cum, garn, coupling) for the 243 demo windows + the calibration reference window; replay and parity reference",
+   "source": "work/GarnMeter/out/garn_demo_outputs.json (gzip)",
+   "licence": "MIT (project licence)",
+   "credit": "CorrFuse-EEG by team SuperHumans: CorrFuse (a team member's own prior code, first written June 2026 for TEKNOFEST 2026 Healthcare-AI ECG, not built for Space Apps), adapted to 14-channel EEG; trained on the Hacettepe data above. Methods: S4D (Gu et al. 2022), GSS (Mehta et al. 2023), GeM (Radenovic et al. 2019), CORAL (Cao et al. 2020)."
+  },
+  {
+   "path": "precomputed/topomap.json.gz",
+   "bytes": 18771,
+   "sha256": "48414e08129a662391c6b2d04a8b5abe8f814d44b7a31c0a083270507ba05166",
+   "role": "precomputed",
+   "what": "measurements, not model output: theta and gamma log10 relative power minus baseline, per channel, per window",
+   "source": "work/GarnMeter/out/garn_topomap_user19_s3.json (gzip)",
+   "licence": "MIT (project licence)",
+   "credit": "Hacettepe VR-sickness EEG: Ozkan, Uyan & Celikcan 2023, Displays, DOI 10.1016/j.displa.2023.102415; Uyan & Celikcan 2024, Displays, DOI 10.1016/j.displa.2024.102704. No licence stated; cited as the authors request. One anonymised 224 s excerpt (test person USER19, session 3)."
+  },
+  {
+   "path": "card.json",
+   "bytes": 14213,
+   "sha256": "13d70400677a472b5d4d12ebdc440ea98025be007e9bacf243ffe95ad85620aa",
+   "role": "meta",
+   "what": "result card: tier, both networks M1-M4, floor, scene-only reference, cut-offs, pooled ROC curves, out-of-fold garn by IDS",
+   "source": "derived from work/GarnMeter/out/garn_metrics.json + garn_oof.csv (no person ids)",
+   "licence": "MIT (project licence)",
+   "credit": "CorrFuse-EEG by team SuperHumans: CorrFuse (a team member's own prior code, first written June 2026 for TEKNOFEST 2026 Healthcare-AI ECG, not built for Space Apps), adapted to 14-channel EEG; trained on the Hacettepe data above. Methods: S4D (Gu et al. 2022), GSS (Mehta et al. 2023), GeM (Radenovic et al. 2019), CORAL (Cao et al. 2020)."
+  }
+ ],
+ "total_bytes": 2303717
+}

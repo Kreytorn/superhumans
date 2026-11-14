@@ -1,0 +1,1089 @@
+{
+ "thumb_px": 64,
+ "severity_range": [
+  0,
+  4
+ ],
+ "cells": [
+  {
+   "file": "strip/00.png",
+   "field": 80,
+   "inst_id": 24,
+   "fold": 0,
+   "class": 0,
+   "class_name": "Disc",
+   "border": false,
+   "probs": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "severity": 0.0
+  },
+  {
+   "file": "strip/01.png",
+   "field": 104,
+   "inst_id": 13,
+   "fold": 3,
+   "class": 0,
+   "class_name": "Disc",
+   "border": false,
+   "probs": [
+    0.9498,
+    0.0004,
+    0.0001,
+    0.001,
+    0.009,
+    0.0398
+   ],
+   "severity": 0.0412
+  },
+  {
+   "file": "strip/02.png",
+   "field": 167,
+   "inst_id": 14,
+   "fold": 3,
+   "class": 0,
+   "class_name": "Disc",
+   "border": false,
+   "probs": [
+    0.9441,
+    0.0136,
+    0.0094,
+    0.0117,
+    0.0171,
+    0.0041
+   ],
+   "severity": 0.1363
+  },
+  {
+   "file": "strip/03.png",
+   "field": 169,
+   "inst_id": 10,
+   "fold": 4,
+   "class": 0,
+   "class_name": "Disc",
+   "border": false,
+   "probs": [
+    0.9163,
+    0.0136,
+    0.0097,
+    0.0178,
+    0.0285,
+    0.014
+   ],
+   "severity": 0.2034
+  },
+  {
+   "file": "strip/04.png",
+   "field": 122,
+   "inst_id": 49,
+   "fold": 4,
+   "class": 0,
+   "class_name": "Disc",
+   "border": false,
+   "probs": [
+    0.8978,
+    0.0121,
+    0.013,
+    0.0233,
+    0.0399,
+    0.0139
+   ],
+   "severity": 0.2712
+  },
+  {
+   "file": "strip/05.png",
+   "field": 109,
+   "inst_id": 15,
+   "fold": 0,
+   "class": 1,
+   "class_name": "E1",
+   "border": false,
+   "probs": [
+    0.8303,
+    0.0391,
+    0.0423,
+    0.0211,
+    0.0353,
+    0.0319
+   ],
+   "severity": 0.339
+  },
+  {
+   "file": "strip/06.png",
+   "field": 121,
+   "inst_id": 15,
+   "fold": 0,
+   "class": 0,
+   "class_name": "Disc",
+   "border": false,
+   "probs": [
+    0.8157,
+    0.0626,
+    0.0202,
+    0.0265,
+    0.0539,
+    0.021
+   ],
+   "severity": 0.4068
+  },
+  {
+   "file": "strip/07.png",
+   "field": 35,
+   "inst_id": 18,
+   "fold": 0,
+   "class": 0,
+   "class_name": "Disc",
+   "border": false,
+   "probs": [
+    0.7595,
+    0.1214,
+    0.0146,
+    0.0292,
+    0.0569,
+    0.0183
+   ],
+   "severity": 0.4746
+  },
+  {
+   "file": "strip/08.png",
+   "field": 91,
+   "inst_id": 36,
+   "fold": 1,
+   "class": 0,
+   "class_name": "Disc",
+   "border": false,
+   "probs": [
+    0.7014,
+    0.1693,
+    0.0219,
+    0.0271,
+    0.059,
+    0.0214
+   ],
+   "severity": 0.5418
+  },
+  {
+   "file": "strip/09.png",
+   "field": 55,
+   "inst_id": 5,
+   "fold": 2,
+   "class": 1,
+   "class_name": "E1",
+   "border": false,
+   "probs": [
+    0.6806,
+    0.0519,
+    0.0369,
+    0.0244,
+    0.0846,
+    0.1216
+   ],
+   "severity": 0.6113
+  },
+  {
+   "file": "strip/10.png",
+   "field": 70,
+   "inst_id": 1,
+   "fold": 0,
+   "class": 0,
+   "class_name": "Disc",
+   "border": false,
+   "probs": [
+    0.6138,
+    0.2421,
+    0.0213,
+    0.0314,
+    0.0715,
+    0.02
+   ],
+   "severity": 0.6783
+  },
+  {
+   "file": "strip/11.png",
+   "field": 181,
+   "inst_id": 50,
+   "fold": 1,
+   "class": 0,
+   "class_name": "Disc",
+   "border": false,
+   "probs": [
+    0.2613,
+    0.0117,
+    0.0129,
+    0.0236,
+    0.0377,
+    0.6529
+   ],
+   "severity": 0.746
+  },
+  {
+   "file": "strip/12.png",
+   "field": 133,
+   "inst_id": 33,
+   "fold": 1,
+   "class": 0,
+   "class_name": "Disc",
+   "border": false,
+   "probs": [
+    0.3516,
+    0.5553,
+    0.025,
+    0.0192,
+    0.0348,
+    0.014
+   ],
+   "severity": 0.8138
+  },
+  {
+   "file": "strip/13.png",
+   "field": 147,
+   "inst_id": 15,
+   "fold": 4,
+   "class": 0,
+   "class_name": "Disc",
+   "border": false,
+   "probs": [
+    0.7336,
+    0.0306,
+    0.0131,
+    0.0218,
+    0.1867,
+    0.0142
+   ],
+   "severity": 0.8815
+  },
+  {
+   "file": "strip/14.png",
+   "field": 174,
+   "inst_id": 48,
+   "fold": 2,
+   "class": 1,
+   "class_name": "E1",
+   "border": false,
+   "probs": [
+    0.1598,
+    0.7772,
+    0.0126,
+    0.016,
+    0.0217,
+    0.0127
+   ],
+   "severity": 0.9492
+  },
+  {
+   "file": "strip/15.png",
+   "field": 172,
+   "inst_id": 25,
+   "fold": 3,
+   "class": 1,
+   "class_name": "E1",
+   "border": false,
+   "probs": [
+    0.1187,
+    0.7764,
+    0.0608,
+    0.014,
+    0.0157,
+    0.0145
+   ],
+   "severity": 1.0174
+  },
+  {
+   "file": "strip/16.png",
+   "field": 70,
+   "inst_id": 5,
+   "fold": 0,
+   "class": 1,
+   "class_name": "E1",
+   "border": false,
+   "probs": [
+    0.0631,
+    0.8485,
+    0.0391,
+    0.0127,
+    0.0276,
+    0.009
+   ],
+   "severity": 1.0849
+  },
+  {
+   "file": "strip/17.png",
+   "field": 86,
+   "inst_id": 2,
+   "fold": 0,
+   "class": 1,
+   "class_name": "E1",
+   "border": false,
+   "probs": [
+    0.0422,
+    0.8098,
+    0.1061,
+    0.0166,
+    0.0189,
+    0.0063
+   ],
+   "severity": 1.1547
+  },
+  {
+   "file": "strip/18.png",
+   "field": 70,
+   "inst_id": 41,
+   "fold": 0,
+   "class": 1,
+   "class_name": "E1",
+   "border": false,
+   "probs": [
+    0.035,
+    0.7643,
+    0.1501,
+    0.015,
+    0.0251,
+    0.0105
+   ],
+   "severity": 1.2226
+  },
+  {
+   "file": "strip/19.png",
+   "field": 116,
+   "inst_id": 19,
+   "fold": 2,
+   "class": 1,
+   "class_name": "E1",
+   "border": false,
+   "probs": [
+    0.0112,
+    0.7527,
+    0.1908,
+    0.0097,
+    0.0297,
+    0.0059
+   ],
+   "severity": 1.2897
+  },
+  {
+   "file": "strip/20.png",
+   "field": 34,
+   "inst_id": 13,
+   "fold": 4,
+   "class": 1,
+   "class_name": "E1",
+   "border": false,
+   "probs": [
+    0.0259,
+    0.6315,
+    0.317,
+    0.0049,
+    0.017,
+    0.0038
+   ],
+   "severity": 1.3531
+  },
+  {
+   "file": "strip/21.png",
+   "field": 172,
+   "inst_id": 19,
+   "fold": 3,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0382,
+    0.5529,
+    0.3691,
+    0.0078,
+    0.0253,
+    0.0067
+   ],
+   "severity": 1.4252
+  },
+  {
+   "file": "strip/22.png",
+   "field": 172,
+   "inst_id": 12,
+   "fold": 3,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0311,
+    0.5426,
+    0.3599,
+    0.0211,
+    0.0383,
+    0.007
+   ],
+   "severity": 1.4892
+  },
+  {
+   "file": "strip/23.png",
+   "field": 133,
+   "inst_id": 12,
+   "fold": 1,
+   "class": 1,
+   "class_name": "E1",
+   "border": false,
+   "probs": [
+    0.1002,
+    0.2973,
+    0.5473,
+    0.0241,
+    0.0195,
+    0.0117
+   ],
+   "severity": 1.5603
+  },
+  {
+   "file": "strip/24.png",
+   "field": 60,
+   "inst_id": 1,
+   "fold": 0,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0143,
+    0.3875,
+    0.5626,
+    0.0111,
+    0.0174,
+    0.0069
+   ],
+   "severity": 1.6272
+  },
+  {
+   "file": "strip/25.png",
+   "field": 128,
+   "inst_id": 39,
+   "fold": 1,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0031,
+    0.3565,
+    0.5977,
+    0.02,
+    0.0189,
+    0.0038
+   ],
+   "severity": 1.6939
+  },
+  {
+   "file": "strip/26.png",
+   "field": 85,
+   "inst_id": 14,
+   "fold": 4,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0087,
+    0.3259,
+    0.5773,
+    0.0414,
+    0.0352,
+    0.0115
+   ],
+   "severity": 1.7658
+  },
+  {
+   "file": "strip/27.png",
+   "field": 118,
+   "inst_id": 22,
+   "fold": 1,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0257,
+    0.1751,
+    0.7598,
+    0.0117,
+    0.0241,
+    0.0035
+   ],
+   "severity": 1.8329
+  },
+  {
+   "file": "strip/28.png",
+   "field": 77,
+   "inst_id": 32,
+   "fold": 3,
+   "class": 1,
+   "class_name": "E1",
+   "border": false,
+   "probs": [
+    0.0188,
+    0.1734,
+    0.7243,
+    0.0411,
+    0.036,
+    0.0063
+   ],
+   "severity": 1.9014
+  },
+  {
+   "file": "strip/29.png",
+   "field": 84,
+   "inst_id": 4,
+   "fold": 0,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0054,
+    0.114,
+    0.8083,
+    0.0368,
+    0.0272,
+    0.0083
+   ],
+   "severity": 1.9661
+  },
+  {
+   "file": "strip/30.png",
+   "field": 94,
+   "inst_id": 13,
+   "fold": 4,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0017,
+    0.0055,
+    0.9531,
+    0.0331,
+    0.0048,
+    0.0017
+   ],
+   "severity": 2.0339
+  },
+  {
+   "file": "strip/31.png",
+   "field": 94,
+   "inst_id": 6,
+   "fold": 4,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0011,
+    0.0039,
+    0.8923,
+    0.0939,
+    0.0059,
+    0.0028
+   ],
+   "severity": 2.1
+  },
+  {
+   "file": "strip/32.png",
+   "field": 89,
+   "inst_id": 22,
+   "fold": 1,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0022,
+    0.0399,
+    0.7557,
+    0.1816,
+    0.0156,
+    0.005
+   ],
+   "severity": 2.1693
+  },
+  {
+   "file": "strip/33.png",
+   "field": 146,
+   "inst_id": 13,
+   "fold": 1,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.006,
+    0.0102,
+    0.7245,
+    0.2462,
+    0.0066,
+    0.0065
+   ],
+   "severity": 2.239
+  },
+  {
+   "file": "strip/34.png",
+   "field": 38,
+   "inst_id": 29,
+   "fold": 2,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0197,
+    0.0223,
+    0.6158,
+    0.3146,
+    0.0196,
+    0.008
+   ],
+   "severity": 2.2944
+  },
+  {
+   "file": "strip/35.png",
+   "field": 141,
+   "inst_id": 19,
+   "fold": 0,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0032,
+    0.0138,
+    0.6126,
+    0.3448,
+    0.0179,
+    0.0077
+   ],
+   "severity": 2.363
+  },
+  {
+   "file": "strip/36.png",
+   "field": 40,
+   "inst_id": 35,
+   "fold": 3,
+   "class": 3,
+   "class_name": "E3",
+   "border": false,
+   "probs": [
+    0.0028,
+    0.0056,
+    0.55,
+    0.42,
+    0.0168,
+    0.0048
+   ],
+   "severity": 2.4445
+  },
+  {
+   "file": "strip/37.png",
+   "field": 173,
+   "inst_id": 9,
+   "fold": 0,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0033,
+    0.0095,
+    0.4745,
+    0.4884,
+    0.0159,
+    0.0084
+   ],
+   "severity": 2.5086
+  },
+  {
+   "file": "strip/38.png",
+   "field": 170,
+   "inst_id": 22,
+   "fold": 2,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0006,
+    0.0016,
+    0.4192,
+    0.5653,
+    0.0107,
+    0.0026
+   ],
+   "severity": 2.5854
+  },
+  {
+   "file": "strip/39.png",
+   "field": 60,
+   "inst_id": 7,
+   "fold": 0,
+   "class": 2,
+   "class_name": "E2",
+   "border": false,
+   "probs": [
+    0.0028,
+    0.0044,
+    0.3471,
+    0.6318,
+    0.0096,
+    0.0042
+   ],
+   "severity": 2.6436
+  },
+  {
+   "file": "strip/40.png",
+   "field": 128,
+   "inst_id": 24,
+   "fold": 1,
+   "class": 3,
+   "class_name": "E3",
+   "border": false,
+   "probs": [
+    0.0005,
+    0.0012,
+    0.2861,
+    0.707,
+    0.0039,
+    0.0012
+   ],
+   "severity": 2.7134
+  },
+  {
+   "file": "strip/41.png",
+   "field": 155,
+   "inst_id": 4,
+   "fold": 3,
+   "class": 3,
+   "class_name": "E3",
+   "border": false,
+   "probs": [
+    0.0043,
+    0.0061,
+    0.21,
+    0.7527,
+    0.0213,
+    0.0055
+   ],
+   "severity": 2.7851
+  },
+  {
+   "file": "strip/42.png",
+   "field": 89,
+   "inst_id": 26,
+   "fold": 1,
+   "class": 3,
+   "class_name": "E3",
+   "border": false,
+   "probs": [
+    0.0018,
+    0.0025,
+    0.1482,
+    0.8392,
+    0.007,
+    0.0012
+   ],
+   "severity": 2.8482
+  },
+  {
+   "file": "strip/43.png",
+   "field": 155,
+   "inst_id": 14,
+   "fold": 3,
+   "class": 3,
+   "class_name": "E3",
+   "border": false,
+   "probs": [
+    0.023,
+    0.0199,
+    0.0153,
+    0.8835,
+    0.041,
+    0.0174
+   ],
+   "severity": 2.9155
+  },
+  {
+   "file": "strip/44.png",
+   "field": 170,
+   "inst_id": 1,
+   "fold": 2,
+   "class": 3,
+   "class_name": "E3",
+   "border": false,
+   "probs": [
+    0.0006,
+    0.0006,
+    0.019,
+    0.9754,
+    0.0038,
+    0.0006
+   ],
+   "severity": 2.9819
+  },
+  {
+   "file": "strip/45.png",
+   "field": 94,
+   "inst_id": 20,
+   "fold": 4,
+   "class": 3,
+   "class_name": "E3",
+   "border": false,
+   "probs": [
+    0.0079,
+    0.0012,
+    0.0192,
+    0.8183,
+    0.0697,
+    0.0838
+   ],
+   "severity": 3.0268
+  },
+  {
+   "file": "strip/46.png",
+   "field": 96,
+   "inst_id": 2,
+   "fold": 0,
+   "class": 4,
+   "class_name": "E4",
+   "border": false,
+   "probs": [
+    0.1614,
+    0.0765,
+    0.0268,
+    0.0182,
+    0.7068,
+    0.0103
+   ],
+   "severity": 3.0434
+  },
+  {
+   "file": "strip/47.png",
+   "field": 96,
+   "inst_id": 8,
+   "fold": 0,
+   "class": 4,
+   "class_name": "E4",
+   "border": false,
+   "probs": [
+    0.1339,
+    0.0293,
+    0.0166,
+    0.0233,
+    0.7841,
+    0.0128
+   ],
+   "severity": 3.3113
+  },
+  {
+   "file": "strip/48.png",
+   "field": 39,
+   "inst_id": 35,
+   "fold": 3,
+   "class": 4,
+   "class_name": "E4",
+   "border": false,
+   "probs": [
+    0.1188,
+    0.0277,
+    0.0247,
+    0.0314,
+    0.7401,
+    0.0573
+   ],
+   "severity": 3.322
+  },
+  {
+   "file": "strip/49.png",
+   "field": 94,
+   "inst_id": 27,
+   "fold": 4,
+   "class": 4,
+   "class_name": "E4",
+   "border": false,
+   "probs": [
+    0.0823,
+    0.0248,
+    0.0134,
+    0.0072,
+    0.8648,
+    0.0076
+   ],
+   "severity": 3.5591
+  },
+  {
+   "file": "strip/50.png",
+   "field": 96,
+   "inst_id": 44,
+   "fold": 0,
+   "class": 4,
+   "class_name": "E4",
+   "border": false,
+   "probs": [
+    0.0835,
+    0.016,
+    0.0045,
+    0.0079,
+    0.8843,
+    0.0038
+   ],
+   "severity": 3.5996
+  },
+  {
+   "file": "strip/51.png",
+   "field": 149,
+   "inst_id": 12,
+   "fold": 2,
+   "class": 4,
+   "class_name": "E4",
+   "border": false,
+   "probs": [
+    0.0789,
+    0.0022,
+    0.0014,
+    0.0055,
+    0.9085,
+    0.0034
+   ],
+   "severity": 3.6681
+  },
+  {
+   "file": "strip/52.png",
+   "field": 39,
+   "inst_id": 20,
+   "fold": 3,
+   "class": 4,
+   "class_name": "E4",
+   "border": false,
+   "probs": [
+    0.0564,
+    0.0149,
+    0.0099,
+    0.006,
+    0.9119,
+    0.0009
+   ],
+   "severity": 3.7035
+  },
+  {
+   "file": "strip/53.png",
+   "field": 94,
+   "inst_id": 25,
+   "fold": 4,
+   "class": 4,
+   "class_name": "E4",
+   "border": false,
+   "probs": [
+    0.0575,
+    0.003,
+    0.0032,
+    0.0052,
+    0.924,
+    0.0072
+   ],
+   "severity": 3.7479
+  },
+  {
+   "file": "strip/54.png",
+   "field": 157,
+   "inst_id": 38,
+   "fold": 4,
+   "class": 4,
+   "class_name": "E4",
+   "border": false,
+   "probs": [
+    0.052,
+    0.0054,
+    0.0057,
+    0.003,
+    0.9316,
+    0.0024
+   ],
+   "severity": 3.7609
+  },
+  {
+   "file": "strip/55.png",
+   "field": 149,
+   "inst_id": 33,
+   "fold": 2,
+   "class": 4,
+   "class_name": "E4",
+   "border": false,
+   "probs": [
+    0.0485,
+    0.0009,
+    0.0008,
+    0.0048,
+    0.9423,
+    0.0027
+   ],
+   "severity": 3.7965
+  },
+  {
+   "file": "strip/56.png",
+   "field": 133,
+   "inst_id": 17,
+   "fold": 1,
+   "class": 4,
+   "class_name": "E4",
+   "border": false,
+   "probs": [
+    0.0251,
+    0.0007,
+    0.0007,
+    0.0047,
+    0.9673,
+    0.0014
+   ],
+   "severity": 3.8911
+  },
+  {
+   "file": "strip/57.png",
+   "field": 96,
+   "inst_id": 13,
+   "fold": 0,
+   "class": 4,
+   "class_name": "E4",
+   "border": false,
+   "probs": [
+    0.0228,
+    0.0031,
+    0.0007,
+    0.0023,
+    0.9694,
+    0.0016
+   ],
+   "severity": 3.8955
+  },
+  {
+   "file": "strip/58.png",
+   "field": 96,
+   "inst_id": 41,
+   "fold": 0,
+   "class": 4,
+   "class_name": "E4",
+   "border": false,
+   "probs": [
+    0.0142,
+    0.0014,
+    0.0006,
+    0.0016,
+    0.9819,
+    0.0003
+   ],
+   "severity": 3.9363
+  },
+  {
+   "file": "strip/59.png",
+   "field": 149,
+   "inst_id": 14,
+   "fold": 2,
+   "class": 4,
+   "class_name": "E4",
+   "border": false,
+   "probs": [
+    0.0035,
+    0.0001,
+    0.0002,
+    0.0012,
+    0.9946,
+    0.0004
+   ],
+   "severity": 3.9842
+  }
+ ]
+}

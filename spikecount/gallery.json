@@ -1,0 +1,1386 @@
+{
+ "thumb_px": 64,
+ "crop_px": 96,
+ "classes": {
+  "Disc": [
+   {
+    "file": "gallery/Disc_00.png",
+    "field": 35,
+    "inst_id": 4,
+    "fold": 0,
+    "class": 0,
+    "class_name": "Disc",
+    "border": false,
+    "probs": [
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "severity": 0.0,
+    "confidence": 1.0
+   },
+   {
+    "file": "gallery/Disc_01.png",
+    "field": 35,
+    "inst_id": 5,
+    "fold": 0,
+    "class": 0,
+    "class_name": "Disc",
+    "border": false,
+    "probs": [
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "severity": 0.0,
+    "confidence": 1.0
+   },
+   {
+    "file": "gallery/Disc_02.png",
+    "field": 35,
+    "inst_id": 7,
+    "fold": 0,
+    "class": 0,
+    "class_name": "Disc",
+    "border": false,
+    "probs": [
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "severity": 0.0,
+    "confidence": 1.0
+   },
+   {
+    "file": "gallery/Disc_03.png",
+    "field": 35,
+    "inst_id": 20,
+    "fold": 0,
+    "class": 0,
+    "class_name": "Disc",
+    "border": false,
+    "probs": [
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "severity": 0.0,
+    "confidence": 1.0
+   },
+   {
+    "file": "gallery/Disc_04.png",
+    "field": 74,
+    "inst_id": 30,
+    "fold": 0,
+    "class": 0,
+    "class_name": "Disc",
+    "border": false,
+    "probs": [
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "severity": 0.0,
+    "confidence": 1.0
+   },
+   {
+    "file": "gallery/Disc_05.png",
+    "field": 80,
+    "inst_id": 10,
+    "fold": 0,
+    "class": 0,
+    "class_name": "Disc",
+    "border": false,
+    "probs": [
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "severity": 0.0,
+    "confidence": 1.0
+   },
+   {
+    "file": "gallery/Disc_06.png",
+    "field": 80,
+    "inst_id": 22,
+    "fold": 0,
+    "class": 0,
+    "class_name": "Disc",
+    "border": false,
+    "probs": [
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "severity": 0.0,
+    "confidence": 1.0
+   },
+   {
+    "file": "gallery/Disc_07.png",
+    "field": 80,
+    "inst_id": 24,
+    "fold": 0,
+    "class": 0,
+    "class_name": "Disc",
+    "border": false,
+    "probs": [
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "severity": 0.0,
+    "confidence": 1.0
+   },
+   {
+    "file": "gallery/Disc_08.png",
+    "field": 81,
+    "inst_id": 14,
+    "fold": 0,
+    "class": 0,
+    "class_name": "Disc",
+    "border": false,
+    "probs": [
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "severity": 0.0,
+    "confidence": 1.0
+   },
+   {
+    "file": "gallery/Disc_09.png",
+    "field": 82,
+    "inst_id": 29,
+    "fold": 0,
+    "class": 0,
+    "class_name": "Disc",
+    "border": false,
+    "probs": [
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "severity": 0.0,
+    "confidence": 1.0
+   },
+   {
+    "file": "gallery/Disc_10.png",
+    "field": 83,
+    "inst_id": 9,
+    "fold": 0,
+    "class": 0,
+    "class_name": "Disc",
+    "border": false,
+    "probs": [
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "severity": 0.0,
+    "confidence": 1.0
+   },
+   {
+    "file": "gallery/Disc_11.png",
+    "field": 83,
+    "inst_id": 10,
+    "fold": 0,
+    "class": 0,
+    "class_name": "Disc",
+    "border": false,
+    "probs": [
+     1.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "severity": 0.0,
+    "confidence": 1.0
+   }
+  ],
+  "E1": [
+   {
+    "file": "gallery/E1_00.png",
+    "field": 83,
+    "inst_id": 18,
+    "fold": 0,
+    "class": 1,
+    "class_name": "E1",
+    "border": false,
+    "probs": [
+     0.0163,
+     0.9143,
+     0.0451,
+     0.0071,
+     0.0128,
+     0.0043
+    ],
+    "severity": 1.0819,
+    "confidence": 0.9143
+   },
+   {
+    "file": "gallery/E1_01.png",
+    "field": 101,
+    "inst_id": 13,
+    "fold": 0,
+    "class": 1,
+    "class_name": "E1",
+    "border": false,
+    "probs": [
+     0.0392,
+     0.9137,
+     0.0169,
+     0.0087,
+     0.0154,
+     0.0061
+    ],
+    "severity": 1.0416,
+    "confidence": 0.9137
+   },
+   {
+    "file": "gallery/E1_02.png",
+    "field": 141,
+    "inst_id": 28,
+    "fold": 0,
+    "class": 1,
+    "class_name": "E1",
+    "border": false,
+    "probs": [
+     0.0339,
+     0.9106,
+     0.0227,
+     0.0093,
+     0.0165,
+     0.0069
+    ],
+    "severity": 1.0572,
+    "confidence": 0.9106
+   },
+   {
+    "file": "gallery/E1_03.png",
+    "field": 121,
+    "inst_id": 4,
+    "fold": 0,
+    "class": 1,
+    "class_name": "E1",
+    "border": false,
+    "probs": [
+     0.0193,
+     0.8962,
+     0.0565,
+     0.0075,
+     0.0155,
+     0.005
+    ],
+    "severity": 1.0992,
+    "confidence": 0.8962
+   },
+   {
+    "file": "gallery/E1_04.png",
+    "field": 107,
+    "inst_id": 38,
+    "fold": 0,
+    "class": 1,
+    "class_name": "E1",
+    "border": false,
+    "probs": [
+     0.0313,
+     0.896,
+     0.0352,
+     0.0076,
+     0.0206,
+     0.0094
+    ],
+    "severity": 1.0815,
+    "confidence": 0.896
+   },
+   {
+    "file": "gallery/E1_05.png",
+    "field": 74,
+    "inst_id": 8,
+    "fold": 0,
+    "class": 1,
+    "class_name": "E1",
+    "border": false,
+    "probs": [
+     0.0579,
+     0.8941,
+     0.0178,
+     0.0084,
+     0.0147,
+     0.0071
+    ],
+    "severity": 1.021,
+    "confidence": 0.8941
+   },
+   {
+    "file": "gallery/E1_06.png",
+    "field": 107,
+    "inst_id": 2,
+    "fold": 0,
+    "class": 1,
+    "class_name": "E1",
+    "border": false,
+    "probs": [
+     0.0361,
+     0.8938,
+     0.0339,
+     0.0088,
+     0.02,
+     0.0074
+    ],
+    "severity": 1.0759,
+    "confidence": 0.8938
+   },
+   {
+    "file": "gallery/E1_07.png",
+    "field": 121,
+    "inst_id": 18,
+    "fold": 0,
+    "class": 1,
+    "class_name": "E1",
+    "border": false,
+    "probs": [
+     0.0378,
+     0.8938,
+     0.0315,
+     0.0084,
+     0.0207,
+     0.0078
+    ],
+    "severity": 1.0731,
+    "confidence": 0.8938
+   },
+   {
+    "file": "gallery/E1_08.png",
+    "field": 141,
+    "inst_id": 6,
+    "fold": 0,
+    "class": 1,
+    "class_name": "E1",
+    "border": false,
+    "probs": [
+     0.0491,
+     0.8883,
+     0.028,
+     0.0099,
+     0.0182,
+     0.0065
+    ],
+    "severity": 1.0537,
+    "confidence": 0.8883
+   },
+   {
+    "file": "gallery/E1_09.png",
+    "field": 173,
+    "inst_id": 26,
+    "fold": 0,
+    "class": 1,
+    "class_name": "E1",
+    "border": false,
+    "probs": [
+     0.0254,
+     0.887,
+     0.0504,
+     0.0094,
+     0.0195,
+     0.0082
+    ],
+    "severity": 1.1032,
+    "confidence": 0.887
+   },
+   {
+    "file": "gallery/E1_10.png",
+    "field": 107,
+    "inst_id": 27,
+    "fold": 0,
+    "class": 1,
+    "class_name": "E1",
+    "border": false,
+    "probs": [
+     0.0473,
+     0.8868,
+     0.0354,
+     0.0096,
+     0.0151,
+     0.0058
+    ],
+    "severity": 1.0529,
+    "confidence": 0.8868
+   },
+   {
+    "file": "gallery/E1_11.png",
+    "field": 96,
+    "inst_id": 27,
+    "fold": 0,
+    "class": 1,
+    "class_name": "E1",
+    "border": false,
+    "probs": [
+     0.0473,
+     0.884,
+     0.0355,
+     0.008,
+     0.0182,
+     0.007
+    ],
+    "severity": 1.0592,
+    "confidence": 0.884
+   }
+  ],
+  "E2": [
+   {
+    "file": "gallery/E2_00.png",
+    "field": 81,
+    "inst_id": 2,
+    "fold": 0,
+    "class": 2,
+    "class_name": "E2",
+    "border": false,
+    "probs": [
+     0.0045,
+     0.0554,
+     0.9214,
+     0.0085,
+     0.0076,
+     0.0027
+    ],
+    "severity": 1.9593,
+    "confidence": 0.9214
+   },
+   {
+    "file": "gallery/E2_01.png",
+    "field": 81,
+    "inst_id": 35,
+    "fold": 0,
+    "class": 2,
+    "class_name": "E2",
+    "border": false,
+    "probs": [
+     0.0029,
+     0.0174,
+     0.9205,
+     0.0487,
+     0.0082,
+     0.0023
+    ],
+    "severity": 2.042,
+    "confidence": 0.9205
+   },
+   {
+    "file": "gallery/E2_02.png",
+    "field": 101,
+    "inst_id": 15,
+    "fold": 0,
+    "class": 2,
+    "class_name": "E2",
+    "border": false,
+    "probs": [
+     0.0019,
+     0.0158,
+     0.8942,
+     0.0709,
+     0.0118,
+     0.0054
+    ],
+    "severity": 2.0753,
+    "confidence": 0.8942
+   },
+   {
+    "file": "gallery/E2_03.png",
+    "field": 101,
+    "inst_id": 19,
+    "fold": 0,
+    "class": 2,
+    "class_name": "E2",
+    "border": false,
+    "probs": [
+     0.0035,
+     0.0432,
+     0.8606,
+     0.072,
+     0.0172,
+     0.0036
+    ],
+    "severity": 2.0565,
+    "confidence": 0.8606
+   },
+   {
+    "file": "gallery/E2_04.png",
+    "field": 168,
+    "inst_id": 21,
+    "fold": 0,
+    "class": 2,
+    "class_name": "E2",
+    "border": false,
+    "probs": [
+     0.0084,
+     0.0368,
+     0.846,
+     0.0806,
+     0.0129,
+     0.0153
+    ],
+    "severity": 2.0538,
+    "confidence": 0.846
+   },
+   {
+    "file": "gallery/E2_05.png",
+    "field": 84,
+    "inst_id": 10,
+    "fold": 0,
+    "class": 2,
+    "class_name": "E2",
+    "border": false,
+    "probs": [
+     0.0032,
+     0.1267,
+     0.8334,
+     0.0198,
+     0.0121,
+     0.0047
+    ],
+    "severity": 1.9104,
+    "confidence": 0.8334
+   },
+   {
+    "file": "gallery/E2_06.png",
+    "field": 84,
+    "inst_id": 4,
+    "fold": 0,
+    "class": 2,
+    "class_name": "E2",
+    "border": false,
+    "probs": [
+     0.0054,
+     0.114,
+     0.8083,
+     0.0368,
+     0.0272,
+     0.0083
+    ],
+    "severity": 1.9661,
+    "confidence": 0.8083
+   },
+   {
+    "file": "gallery/E2_07.png",
+    "field": 168,
+    "inst_id": 3,
+    "fold": 0,
+    "class": 2,
+    "class_name": "E2",
+    "border": false,
+    "probs": [
+     0.0202,
+     0.1301,
+     0.8038,
+     0.0217,
+     0.0144,
+     0.0099
+    ],
+    "severity": 1.8788,
+    "confidence": 0.8038
+   },
+   {
+    "file": "gallery/E2_08.png",
+    "field": 107,
+    "inst_id": 39,
+    "fold": 0,
+    "class": 2,
+    "class_name": "E2",
+    "border": false,
+    "probs": [
+     0.0048,
+     0.0321,
+     0.8014,
+     0.1316,
+     0.0199,
+     0.0102
+    ],
+    "severity": 2.131,
+    "confidence": 0.8014
+   },
+   {
+    "file": "gallery/E2_09.png",
+    "field": 101,
+    "inst_id": 12,
+    "fold": 0,
+    "class": 2,
+    "class_name": "E2",
+    "border": false,
+    "probs": [
+     0.0297,
+     0.0861,
+     0.7879,
+     0.0393,
+     0.0174,
+     0.0397
+    ],
+    "severity": 1.9256,
+    "confidence": 0.7879
+   },
+   {
+    "file": "gallery/E2_10.png",
+    "field": 81,
+    "inst_id": 4,
+    "fold": 0,
+    "class": 2,
+    "class_name": "E2",
+    "border": false,
+    "probs": [
+     0.0042,
+     0.0252,
+     0.7666,
+     0.182,
+     0.0152,
+     0.0068
+    ],
+    "severity": 2.1799,
+    "confidence": 0.7666
+   },
+   {
+    "file": "gallery/E2_11.png",
+    "field": 92,
+    "inst_id": 37,
+    "fold": 0,
+    "class": 2,
+    "class_name": "E2",
+    "border": false,
+    "probs": [
+     0.0232,
+     0.025,
+     0.7288,
+     0.1773,
+     0.0139,
+     0.0318
+    ],
+    "severity": 2.1382,
+    "confidence": 0.7288
+   }
+  ],
+  "E3": [
+   {
+    "file": "gallery/E3_00.png",
+    "field": 168,
+    "inst_id": 12,
+    "fold": 0,
+    "class": 3,
+    "class_name": "E3",
+    "border": false,
+    "probs": [
+     0.0004,
+     0.0004,
+     0.0114,
+     0.9832,
+     0.0038,
+     0.0008
+    ],
+    "severity": 2.9904,
+    "confidence": 0.9832
+   },
+   {
+    "file": "gallery/E3_01.png",
+    "field": 60,
+    "inst_id": 16,
+    "fold": 0,
+    "class": 3,
+    "class_name": "E3",
+    "border": false,
+    "probs": [
+     0.0005,
+     0.0006,
+     0.0146,
+     0.9781,
+     0.0057,
+     0.0006
+    ],
+    "severity": 2.9883,
+    "confidence": 0.9781
+   },
+   {
+    "file": "gallery/E3_02.png",
+    "field": 168,
+    "inst_id": 7,
+    "fold": 0,
+    "class": 3,
+    "class_name": "E3",
+    "border": false,
+    "probs": [
+     0.0009,
+     0.001,
+     0.0171,
+     0.9734,
+     0.0065,
+     0.0011
+    ],
+    "severity": 2.9848,
+    "confidence": 0.9734
+   },
+   {
+    "file": "gallery/E3_03.png",
+    "field": 168,
+    "inst_id": 16,
+    "fold": 0,
+    "class": 3,
+    "class_name": "E3",
+    "border": false,
+    "probs": [
+     0.0009,
+     0.001,
+     0.0172,
+     0.972,
+     0.0078,
+     0.001
+    ],
+    "severity": 2.9859,
+    "confidence": 0.972
+   },
+   {
+    "file": "gallery/E3_04.png",
+    "field": 141,
+    "inst_id": 36,
+    "fold": 0,
+    "class": 3,
+    "class_name": "E3",
+    "border": false,
+    "probs": [
+     0.0006,
+     0.0008,
+     0.0218,
+     0.9705,
+     0.0051,
+     0.0012
+    ],
+    "severity": 2.9798,
+    "confidence": 0.9705
+   },
+   {
+    "file": "gallery/E3_05.png",
+    "field": 141,
+    "inst_id": 21,
+    "fold": 0,
+    "class": 3,
+    "class_name": "E3",
+    "border": false,
+    "probs": [
+     0.0007,
+     0.0009,
+     0.0332,
+     0.9586,
+     0.0053,
+     0.0013
+    ],
+    "severity": 2.9681,
+    "confidence": 0.9586
+   },
+   {
+    "file": "gallery/E3_06.png",
+    "field": 78,
+    "inst_id": 4,
+    "fold": 0,
+    "class": 3,
+    "class_name": "E3",
+    "border": false,
+    "probs": [
+     0.0006,
+     0.0008,
+     0.0331,
+     0.9582,
+     0.0057,
+     0.0017
+    ],
+    "severity": 2.9692,
+    "confidence": 0.9582
+   },
+   {
+    "file": "gallery/E3_07.png",
+    "field": 141,
+    "inst_id": 34,
+    "fold": 0,
+    "class": 3,
+    "class_name": "E3",
+    "border": false,
+    "probs": [
+     0.0017,
+     0.0024,
+     0.042,
+     0.9421,
+     0.0092,
+     0.0026
+    ],
+    "severity": 2.9571,
+    "confidence": 0.9421
+   },
+   {
+    "file": "gallery/E3_08.png",
+    "field": 168,
+    "inst_id": 10,
+    "fold": 0,
+    "class": 3,
+    "class_name": "E3",
+    "border": false,
+    "probs": [
+     0.0023,
+     0.0037,
+     0.0584,
+     0.9248,
+     0.009,
+     0.0018
+    ],
+    "severity": 2.9363,
+    "confidence": 0.9248
+   },
+   {
+    "file": "gallery/E3_09.png",
+    "field": 168,
+    "inst_id": 13,
+    "fold": 0,
+    "class": 3,
+    "class_name": "E3",
+    "border": false,
+    "probs": [
+     0.0034,
+     0.0035,
+     0.0575,
+     0.9205,
+     0.0114,
+     0.0037
+    ],
+    "severity": 2.9365,
+    "confidence": 0.9205
+   },
+   {
+    "file": "gallery/E3_10.png",
+    "field": 168,
+    "inst_id": 15,
+    "fold": 0,
+    "class": 3,
+    "class_name": "E3",
+    "border": false,
+    "probs": [
+     0.002,
+     0.0022,
+     0.0755,
+     0.9107,
+     0.0067,
+     0.003
+    ],
+    "severity": 2.9205,
+    "confidence": 0.9107
+   },
+   {
+    "file": "gallery/E3_11.png",
+    "field": 168,
+    "inst_id": 14,
+    "fold": 0,
+    "class": 3,
+    "class_name": "E3",
+    "border": true,
+    "probs": [
+     0.0007,
+     0.0011,
+     0.0377,
+     0.9525,
+     0.0062,
+     0.0018
+    ],
+    "severity": 2.9642,
+    "confidence": 0.9525
+   }
+  ],
+  "E4": [
+   {
+    "file": "gallery/E4_00.png",
+    "field": 96,
+    "inst_id": 29,
+    "fold": 0,
+    "class": 4,
+    "class_name": "E4",
+    "border": false,
+    "probs": [
+     0.0099,
+     0.0004,
+     0.0002,
+     0.0006,
+     0.9888,
+     0.0001
+    ],
+    "severity": 3.9582,
+    "confidence": 0.9888
+   },
+   {
+    "file": "gallery/E4_01.png",
+    "field": 96,
+    "inst_id": 23,
+    "fold": 0,
+    "class": 4,
+    "class_name": "E4",
+    "border": false,
+    "probs": [
+     0.0097,
+     0.0006,
+     0.0003,
+     0.0011,
+     0.9881,
+     0.0003
+    ],
+    "severity": 3.9578,
+    "confidence": 0.9881
+   },
+   {
+    "file": "gallery/E4_02.png",
+    "field": 96,
+    "inst_id": 41,
+    "fold": 0,
+    "class": 4,
+    "class_name": "E4",
+    "border": false,
+    "probs": [
+     0.0142,
+     0.0014,
+     0.0006,
+     0.0016,
+     0.9819,
+     0.0003
+    ],
+    "severity": 3.9363,
+    "confidence": 0.9819
+   },
+   {
+    "file": "gallery/E4_03.png",
+    "field": 96,
+    "inst_id": 52,
+    "fold": 0,
+    "class": 4,
+    "class_name": "E4",
+    "border": false,
+    "probs": [
+     0.019,
+     0.0014,
+     0.001,
+     0.0019,
+     0.9762,
+     0.0004
+    ],
+    "severity": 3.9156,
+    "confidence": 0.9762
+   },
+   {
+    "file": "gallery/E4_04.png",
+    "field": 96,
+    "inst_id": 45,
+    "fold": 0,
+    "class": 4,
+    "class_name": "E4",
+    "border": false,
+    "probs": [
+     0.02,
+     0.0021,
+     0.0013,
+     0.0027,
+     0.9735,
+     0.0005
+    ],
+    "severity": 3.9084,
+    "confidence": 0.9735
+   },
+   {
+    "file": "gallery/E4_05.png",
+    "field": 96,
+    "inst_id": 13,
+    "fold": 0,
+    "class": 4,
+    "class_name": "E4",
+    "border": false,
+    "probs": [
+     0.0228,
+     0.0031,
+     0.0007,
+     0.0023,
+     0.9694,
+     0.0016
+    ],
+    "severity": 3.8955,
+    "confidence": 0.9694
+   },
+   {
+    "file": "gallery/E4_06.png",
+    "field": 96,
+    "inst_id": 44,
+    "fold": 0,
+    "class": 4,
+    "class_name": "E4",
+    "border": false,
+    "probs": [
+     0.0835,
+     0.016,
+     0.0045,
+     0.0079,
+     0.8843,
+     0.0038
+    ],
+    "severity": 3.5996,
+    "confidence": 0.8843
+   },
+   {
+    "file": "gallery/E4_07.png",
+    "field": 96,
+    "inst_id": 8,
+    "fold": 0,
+    "class": 4,
+    "class_name": "E4",
+    "border": false,
+    "probs": [
+     0.1339,
+     0.0293,
+     0.0166,
+     0.0233,
+     0.7841,
+     0.0128
+    ],
+    "severity": 3.3113,
+    "confidence": 0.7841
+   },
+   {
+    "file": "gallery/E4_08.png",
+    "field": 96,
+    "inst_id": 2,
+    "fold": 0,
+    "class": 4,
+    "class_name": "E4",
+    "border": false,
+    "probs": [
+     0.1614,
+     0.0765,
+     0.0268,
+     0.0182,
+     0.7068,
+     0.0103
+    ],
+    "severity": 3.0434,
+    "confidence": 0.7068
+   },
+   {
+    "file": "gallery/E4_09.png",
+    "field": 96,
+    "inst_id": 4,
+    "fold": 0,
+    "class": 4,
+    "class_name": "E4",
+    "border": false,
+    "probs": [
+     0.185,
+     0.0782,
+     0.0229,
+     0.0176,
+     0.6904,
+     0.0058
+    ],
+    "severity": 2.9556,
+    "confidence": 0.6904
+   },
+   {
+    "file": "gallery/E4_10.png",
+    "field": 96,
+    "inst_id": 1,
+    "fold": 0,
+    "class": 4,
+    "class_name": "E4",
+    "border": true,
+    "probs": [
+     0.0276,
+     0.0028,
+     0.0012,
+     0.0024,
+     0.9654,
+     0.0006
+    ],
+    "severity": 3.8761,
+    "confidence": 0.9654
+   },
+   {
+    "file": "gallery/E4_11.png",
+    "field": 149,
+    "inst_id": 14,
+    "fold": 2,
+    "class": 4,
+    "class_name": "E4",
+    "border": false,
+    "probs": [
+     0.0035,
+     0.0001,
+     0.0002,
+     0.0012,
+     0.9946,
+     0.0004
+    ],
+    "severity": 3.9842,
+    "confidence": 0.9946
+   }
+  ],
+  "Cup": [
+   {
+    "file": "gallery/Cup_00.png",
+    "field": 35,
+    "inst_id": 25,
+    "fold": 0,
+    "class": 5,
+    "class_name": "Cup",
+    "border": false,
+    "probs": [
+     0.0045,
+     0.0037,
+     0.0025,
+     0.0021,
+     0.011,
+     0.9761
+    ],
+    "severity": 2.4763,
+    "confidence": 0.9761
+   },
+   {
+    "file": "gallery/Cup_01.png",
+    "field": 80,
+    "inst_id": 27,
+    "fold": 0,
+    "class": 5,
+    "class_name": "Cup",
+    "border": false,
+    "probs": [
+     0.0137,
+     0.0008,
+     0.0025,
+     0.0025,
+     0.0083,
+     0.9722
+    ],
+    "severity": 1.668,
+    "confidence": 0.9722
+   },
+   {
+    "file": "gallery/Cup_02.png",
+    "field": 82,
+    "inst_id": 18,
+    "fold": 0,
+    "class": 5,
+    "class_name": "Cup",
+    "border": false,
+    "probs": [
+     0.0066,
+     0.0027,
+     0.0036,
+     0.0053,
+     0.011,
+     0.9709
+    ],
+    "severity": 2.3941,
+    "confidence": 0.9709
+   },
+   {
+    "file": "gallery/Cup_03.png",
+    "field": 74,
+    "inst_id": 40,
+    "fold": 0,
+    "class": 5,
+    "class_name": "Cup",
+    "border": false,
+    "probs": [
+     0.0049,
+     0.0034,
+     0.0048,
+     0.0046,
+     0.0116,
+     0.9706
+    ],
+    "severity": 2.4902,
+    "confidence": 0.9706
+   },
+   {
+    "file": "gallery/Cup_04.png",
+    "field": 134,
+    "inst_id": 32,
+    "fold": 0,
+    "class": 5,
+    "class_name": "Cup",
+    "border": false,
+    "probs": [
+     0.0059,
+     0.0032,
+     0.0035,
+     0.0041,
+     0.0133,
+     0.9699
+    ],
+    "severity": 2.5204,
+    "confidence": 0.9699
+   },
+   {
+    "file": "gallery/Cup_05.png",
+    "field": 80,
+    "inst_id": 15,
+    "fold": 0,
+    "class": 5,
+    "class_name": "Cup",
+    "border": false,
+    "probs": [
+     0.0101,
+     0.0039,
+     0.0052,
+     0.0038,
+     0.0075,
+     0.9695
+    ],
+    "severity": 1.8263,
+    "confidence": 0.9695
+   },
+   {
+    "file": "gallery/Cup_06.png",
+    "field": 134,
+    "inst_id": 25,
+    "fold": 0,
+    "class": 5,
+    "class_name": "Cup",
+    "border": false,
+    "probs": [
+     0.006,
+     0.0033,
+     0.0048,
+     0.0048,
+     0.0119,
+     0.9691
+    ],
+    "severity": 2.4329,
+    "confidence": 0.9691
+   },
+   {
+    "file": "gallery/Cup_07.png",
+    "field": 74,
+    "inst_id": 47,
+    "fold": 0,
+    "class": 5,
+    "class_name": "Cup",
+    "border": false,
+    "probs": [
+     0.0098,
+     0.0029,
+     0.0044,
+     0.0047,
+     0.0107,
+     0.9675
+    ],
+    "severity": 2.1072,
+    "confidence": 0.9675
+   },
+   {
+    "file": "gallery/Cup_08.png",
+    "field": 130,
+    "inst_id": 10,
+    "fold": 0,
+    "class": 5,
+    "class_name": "Cup",
+    "border": false,
+    "probs": [
+     0.0096,
+     0.0033,
+     0.0055,
+     0.0061,
+     0.0086,
+     0.967
+    ],
+    "severity": 2.0236,
+    "confidence": 0.967
+   },
+   {
+    "file": "gallery/Cup_09.png",
+    "field": 134,
+    "inst_id": 14,
+    "fold": 0,
+    "class": 5,
+    "class_name": "Cup",
+    "border": false,
+    "probs": [
+     0.0071,
+     0.0052,
+     0.0049,
+     0.006,
+     0.0129,
+     0.9639
+    ],
+    "severity": 2.342,
+    "confidence": 0.9639
+   },
+   {
+    "file": "gallery/Cup_10.png",
+    "field": 136,
+    "inst_id": 2,
+    "fold": 0,
+    "class": 5,
+    "class_name": "Cup",
+    "border": false,
+    "probs": [
+     0.0152,
+     0.0034,
+     0.0033,
+     0.0029,
+     0.0124,
+     0.9628
+    ],
+    "severity": 1.8363,
+    "confidence": 0.9628
+   },
+   {
+    "file": "gallery/Cup_11.png",
+    "field": 134,
+    "inst_id": 28,
+    "fold": 0,
+    "class": 5,
+    "class_name": "Cup",
+    "border": false,
+    "probs": [
+     0.0136,
+     0.0035,
+     0.0039,
+     0.0047,
+     0.0118,
+     0.9625
+    ],
+    "severity": 1.9374,
+    "confidence": 0.9625
+   }
+  ]
+ }
+}

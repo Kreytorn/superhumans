@@ -1,0 +1,2709 @@
+{
+ "module": "spikecount",
+ "product_name": "RedShift: in-flight hemolysis surveillance",
+ "generated": "r3 2026-11-14",
+ "class_names": [
+  "Disc",
+  "E1",
+  "E2",
+  "E3",
+  "E4",
+  "Cup"
+ ],
+ "demo_fold": 0,
+ "parity_fields": [
+  96,
+  184
+ ],
+ "band": {
+  "name": "ship_live",
+  "live": true,
+  "colours": 6,
+  "outlines_default": "model",
+  "headline_source": "end_to_end",
+  "headline_r": 0.9332168388955386,
+  "may_say_works": true,
+  "provisional": false,
+  "text": "r >= 0.9: ship live, 6 colours; the pitch may say it works"
+ },
+ "act_margin_pp": 10.0,
+ "shipped_grader": "fp32 (34.05 MB); the fp16-stored copy failed the fixed 5e-3 tolerance",
+ "licence_note": "Data excerpts: RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0. Models: Team SuperHumans fine-tune (fold-0 model) on RedTell; backbone MobileNetV4 (Qin et al., ECCV 2024) with ImageNet weights trained by timm (Wightman), Apache-2.0.",
+ "files": [
+  {
+   "path": "models/spike_outliner.onnx",
+   "bytes": 11627994,
+   "sha256": "af5cc526914f3c27c4622913f52993242fca6f92cad8b3bc9762cdf49a7d67c9",
+   "role": "model",
+   "source": "work/SpikeCount/results/spike_outliner.onnx",
+   "licence": "Apache-2.0 backbone weights; fine-tune by Team SuperHumans",
+   "credit": "Team SuperHumans fine-tune (fold-0 model) on RedTell; backbone MobileNetV4 (Qin et al., ECCV 2024) with ImageNet weights trained by timm (Wightman), Apache-2.0",
+   "what": "U-Net on MobileNetV4-Conv-Small: image [1,1,576,576] -> pixel_probs [1,3,576,576]"
+  },
+  {
+   "path": "models/spike_grader.onnx",
+   "bytes": 34054967,
+   "sha256": "e869aca5a7f8cee76da9da5963ea7fc741c5de80cddc604449f08e1496e806bd",
+   "role": "model",
+   "source": "work/SpikeCount/results/spike_grader.onnx",
+   "licence": "Apache-2.0 backbone weights; fine-tune by Team SuperHumans",
+   "credit": "Team SuperHumans fine-tune (fold-0 model) on RedTell; backbone MobileNetV4 (Qin et al., ECCV 2024) with ImageNet weights trained by timm (Wightman), Apache-2.0",
+   "what": "MobileNetV4-Conv-Medium, fp32: cells [N,3,96,96] -> cell_probs [N,6]"
+  },
+  {
+   "path": "fields/32.png",
+   "bytes": 166606,
+   "sha256": "5bdcbe813f30a91021d390e719af524c1484b4fb4ba5b4ad6911ad744331ee6d",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/32.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/32.png",
+   "bytes": 5737,
+   "sha256": "1b768b2506c00b74db76f20ef8689fe0b35ba435fe6ce890430054388263db22",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/32.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/32.json",
+   "bytes": 2466,
+   "sha256": "f236103434b331052d621a102c43bbee5699b2e9ccac057f9064a624b46c2473",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/32.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/32.json",
+   "bytes": 20487,
+   "sha256": "5df59ba318b5e7f88bfb185ccc8f30713406f3e4833775ab9fba08d52695ba75",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/32.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/35.png",
+   "bytes": 180566,
+   "sha256": "5ede66a9427d50f39bce886b82ce0af429d606441d09c63342febafce8485896",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/35.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/35.png",
+   "bytes": 6997,
+   "sha256": "b3cb60bb3bbcb2279a38e099b84e94128ee9233e9baf9ad21036e5ba05e13e6a",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/35.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/35.json",
+   "bytes": 2990,
+   "sha256": "1e71ff1f1243bf247f067eab4e8a5319d7d71c1344648ddc2bec0bd88a8362af",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/35.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/35.json",
+   "bytes": 20801,
+   "sha256": "79e1e978d647a7dfee643ff3a3eeeda940a5c6e73250741e311f7f3b4fd4689c",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/35.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/41.png",
+   "bytes": 160609,
+   "sha256": "79d04acd0731b419f9cfb0e203b0d661fbfb98f36515919132019e089015bb4c",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/41.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/41.png",
+   "bytes": 2782,
+   "sha256": "ca2be9afacdedfcf55cba435e9bbbe2960a2cc7d0cbf3e5455cb980eb3768d7f",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/41.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/41.json",
+   "bytes": 1148,
+   "sha256": "d1c5349f9a9ad066913dd87204af741bce8958792c669d59aedb96e36c8ce959",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/41.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/41.json",
+   "bytes": 6592,
+   "sha256": "ebb7c08ec6d63d55871046162f9d661b5ca90722e810e1426f396ce374d805ec",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/41.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/60.png",
+   "bytes": 164742,
+   "sha256": "173b2c42686800d5ba72b4acbc869036b52a787298ba2b3143064c29ee924bec",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/60.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/60.png",
+   "bytes": 3415,
+   "sha256": "3b9b8bb2e43de1acf460128712164d8098f36a88295806d0d72756b373c2f662",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/60.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/60.json",
+   "bytes": 1314,
+   "sha256": "fa18a06ac36105636433bf7a7c04664cf8f124a97f007ce37570762d471b9a7e",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/60.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/60.json",
+   "bytes": 8608,
+   "sha256": "a3a5b899aa9243c91c16e35dc65312d11c5c7fee9328391fb9be6779e8edf8e8",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/60.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/70.png",
+   "bytes": 176404,
+   "sha256": "941ff3612105bd134dbfb1406d6b73da009423e42353d9f76cbef831b5b35fde",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/70.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/70.png",
+   "bytes": 9483,
+   "sha256": "e547c5cc639d0de699bdcbe58bee1e2098aa395467f2e015764b6e327bd99cc4",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/70.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/70.json",
+   "bytes": 3821,
+   "sha256": "eeb6f7bbfff034d747ab529bad3da5df0d0da9b6d5e8342aaf0bf423826a61c9",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/70.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/70.json",
+   "bytes": 26887,
+   "sha256": "3afbb879b6b466482df6e8f5ab2ca3a06ce638f194c55acfa427fe14d566212e",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/70.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/74.png",
+   "bytes": 197820,
+   "sha256": "480addf481df740168eb02c4bb5b54b4999209126b2f496ebc670cb196e0f571",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/74.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/74.png",
+   "bytes": 8577,
+   "sha256": "3b2102e39d78191e66b90eeadcfee340486809dd1f25d154452a3a50221f069a",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/74.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/74.json",
+   "bytes": 3644,
+   "sha256": "617ce91e6e46262b345697d4ec5edabffe478867864c6f3c76359cb4a7dbd7b9",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/74.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/74.json",
+   "bytes": 23971,
+   "sha256": "caebd8da0558a86140f76f6a331bcfdab8b55a81e57dbe005450d29ddc01cd12",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/74.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/78.png",
+   "bytes": 160582,
+   "sha256": "97966fec705d61ef5aea3b7c8853f0631e9f1c21be32d050961e2e87af624e48",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/78.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/78.png",
+   "bytes": 3685,
+   "sha256": "7a4df44d316cfe624681ad539dcc8bb1467e3203dfaf3ea9ac1413fd59e1b04c",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/78.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/78.json",
+   "bytes": 1477,
+   "sha256": "a73c8ee511de4dd16dd02a2b4764a7de2a66fee7307443b9024d07cc9f98ff80",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/78.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/78.json",
+   "bytes": 8823,
+   "sha256": "e2edcb87b97c9583c2bfe6163e1968870dd18f5709e911b6f743389aecfab77d",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/78.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/80.png",
+   "bytes": 175160,
+   "sha256": "6e786cdeab1124a9923d42a2de2853905784aa152b6cf462e6d741d0b6b47b4e",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/80.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/80.png",
+   "bytes": 7772,
+   "sha256": "65f1abea982818925200f1155ff2bcf75dfd71fb9318316a0e8e98e44c035a48",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/80.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/80.json",
+   "bytes": 3378,
+   "sha256": "31529f807a9a6c5d301871a32fad9f92bbd7f6f40f86f3ee4e9cc2728d2b020a",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/80.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/80.json",
+   "bytes": 22288,
+   "sha256": "98dd02ac87dd44cea321407a2c90c964054fc1f3d5ccb4b448df157f0fb9bb2c",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/80.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/81.png",
+   "bytes": 174848,
+   "sha256": "72156e4fedb653ec6714fcd4ba50b4fce58aa298969fe3d67cfb892743827540",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/81.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/81.png",
+   "bytes": 5481,
+   "sha256": "ba8ad0776641faf5ccb3515f33feec9e66851315dbbba1dbcf2a15b17694247d",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/81.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/81.json",
+   "bytes": 2571,
+   "sha256": "f3c96f63b16be8f49e5ca50725c512aff9d51b3698430cd49a0240f9c3f42cdf",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/81.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/81.json",
+   "bytes": 16862,
+   "sha256": "984b0372a635d2af1f56f6057e4736b1b55f0dda749a4f51b5f5582c8c6ca7cc",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/81.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/82.png",
+   "bytes": 172339,
+   "sha256": "50422ddee5b41f4ed1299ab21a32b774807cbbbf1bd6f4ba39fb7795cc16e07b",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/82.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/82.png",
+   "bytes": 5969,
+   "sha256": "cd57d5b0b4f001ba47a28573394a07281de5ec547371345c2024b350e74c563f",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/82.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/82.json",
+   "bytes": 2794,
+   "sha256": "5df37442f530a2929668c61edd5d8530830740671105c45b05af02368ddded3f",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/82.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/82.json",
+   "bytes": 17853,
+   "sha256": "2bc23bf63e7b4850dd7e27e248ad7f6029b9f392ffbd1dc52f0bdb7ef7a77b5d",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/82.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/83.png",
+   "bytes": 174017,
+   "sha256": "b47ea5028140fbc52ffdf336811248065e686c8d92707026b2e7eb8e66bc0edb",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/83.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/83.png",
+   "bytes": 7960,
+   "sha256": "a7b9eb90c386546e9c8288aee83dd7526cd3f5175bf0a4aa6d8a573a4398aed9",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/83.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/83.json",
+   "bytes": 3241,
+   "sha256": "84e69e7dce324053778dc6ed3f1471e4c317e6eca0cf460b5df1927b4d33191f",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/83.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/83.json",
+   "bytes": 21362,
+   "sha256": "b9e0fcaad32bc65748d4dc7a55573bfacf5bca1a8cdcef218f2294391ec8eab9",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/83.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/84.png",
+   "bytes": 169352,
+   "sha256": "055d0acf60e457285ba674038d712376f3cbcdb2dbecd174575b717ac06c339d",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/84.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/84.png",
+   "bytes": 4427,
+   "sha256": "5d74b85f6783f4f271733e5d744a69dd349075356c68982e2bcf8d9f16fac039",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/84.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/84.json",
+   "bytes": 1850,
+   "sha256": "6674dcedbb5790067e5ba0c9fbc9f9623abf591055f08b620aca685b915feb73",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/84.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/84.json",
+   "bytes": 11256,
+   "sha256": "216e1c883aaf2a0ce08bde166127db17a4a467290047d3c153d3b460f72e9bd4",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/84.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/86.png",
+   "bytes": 180967,
+   "sha256": "b1de093dc6f54138d9464d90c442e6e969b8badb1e6b487570b0928f22a950ab",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/86.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/86.png",
+   "bytes": 3675,
+   "sha256": "1ff4ef13abe23ef9f83656c603c80589ceceff44efd1f362b8d9f042780e4ec3",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/86.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/86.json",
+   "bytes": 1476,
+   "sha256": "45adafe4d9818d7e407f0c7c04085085e9aa7b9f43f75bcb34ce0b234c9abb19",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/86.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/86.json",
+   "bytes": 8765,
+   "sha256": "1b46a595c37ea2b27a928841105f319449d47cabf28c75b3f50b4f21321fe869",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/86.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/87.png",
+   "bytes": 175530,
+   "sha256": "179409bbd0cae9baeb9bc8159474cdeecebd4d5b7def5a2d0ad9eddfa62fa656",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/87.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/87.png",
+   "bytes": 9776,
+   "sha256": "2ab6ef90519be6c0f47a9efda2ab01496b7372fa0a57b039b416eb8580bc05ce",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/87.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/87.json",
+   "bytes": 4369,
+   "sha256": "e71acda7ef92f73558a1ecc606cc0efaeee1da6a3b3f62e021f02d740a1f4db7",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/87.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/87.json",
+   "bytes": 30414,
+   "sha256": "8cfc772d0eaaed56dc783886dbe98f574bf6a8aa67975bd2a7d5949aba1aa0d9",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/87.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/92.png",
+   "bytes": 173299,
+   "sha256": "428ff6d378b7b732457ffc478ff5a329c659aa046d09f284d4c2704b1d1f586b",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/92.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/92.png",
+   "bytes": 6495,
+   "sha256": "2e9f7fb89a6aa872ab50b0f91e2b8d67ab4a6aa529d80c9fecaf5b93f2edf0be",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/92.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/92.json",
+   "bytes": 2801,
+   "sha256": "9a3bc95800a4accaad80e35ea21c8ceb9a2d0f676c88b6a76a434d94b2626c60",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/92.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/92.json",
+   "bytes": 19288,
+   "sha256": "26f4be901e2f92a13b1d5d6d476b5f6f6a93f0587ea68c156d9808efaabfd66d",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/92.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/96.png",
+   "bytes": 177014,
+   "sha256": "94a7ab69974f764f4ae8a0033ccc669ffe1e332ea8f6a1e300a6fac5006cfa21",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/96.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/96.png",
+   "bytes": 8422,
+   "sha256": "a501a14ac342cd4be1898671b555c06de5b0e6b7be335a667d28d177a1a1a98a",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/96.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/96.json",
+   "bytes": 3667,
+   "sha256": "a2b711e89d47673ea6bd78332e359139a59a56531aa6117387cd34ac6ec4424d",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/96.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/96.json",
+   "bytes": 23780,
+   "sha256": "a219eaf121b00a3999cc58d9d222d62609d2e411ef3adb69cbb0ab615975cb17",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/96.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/101.png",
+   "bytes": 170391,
+   "sha256": "118b7d26f2829f2e56917ca4eae400a9400bb1e3403e827d2d82b5f477daeab0",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/101.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/101.png",
+   "bytes": 4835,
+   "sha256": "443f5c11406e39d49dc80d2096170cf3c4587b9e299f894cc8dbaef5d33e314e",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/101.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/101.json",
+   "bytes": 2186,
+   "sha256": "b8beafd8d8d1be5e56e5f7af28f887b71b4e0673d04ad18c6da85b4a28bb402d",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/101.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/101.json",
+   "bytes": 14205,
+   "sha256": "6c4b3fb6b780f05dc840ddc2e560a22440e102f9839546b4135ac6f52eb85a43",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/101.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/107.png",
+   "bytes": 175694,
+   "sha256": "6d9e7eedb49f547625ffd7455a85b1b9f86a421717dbce11b800a4fe9ab5cb75",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/107.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/107.png",
+   "bytes": 6832,
+   "sha256": "9324979da3972c699dab992371ddd921282f9d8b3300893e105bef85ee099d23",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/107.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/107.json",
+   "bytes": 2990,
+   "sha256": "5291ff1c327953a634a7e9adcb09693e082b1591bcc9be3ca86a13734c4d958b",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/107.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/107.json",
+   "bytes": 19021,
+   "sha256": "7320c2cc2a5d7bb6ea17f9feb017105aeaf4cbb809c7b1ded336cb17c7efaef9",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/107.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/109.png",
+   "bytes": 181791,
+   "sha256": "c4e3adde64eaf1c0bd73f93f34a740ca072d3cd24dc1844be13a465324d9f415",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/109.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/109.png",
+   "bytes": 4466,
+   "sha256": "143442b42ec2a804b09654041da623e8c196dabf260031c0d55b05d1f8caf7e8",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/109.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/109.json",
+   "bytes": 1871,
+   "sha256": "1a798a198b63a9cfd2678157fb1a1c2a52acc8dcd26df54d9f30f5e5df8069ab",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/109.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/109.json",
+   "bytes": 12071,
+   "sha256": "5c37198b03ed4925980a9afee0d33fc27ab56874ea741c76d7ea50a3470719cf",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/109.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/121.png",
+   "bytes": 171074,
+   "sha256": "7d2fd66d5cc3f5f1351f71bee249b854554f6cc6e0d9a4deb7fb1e3ceb738a1e",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/121.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/121.png",
+   "bytes": 7222,
+   "sha256": "0e3dc70b754a91a0bbf5ae8e8689cb0e65bb37a7531368fee507d9dabe7d272d",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/121.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/121.json",
+   "bytes": 3117,
+   "sha256": "eb3bd30194caf1b1a8d321efea561f3014e73837ec0662217de761e2882c9057",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/121.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/121.json",
+   "bytes": 23029,
+   "sha256": "baa9d6aae1e6682f800df67d7e37c0159575c3789ab2d2c51a14772bc736f5e2",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/121.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/130.png",
+   "bytes": 175245,
+   "sha256": "c1c37423d6a28afab3a389136109c48675c8af4349eaeb4313fc674c6ddbd6d5",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/130.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/130.png",
+   "bytes": 7086,
+   "sha256": "a9554c161c6c79db5962c94a1a1d8c26b4b464caeb1ee713b1b7050c76591d31",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/130.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/130.json",
+   "bytes": 3114,
+   "sha256": "bb9b93ab69824a31338a0d0a5914153a54d909e78e4e98e14c24fa7654083e9c",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/130.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/130.json",
+   "bytes": 20323,
+   "sha256": "8fae9db8c3154cb79a028a407d318448fdb2b922491e362cdde813d3f05d3344",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/130.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/134.png",
+   "bytes": 173770,
+   "sha256": "f7e8812edabfd2cbfe61c683277de0d4b47ea7ea0adf4f5c5989f4d35a87ceac",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/134.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/134.png",
+   "bytes": 7694,
+   "sha256": "d194bbf7f6436bb13f53c62b2c8eb0f1af03a3c3a5b0219c4bb8a423afa3aa59",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/134.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/134.json",
+   "bytes": 3323,
+   "sha256": "707e49b4e45d7fa1d6409b2af122a9cbe0da8f3c69666b64c935f072a42ad1bc",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/134.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/134.json",
+   "bytes": 22921,
+   "sha256": "eb23a027ebec12056075c0f55f56b468cf495d003cb8649f431eb275f05aabfe",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/134.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/136.png",
+   "bytes": 167990,
+   "sha256": "cdc4eb46638f00251b3fd826590cd9bb9ca5cb29263a99981c791bca22bc3cb4",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/136.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/136.png",
+   "bytes": 2994,
+   "sha256": "7424c3c184f2fe829349e4f34f170c0590712688380ff064b432ad055a0a2fd0",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/136.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/136.json",
+   "bytes": 1212,
+   "sha256": "decffb71c2e62ffae4b8a9c0dc1ad14b3bfb99e326d579051559ce630d5f2f37",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/136.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/136.json",
+   "bytes": 7920,
+   "sha256": "bc8bacdc66289a0cbd1c3af6c8ebb0fac8fa229b750cefa1b5dd78eb6362647e",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/136.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/141.png",
+   "bytes": 184095,
+   "sha256": "1bd544a8e7188d122767ae1417d3ea6d0c0a1425ebb9a153abd85dce963787bd",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/141.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/141.png",
+   "bytes": 8495,
+   "sha256": "ba80c6cd5ad7b6dab1691bf8747cc182bcc7d68ea04752427340d08570dd35af",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/141.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/141.json",
+   "bytes": 3205,
+   "sha256": "126dcfa577495a1a395028074177590f5c3201f5caf5425a4ac8226e2b75f64d",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/141.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/141.json",
+   "bytes": 21732,
+   "sha256": "c45cd018ceb8e72d16f0e3d941318fdef5a19b0b834f96cb48008d19b17ade59",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/141.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/153.png",
+   "bytes": 169791,
+   "sha256": "574b0aa56406ddc25d8286cfebb03124bf15d744883435b4ee69b48787736ca5",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/153.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/153.png",
+   "bytes": 6630,
+   "sha256": "694abc71972fdf1ac6fa563e164d87686b2b0bb0874e0ce909a2c87a9f84306d",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/153.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/153.json",
+   "bytes": 2923,
+   "sha256": "bd35873a243be0c7aa4e298ae31a4f273c6fbacb94fde3d61e6750d6d1810456",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/153.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/153.json",
+   "bytes": 20533,
+   "sha256": "d54a7bf61000f6cb8e9c464c464cd0956ecdea34593fdceaa4dfe0484e693a32",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/153.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/158.png",
+   "bytes": 168347,
+   "sha256": "2702e68c6c29182e616742083fba6d2a981d13792a21abb6b8e2d7f78419a2ea",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/158.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/158.png",
+   "bytes": 8316,
+   "sha256": "4d078325ceeb96fc6a7d000ef137de87184e090644ca358bb014793351d0a212",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/158.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/158.json",
+   "bytes": 3514,
+   "sha256": "19a418ac6944a49c994ce9d7a8c3b7c06490c27c6e6466fd1997604b4d3a42fb",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/158.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/158.json",
+   "bytes": 23024,
+   "sha256": "cee1b0711a6fa702d1b2ad75050e5e7ea831966e83af4be64081576287e81cae",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/158.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/168.png",
+   "bytes": 168161,
+   "sha256": "6c5c11f9bfdc4ea111029a9ccc82e07b4e4d8f9d085c18706507ed60d0b25edc",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/168.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/168.png",
+   "bytes": 4240,
+   "sha256": "bbaa864e8d8535b85fb8764afac73b2169a700baf5a03cba3e57e1ebf66e49f7",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/168.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/168.json",
+   "bytes": 1656,
+   "sha256": "bb0609bc00253ec5755343522f252feeecd956e5b285c00497ecb5dea8164925",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/168.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/168.json",
+   "bytes": 10237,
+   "sha256": "a89f2635efd0ca2ff2261ae05a0e05a8890c7f2b47d9ff911d0ac13263b0b1c5",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/168.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/173.png",
+   "bytes": 177945,
+   "sha256": "be40675e931dbc0d8a65f054f399d373a394966cdf8b9c03fe2d78fda0545b6d",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/173.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/173.png",
+   "bytes": 6464,
+   "sha256": "5439cbbc4c4123e3323eec2941652b248aea36795de484b736d1ac576b927063",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/173.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/173.json",
+   "bytes": 2456,
+   "sha256": "01e658851ec2c2ebd8ade79cccbf1ff9ae995393f62ee3df40f87e797971c0ed",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/173.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/173.json",
+   "bytes": 18517,
+   "sha256": "1fe8fe95af97faeff7be41e440e2d2d99dd19b0c0ae11995f74286b866f843c4",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/173.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/182.png",
+   "bytes": 173986,
+   "sha256": "71f402ce0f74eea806edb091ab871f499515bab03d7d65b62e46e09baadd5dbb",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/182.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/182.png",
+   "bytes": 3487,
+   "sha256": "add94607f96609f0bd663ab73b62a4127ead09e59d59999363f9191b1340e4f2",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/182.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/182.json",
+   "bytes": 1479,
+   "sha256": "0e60dc6f96da7c02febea21ba17be8d0340ac0adeb7fdea978f742354469d108",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/182.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/182.json",
+   "bytes": 8726,
+   "sha256": "4d11cebf119683bce3633b1810ca769b0f24a1f099323283dea40deb543e469b",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/182.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/184.png",
+   "bytes": 180100,
+   "sha256": "fd082b3ceee06fc783a227571c36006271277e1408860d952beb45008dad70b3",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/184.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/184.png",
+   "bytes": 10806,
+   "sha256": "3911721d2a369ee00d9d056c29daa926778e7e2928e1543ce09a78b2b3ffd9e2",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/184.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/184.json",
+   "bytes": 4700,
+   "sha256": "5b66be12e7aeae5d4552a45c154decb3131522deb9dc6f846502f911315a6ffe",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/184.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/184.json",
+   "bytes": 33900,
+   "sha256": "ae628237a514cb875f71f80bdaa0483da430e723c1d5ce99b6aa241a0d95163e",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/184.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "fields/185.png",
+   "bytes": 173784,
+   "sha256": "3dca294b1f3e8de820af9b39d1107b3b1e51d08a0b6678f5f1710223282f4b93",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:fields/185.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "572x572 8-bit grey light-microscope blood-smear field (held out, fold 0)"
+  },
+  {
+   "path": "expert/185.png",
+   "bytes": 6729,
+   "sha256": "3c6f1672b6abe83e65ee15a4aba34a6b9d6aefd296119f5fd838374aafc7bbc4",
+   "role": "input",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/185.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert cell outlines as a uint8 label image (0 none, 1..K cell id, 255 not annotated)"
+  },
+  {
+   "path": "expert/185.json",
+   "bytes": 2919,
+   "sha256": "d03ec86f8912a96a080c6467e91ea11864597b9402a6b485a76337b28d5f333c",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:expert/185.json",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "expert class per cell id + expert field metrics"
+  },
+  {
+   "path": "precomputed/185.json",
+   "bytes": 19301,
+   "sha256": "9f76d7917ca164c3309268b015aa21872eaaa4e4638a5ae790c8881bf66474ab",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:precomputed/185.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python onnxruntime CPU run of the same two models: polygons, probs (4 dp), metrics, expert-outline grades"
+  },
+  {
+   "path": "parity/96.bin.gz",
+   "bytes": 283740,
+   "sha256": "795a4c465986c9ffeac3048ceeea4816b6ca39ad1815398b952b68361892c583",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:parity/96.bin",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "gzip of the exact float32 outliner input [1,1,576,576] (standardized, padded)"
+  },
+  {
+   "path": "parity/96.json",
+   "bytes": 22090,
+   "sha256": "5da9abd971d5ea0b06969a0aec10603c40cfd51ddc560fbe603d45d32fa70156",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:parity/96.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python reference: per-cell centre, area, class, probs (6 dp), model and expert outlines"
+  },
+  {
+   "path": "parity/184.bin.gz",
+   "bytes": 313060,
+   "sha256": "db3b810e6f9db67c1e78061b813ea4802b06398dae72fdd963504b550c467fa5",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:parity/184.bin",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "gzip of the exact float32 outliner input [1,1,576,576] (standardized, padded)"
+  },
+  {
+   "path": "parity/184.json",
+   "bytes": 29805,
+   "sha256": "6c8c2b243ef2f6a7af9622324dc315722ca23774ce62333e0e82f27ab9886f1a",
+   "role": "precomputed",
+   "source": "work/SpikeCount/results/spike_demo.zip:parity/184.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "Python reference: per-cell centre, area, class, probs (6 dp), model and expert outlines"
+  },
+  {
+   "path": "gallery/Cup_00.png",
+   "bytes": 2706,
+   "sha256": "d5cba529412995b7e8f6add98f521c1e3f468cb48d33ebe2c5e42f3ae67972f7",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Cup_00.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Cup_01.png",
+   "bytes": 2762,
+   "sha256": "cee643e3bff0ee1b3401194c02872c7243a6517d608181b41d599ee952a10db5",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Cup_01.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Cup_02.png",
+   "bytes": 2496,
+   "sha256": "12a599f38916024c0d5ff6d436c57ddc9b09c3dd69c0d49c968f95fa4ce5a71d",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Cup_02.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Cup_03.png",
+   "bytes": 2569,
+   "sha256": "13d4ab0b5749acc3f723407240df2e692c75c91ca6ed585e21dce5fa900ca0d9",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Cup_03.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Cup_04.png",
+   "bytes": 2565,
+   "sha256": "7c08826d7a913e01c362a970965e772e7339d470ef449d21c9d8215e2d332e3a",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Cup_04.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Cup_05.png",
+   "bytes": 2095,
+   "sha256": "0ac440ede6e65eee4861929546b9e2b279701b41d39543a7375e9ce7dc238656",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Cup_05.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Cup_06.png",
+   "bytes": 2578,
+   "sha256": "7e77a0dd86ea4b6f6cfacc6a14a339ce7a42759f828bb849b1d511bf02769989",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Cup_06.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Cup_07.png",
+   "bytes": 2628,
+   "sha256": "fbf3d347b22241e09b542a1867aff09d903be4cca2f2e3ac13cdbb95c8b0757d",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Cup_07.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Cup_08.png",
+   "bytes": 2641,
+   "sha256": "03a8c9e361fd827bd56cd29d51ff063198dcb2dc3afdb8d5c931b2490ebf26d2",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Cup_08.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Cup_09.png",
+   "bytes": 2410,
+   "sha256": "8ec3a1b00d2f0bb8540af7af5084cec60773c10a0206870bfb5fc3207229a651",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Cup_09.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Cup_10.png",
+   "bytes": 2431,
+   "sha256": "19f8adf7ecfcd520e9e5b58906688d328756bcbaa4e7ca79a8cbb40af821fdb5",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Cup_10.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Cup_11.png",
+   "bytes": 2313,
+   "sha256": "de40c7473cb49f2b4c4511f6de681235b250820f6a7a7185f8bb6641aa91ed3a",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Cup_11.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Disc_00.png",
+   "bytes": 2494,
+   "sha256": "ffefb03ed5630eef80296ad8ec9be2f2895ea1acce0982043c4899f078fcc8f4",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Disc_00.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Disc_01.png",
+   "bytes": 2492,
+   "sha256": "72046502a5f6f2e74401216e61c620fc613eff3944387926961e84add2dfdb5f",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Disc_01.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Disc_02.png",
+   "bytes": 2418,
+   "sha256": "51aa1dcdd229efff639fd6595fc2c52e011f8f5497db86bf9fd238517af7f7eb",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Disc_02.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Disc_03.png",
+   "bytes": 2543,
+   "sha256": "35dcb643ba55cb206d5b59e94e653b07d7ebeaac9a0d66a95a53d0b8b94cdb2b",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Disc_03.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Disc_04.png",
+   "bytes": 1867,
+   "sha256": "0f553a051b344abe784f6bb7e2af0ca8c39db18fb2451ff5418f909668cda2bc",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Disc_04.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Disc_05.png",
+   "bytes": 1910,
+   "sha256": "3f19d21d1c82ee661819e781d90504626286f75fddd75a0e77d2bf0773cb30b2",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Disc_05.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Disc_06.png",
+   "bytes": 1636,
+   "sha256": "add8dbaeb2b647f637541d120fde8cca3a25947229055658e06c1efa3020e511",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Disc_06.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Disc_07.png",
+   "bytes": 2367,
+   "sha256": "b36f924a1344a245aa52594e84339962bb7d35e4ac2925ffc482b3962d57cb96",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Disc_07.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Disc_08.png",
+   "bytes": 1912,
+   "sha256": "c91ce79e2fdac503befdddc39457b4c62f410eab50cb8c794c95128c648c78f2",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Disc_08.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Disc_09.png",
+   "bytes": 1275,
+   "sha256": "e8667c7f68a34bd0c8e1d02ca3d2b3a237c5cf5b24e6a663cc8e214f9419ac7f",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Disc_09.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Disc_10.png",
+   "bytes": 2179,
+   "sha256": "98407cead8ebcf8d07a88f4dd9c0bc7ecc51134a3c8dcfab1e0cdc4396585128",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Disc_10.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/Disc_11.png",
+   "bytes": 1735,
+   "sha256": "1210af036da7c7bb3afc45949f6dc4c75e12612d24dc236218299390185f72a1",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/Disc_11.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E1_00.png",
+   "bytes": 2266,
+   "sha256": "c704029dc719c7c74b1453cb6879aaa4bd3ccd874092ff9095a3523e3e403420",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E1_00.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E1_01.png",
+   "bytes": 2188,
+   "sha256": "69524c8aa568be13d33f06ad984a73a18e3fe53f7aa9366aff6c1d7a9ffdc2b0",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E1_01.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E1_02.png",
+   "bytes": 2393,
+   "sha256": "5c256567dc21ca1661a75928518d6bae18d9e92033a34fb65a32c112e2656e72",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E1_02.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E1_03.png",
+   "bytes": 2313,
+   "sha256": "4e71a753e9fa1a48e850b45654b893b9436008c0333ba76a64e6e58d6416eb71",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E1_03.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E1_04.png",
+   "bytes": 2501,
+   "sha256": "ee705eb3d75a6c0fcd762fa37a05972ee7635a51114174e8128bd8b82dbd2024",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E1_04.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E1_05.png",
+   "bytes": 2786,
+   "sha256": "1fde13b63df5ae65cdbfc59af2e51ae6e32451a29e4f2c7209230b2ad101813b",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E1_05.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E1_06.png",
+   "bytes": 2333,
+   "sha256": "f26f958b4c2f06c66b1f76c4d84a1ddeddea3fdb882339bc156fa7b8347bab27",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E1_06.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E1_07.png",
+   "bytes": 2258,
+   "sha256": "adfcfc0a707d77d7eccb4de56d4b48ea07a029f2fcfcaaa7d3632006f25e9275",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E1_07.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E1_08.png",
+   "bytes": 2716,
+   "sha256": "1b0f1dae6026eddd209d0385cbfca2c08cb52224e9a2494fcec447cd6c6d7b39",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E1_08.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E1_09.png",
+   "bytes": 2500,
+   "sha256": "0c4b637aba295dc71c5e557ac28de7e39169e0e9f8b51223857e7cf258fc89d6",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E1_09.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E1_10.png",
+   "bytes": 1630,
+   "sha256": "1a3e7910a93ded2ce1ea3163008c9b70a922ab2475403267a29c0fbfefe052e2",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E1_10.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E1_11.png",
+   "bytes": 2442,
+   "sha256": "b149d3c618f2578bbbe1003d88cc7089422eb36113598b025675c194c0829330",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E1_11.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E2_00.png",
+   "bytes": 2645,
+   "sha256": "9ff88a89e6c85027481f052bfbb982d738ca50f8ae699d09d906c0e287825088",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E2_00.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E2_01.png",
+   "bytes": 2510,
+   "sha256": "e9c92eebd7ccc79c9b27a8ea2e8c1047b5e5aae5bf9f8c3acd8975cf3dc6b845",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E2_01.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E2_02.png",
+   "bytes": 2436,
+   "sha256": "4d4016c52c744c0f1cd892f1ddf6418b836150de194f5e2d4b3938381c1e1ce6",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E2_02.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E2_03.png",
+   "bytes": 2348,
+   "sha256": "4890cdae8a87db0675bfabcccd563c4687a4f7d403fb431dce9b3eae40050505",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E2_03.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E2_04.png",
+   "bytes": 2306,
+   "sha256": "f05d6fc62fbb302fef96da39e8e88a4f9c06d85e6a9086bb10bb55ef8288b437",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E2_04.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E2_05.png",
+   "bytes": 2444,
+   "sha256": "70ebbef4befba73f8945d426728fae244a8ffade3f8d439919c977df8b4da66a",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E2_05.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E2_06.png",
+   "bytes": 2364,
+   "sha256": "c05bd512f26f334248551ab552d20afb42d1aae804e54e35581d312a7b073fc4",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E2_06.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E2_07.png",
+   "bytes": 2216,
+   "sha256": "6e00a7badf0bba0b771dda1954dd1d121beba04f70ec585924aba4bf54d84a47",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E2_07.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E2_08.png",
+   "bytes": 2335,
+   "sha256": "c475a0ef74c67e9daab4f5369e0c0afeda89c28dd3a045d8a54b7fdefa44206c",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E2_08.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E2_09.png",
+   "bytes": 2387,
+   "sha256": "013175a64e9335858b0981dd1f8a3b27564094f73dd1e2d24320b3c6d5a8127b",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E2_09.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E2_10.png",
+   "bytes": 2323,
+   "sha256": "83aa727935fcdef5173061e87b586588d118a1735c4bf757fc4c4b27220273f3",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E2_10.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E2_11.png",
+   "bytes": 1784,
+   "sha256": "0be12e2f188649980fc255dffda8eef4bf44ddf36099d88bb3f23007a6330473",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E2_11.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E3_00.png",
+   "bytes": 2435,
+   "sha256": "8dfb77d6607435d51adc96fcc277059234310b97e21207602faf83086b90895d",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E3_00.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E3_01.png",
+   "bytes": 2305,
+   "sha256": "d00ef4cd481658f04d4c4f3e118000156e66888d79dc2da9696f26e90a487e7c",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E3_01.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E3_02.png",
+   "bytes": 2492,
+   "sha256": "7eb31a659949bb88a096ce1addd690059b34a29b2613449f59fd72128cd85542",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E3_02.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E3_03.png",
+   "bytes": 2500,
+   "sha256": "d3e1068036991f79fab97f24b46083485984d4908abe5e08426ad0d12372dca7",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E3_03.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E3_04.png",
+   "bytes": 2657,
+   "sha256": "4c09e5c95dc514fa1146e8877b72156fbfd8bf109d2e959adc79b89934fd5418",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E3_04.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E3_05.png",
+   "bytes": 2731,
+   "sha256": "f0d8963007f15fb6712cb315ea4b9bd33027ecb25fec184bafea616134f6a4b9",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E3_05.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E3_06.png",
+   "bytes": 2300,
+   "sha256": "c7659d399bd7677e3ae324f3cae5b8413c0ebd6c80a2a3ca90c658071d67ba16",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E3_06.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E3_07.png",
+   "bytes": 2756,
+   "sha256": "ec2f0b42ab58f6b21012c55b3d85ac85b90b13b51e2f3cd19f3d8c0d891db4c6",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E3_07.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E3_08.png",
+   "bytes": 2715,
+   "sha256": "e16029e99398c1ad8c9b818c536e27037bd7af4ced52dbfe6c4b75deef16ca67",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E3_08.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E3_09.png",
+   "bytes": 2514,
+   "sha256": "51fada94dd48e1633446aa9a696e132fce98f5e81a9942a1053cf6ab7b95d180",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E3_09.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E3_10.png",
+   "bytes": 2609,
+   "sha256": "87d79fa88d9acbfa8690eedd7c0e5c8123989a51a22724e67a3cf35aaf8b2cb5",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E3_10.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E3_11.png",
+   "bytes": 1798,
+   "sha256": "9ebf706a908c43e766093095d796fb175f1c54a6fe73c1f6813a0131d91fae9a",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E3_11.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E4_00.png",
+   "bytes": 2306,
+   "sha256": "c5740cc83a82376151fee9c663c3e25536f466d9aa4a97deaa979f897b68f43e",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E4_00.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E4_01.png",
+   "bytes": 2663,
+   "sha256": "cdba6658cc4de8c5594529a22cb1e4b1f03d0a41c9a6e279be54610ea29367e0",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E4_01.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E4_02.png",
+   "bytes": 2184,
+   "sha256": "54012ee85d82df5dd7cee88f057c0c3296b546a6a7cfc2e83440da0c66cd10f2",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E4_02.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E4_03.png",
+   "bytes": 2390,
+   "sha256": "9dabc5d55158adc4b3eb4fcfdbef3a2af5921a903b00e53b5bf58db7f69e4ebb",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E4_03.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E4_04.png",
+   "bytes": 2306,
+   "sha256": "7fd702db32a3910851323fa6099e635e4074c6fa01c4aab169d91b282941048a",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E4_04.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E4_05.png",
+   "bytes": 2553,
+   "sha256": "037ff1f688dd0638807d09e8aa96735a25c398549f3bfbfe439e0905b298bba2",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E4_05.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E4_06.png",
+   "bytes": 2149,
+   "sha256": "b7c94a73307ee06a278b85dab456646b5218644399dae1d5cc86268f1af3f2a3",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E4_06.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E4_07.png",
+   "bytes": 2429,
+   "sha256": "e6f50d3f322640df07a8141c987b4ffa541b7bdb793d823df5e603b0c9f2c8c6",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E4_07.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E4_08.png",
+   "bytes": 2580,
+   "sha256": "7ab691738c5a31fae4c00bed24c218b7445d1dffbf09e8867900e090922bd02b",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E4_08.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E4_09.png",
+   "bytes": 2487,
+   "sha256": "c1795f78dcf326d170507f6763057b8cae50998ad3ab0e86f2df15601bf56fcb",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E4_09.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E4_10.png",
+   "bytes": 1740,
+   "sha256": "fb2c56804f1ddf47a4daeeb5491768b3d81faddb69a76c2161df8c0380146e6c",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E4_10.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "gallery/E4_11.png",
+   "bytes": 2404,
+   "sha256": "f90025ec5a8813c16ff3c8f2f1d0c18b1656c11491b1253cf583e7b15b25882b",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery/E4_11.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail of one expert-outlined cell"
+  },
+  {
+   "path": "strip/00.png",
+   "bytes": 2367,
+   "sha256": "b36f924a1344a245aa52594e84339962bb7d35e4ac2925ffc482b3962d57cb96",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/00.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/01.png",
+   "bytes": 2354,
+   "sha256": "aff08f83bf59f606960a55f236847fab9c5437f7c452d0bb2bb3a27328de2e7f",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/01.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/02.png",
+   "bytes": 2220,
+   "sha256": "f3e241752341bb8a10d36e51f0a3fd4b71e54b453a22c161470c05c3b480002a",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/02.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/03.png",
+   "bytes": 2277,
+   "sha256": "34d279e68c3fe0d04348333df327428ff649a7e76c394d7bcce609341c670574",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/03.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/04.png",
+   "bytes": 2267,
+   "sha256": "02f44933ea14a9216c2b806030aec2b3615b1c32f7f2b587c88eb04520d0f0aa",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/04.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/05.png",
+   "bytes": 2572,
+   "sha256": "85d67a4db2b2fc87fc2268d2cb9d5bfb1048a4ef207af07159bcf89b1e965b2c",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/05.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/06.png",
+   "bytes": 2404,
+   "sha256": "7bf351d3d2ef0a2696dd4eccb14f81b6dde514ccbfaced6d363d757ed27a5590",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/06.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/07.png",
+   "bytes": 2478,
+   "sha256": "b31ba5bd94686153c1cccad1107b345d577fdfa5c4f078dc63f984c7296fd804",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/07.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/08.png",
+   "bytes": 2379,
+   "sha256": "44b0970801270ee879fa7316ea4019ea6f8a9e91d545706bc560c608dea55dee",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/08.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/09.png",
+   "bytes": 2276,
+   "sha256": "af350bed0aab2f41f843fad6717ed3f45fc7f053c33753f77a6afa63f8ac8205",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/09.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/10.png",
+   "bytes": 2516,
+   "sha256": "d8d3da648dfb8250445d9db92d93fe886664c06cefc2b21f28fa73a4c0e60460",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/10.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/11.png",
+   "bytes": 2412,
+   "sha256": "abb0d66e9c6ee3cc66a0cf2a6a28e1c3203aa3d20291ca400e534994c110b599",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/11.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/12.png",
+   "bytes": 2424,
+   "sha256": "1e7bd3c51c9672d82332f86231469735e898dd17be5ebf11efdac7d351064a83",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/12.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/13.png",
+   "bytes": 1966,
+   "sha256": "05f363c003d3ee1f34817b306f5ca3640dd3c48327a6bfa3755220dbc27ecf35",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/13.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/14.png",
+   "bytes": 2319,
+   "sha256": "2147763db69210e4fadd5ae483b9a0b3c2cb444d9293c5132bd53966cbcb4056",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/14.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/15.png",
+   "bytes": 2665,
+   "sha256": "a2a39ee82116af9033d464147fba424b120f34547884bdc731dc899cac9b876c",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/15.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/16.png",
+   "bytes": 2410,
+   "sha256": "0a6468f080606d339ae8fa39a0b2891a36b536cec6b7f7a3f7e76b0ca9fcbc62",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/16.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/17.png",
+   "bytes": 2571,
+   "sha256": "70cd182adea4b0b95018e5a64a94ff669f118347afa613c7c25e6ca1f671ba74",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/17.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/18.png",
+   "bytes": 2463,
+   "sha256": "25ed143ec125374a97f18fe5bd5b7bd0b0bd8cafc0fdec4b562bd0b4d2f1838a",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/18.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/19.png",
+   "bytes": 2415,
+   "sha256": "4fba130387965228b76c6d2e96119d2370e5584d3174f84304dd7329c2c7fcc1",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/19.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/20.png",
+   "bytes": 2436,
+   "sha256": "ef1d48e83e1af4aed0e006ab2909aa6432e590f822682c965e5ccd85b9742437",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/20.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/21.png",
+   "bytes": 2647,
+   "sha256": "ef8554bc4019bf3b6041eb02f1255e7af2e80839cbac863fa82961bb0611cdbc",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/21.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/22.png",
+   "bytes": 2814,
+   "sha256": "36b655b73f7860d8699fcb577aa26d1f8607607851c642534d296298a4825d5f",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/22.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/23.png",
+   "bytes": 2523,
+   "sha256": "4d9327cd73f18ba6215c070719c0cd9c6b75d77088555b6ac8350e44609e2357",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/23.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/24.png",
+   "bytes": 2268,
+   "sha256": "4261e8e8691e1d23d4dde6989b6a5eb8ebc0f8abadb44267f1a6546a1bad6e68",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/24.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/25.png",
+   "bytes": 2275,
+   "sha256": "ee7409973d5d5845fbf97c88ce4809a20d733bb10a1fbb966e96858aa31df58a",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/25.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/26.png",
+   "bytes": 2471,
+   "sha256": "a9d4161cb9420e849f33ca9aac9bf293d0f45b69a077b7d18275ca3922c1af48",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/26.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/27.png",
+   "bytes": 2595,
+   "sha256": "d8946bb1a6ffbe25346e478273cbc819dff2c2bb63da230c2c1efefc7030d4a9",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/27.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/28.png",
+   "bytes": 2389,
+   "sha256": "6025f9b12c2ad1da73ccce69d3fc05996df815135dfe3e11a0903e1f1205ef82",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/28.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/29.png",
+   "bytes": 2364,
+   "sha256": "c05bd512f26f334248551ab552d20afb42d1aae804e54e35581d312a7b073fc4",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/29.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/30.png",
+   "bytes": 2605,
+   "sha256": "1d797c77e10347ee821c30f88f17cb23f3da481cbec03e89560be3a983177808",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/30.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/31.png",
+   "bytes": 2353,
+   "sha256": "3a41aa7fc124fb51befdccbd60e6e6e678c4e8fc196077102fcb30cd482b132c",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/31.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/32.png",
+   "bytes": 2613,
+   "sha256": "dc5171773b84582c7bea90803edd1c3f20bb4e63f7d9989c786eb9a65515c5dc",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/32.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/33.png",
+   "bytes": 2336,
+   "sha256": "b27008fdb9469e3cb5da3bac9a7ca2615ba5e9e522ffa509b496370fe7bbb19b",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/33.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/34.png",
+   "bytes": 2348,
+   "sha256": "c6811e17ab28da9c52c22f36eece3dda1550881e4d03991019b81dc3e2fe2d8b",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/34.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/35.png",
+   "bytes": 2654,
+   "sha256": "c7c399e17f42b5d3568cd5effe7209054a306e78ff1231da8be973dbe94ebbf4",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/35.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/36.png",
+   "bytes": 2542,
+   "sha256": "1d6ce4f819f4a50da2132a98974d4c01a863a8e5374ad96b177f532c6d0f835e",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/36.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/37.png",
+   "bytes": 2009,
+   "sha256": "831e2b53b04d03e518725d35665a1b0a0394a392ff69f1bb27f8164624c436c7",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/37.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/38.png",
+   "bytes": 2606,
+   "sha256": "d4ff197859fea1ea10638d5f899f6263791c3b650379015c4f53027a6d9d2a4c",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/38.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/39.png",
+   "bytes": 2365,
+   "sha256": "e3a52c7a036807e7d3b647a541d8a4c5128be8b0e8e78961cf7e0789a1e88af8",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/39.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/40.png",
+   "bytes": 2400,
+   "sha256": "975e1ac314b9bb953a0042b6427d81b0f4dc1fb2195b91dd1d819c6686be6583",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/40.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/41.png",
+   "bytes": 2738,
+   "sha256": "4996d26f701c9e47f742c33d185bae769a10978690b9a6e58a18f636a111981f",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/41.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/42.png",
+   "bytes": 2367,
+   "sha256": "4ba4568cf1a51425043e320dc2541bdfefdf8fc4256fae140d225077685e9121",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/42.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/43.png",
+   "bytes": 2543,
+   "sha256": "49b1a13e0dc34211909de6ab8e8a57fd7941b3381b582a7c884ea74488b9d0f6",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/43.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/44.png",
+   "bytes": 2637,
+   "sha256": "d1293e9a8342d345313dbfc746f70f021d2b9243fcec1c91b095055e1d5c132e",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/44.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/45.png",
+   "bytes": 2512,
+   "sha256": "2a0be11d7256759b53c59d37965d3f04f8ac54bd2911398b5fd56630a73c3559",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/45.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/46.png",
+   "bytes": 2580,
+   "sha256": "7ab691738c5a31fae4c00bed24c218b7445d1dffbf09e8867900e090922bd02b",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/46.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/47.png",
+   "bytes": 2429,
+   "sha256": "e6f50d3f322640df07a8141c987b4ffa541b7bdb793d823df5e603b0c9f2c8c6",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/47.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/48.png",
+   "bytes": 2355,
+   "sha256": "38f5d95a16b7f158b885eec96faebc2ad18c6d94851836773d575dc60c74dec4",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/48.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/49.png",
+   "bytes": 2386,
+   "sha256": "a09e729446d2091bf8e17cbdf57bdc094c2e712d4f3a99050e71b6a6dc6956b7",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/49.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/50.png",
+   "bytes": 2149,
+   "sha256": "b7c94a73307ee06a278b85dab456646b5218644399dae1d5cc86268f1af3f2a3",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/50.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/51.png",
+   "bytes": 2116,
+   "sha256": "001eb596b3814deb4fdc99a74c74c6f9112218994f1e36385cc53db2c4ee784e",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/51.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/52.png",
+   "bytes": 2420,
+   "sha256": "e1c653ae4541e44ccc58e702dec9cfafacd9f4562113ab26e383cc02e540fadf",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/52.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/53.png",
+   "bytes": 2553,
+   "sha256": "56f6195e2fa4eb49390cb3e8d5c6eea99d10969e850d17e765de95f1f3521854",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/53.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/54.png",
+   "bytes": 2393,
+   "sha256": "03f2f0624d22e1794420b5313a3cea71161ab4b70314be2c86b966dd3886fc3a",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/54.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/55.png",
+   "bytes": 2085,
+   "sha256": "cbc776b97e8109073e4bbef7c80daaa73320dc0d4154d170fb726485827bf5f2",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/55.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/56.png",
+   "bytes": 2265,
+   "sha256": "389ec9523ab48616d4956296e7282c36a70de4fc0e3445019dbf0e2138af890b",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/56.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/57.png",
+   "bytes": 2553,
+   "sha256": "037ff1f688dd0638807d09e8aa96735a25c398549f3bfbfe439e0905b298bba2",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/57.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/58.png",
+   "bytes": 2184,
+   "sha256": "54012ee85d82df5dd7cee88f057c0c3296b546a6a7cfc2e83440da0c66cd10f2",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/58.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "strip/59.png",
+   "bytes": 2404,
+   "sha256": "f90025ec5a8813c16ff3c8f2f1d0c18b1656c11491b1253cf583e7b15b25882b",
+   "role": "media",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip/59.png",
+   "licence": "CC BY 4.0",
+   "credit": "RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430 (Helmholtz Munich / Univ. Zurich), CC BY 4.0",
+   "what": "64x64 grey thumbnail, one of 60 cells sorted by per-cell severity"
+  },
+  {
+   "path": "gallery.json",
+   "bytes": 21778,
+   "sha256": "f7a5a0a8d7afad71860b984ee4715ab691ba84ac8b1762fa8c6f0c825ae62380",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:gallery.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)"
+  },
+  {
+   "path": "strip.json",
+   "bytes": 15338,
+   "sha256": "68cd68b9a559d61c1d54ea358af79af96ca5c656b77f226a2c042bceeafd1279",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:strip.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)"
+  },
+  {
+   "path": "timeline.json",
+   "bytes": 3036,
+   "sha256": "9a2400b706f39c170242bc0fefa3b09275da2d81a96d7a88f0f33c3d1c30c8bf",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:timeline.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)"
+  },
+  {
+   "path": "showcase.json",
+   "bytes": 7228,
+   "sha256": "1132201baf885f7bfe9f8a851bbf4163616c36129e17fc43237a670bf70799fe",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:showcase.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)"
+  },
+  {
+   "path": "confusion.json",
+   "bytes": 1371,
+   "sha256": "68fad2502a601e60ea61f2d8d9cbb1eede8eea6e821451885bcd9f1738288ef9",
+   "role": "meta",
+   "source": "work/SpikeCount/results/spike_demo.zip:confusion.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)"
+  },
+  {
+   "path": "evidence.json",
+   "bytes": 25515,
+   "sha256": "5dee493e7571d29c201f3e1b6620124258b6512cbd1c9b0aa93c9ef04f47f9fb",
+   "role": "meta",
+   "source": "work/SpikeCount/results/metrics.json + work/SpikeCount/results/spike_demo.zip:fields_oof.json",
+   "licence": "CC BY 4.0",
+   "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
+   "what": "compact derived evidence: OOF scatter rows, headline numbers, comparison table"
+  }
+ ]
+}
