@@ -63,6 +63,21 @@ export function Field({ url, cells, t, api, label, onImage, picked = null, onPic
   const last = useRef<number | null>(t)
   const [px, setPx] = useState(0.75) // image pixels per CSS pixel
 
+  // The load event of an SVG <image> is not dependable: on the published site (pictures come through the
+  // service worker) it is sometimes never sent, and the view would wait for ever. An HTML image watches the same URL.
+  const onImageRef = useRef(onImage)
+  onImageRef.current = onImage
+  useEffect(() => {
+    let live = true
+    const im = new Image()
+    im.onload = () => live && onImageRef.current?.(true)
+    im.onerror = () => live && onImageRef.current?.(false)
+    im.src = url
+    return () => {
+      live = false
+    }
+  }, [url])
+
   useLayoutEffect(() => {
     const el = svg.current
     if (!el) return
