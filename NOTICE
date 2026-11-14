@@ -1,0 +1,6 @@
+SuperHumans (Team SuperHumans, NASA Space Apps Challenge 2026)
+
+The MIT licence in LICENSE covers the source code and the model weights trained by Team SuperHumans.
+Third-party data excerpts under public/ keep their own licences and citations: see each
+public/<module>/manifest.json, and public/bubblegrade/LICENSE-DATA.txt for the GPL-3.0-or-later
+Doppler clips. coi-serviceworker (public/coi-serviceworker.js) is MIT, Guido Zuidhof and contributors.

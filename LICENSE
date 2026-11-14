@@ -19,8 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-This licence covers the source code and the model weights trained by Team
-SuperHumans. Third-party data excerpts under public/ keep their own licences
-and citations: see each public/<module>/manifest.json, and
-public/bubblegrade/LICENSE-DATA.txt for the GPL-3.0-or-later Doppler clips.
