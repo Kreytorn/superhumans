@@ -1,0 +1,52 @@
+@import 'tailwindcss';
+@import './styles/tokens.css';
+
+/* Stage scaling: 1rem = 16 stage px at 1920x1080 (PLAYBOOK §1.2). */
+html {
+  font-size: min(calc(100vw / 120), calc(100dvh / 67.5));
+  background: var(--bg);
+}
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+body {
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+::selection {
+  background: rgba(143, 184, 255, 0.35);
+  color: var(--text-1);
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.mono {
+  font-family: var(--font-mono);
+}
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}

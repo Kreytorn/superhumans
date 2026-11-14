@@ -1,0 +1,153 @@
+{
+ "label": "Illustrative: lab blood fields from different donors, not one astronaut",
+ "primary": "model",
+ "outlines_default": "model",
+ "margin_pp": 10.0,
+ "margin_source": "M",
+ "baseline": "S0/A0 = the preflight step's own spiky % / advanced % (per source)",
+ "baselines": {
+  "model": {
+   "S0": 5.1948,
+   "A0": 2.5974
+  },
+  "model_expert_outlines": {
+   "S0": 5.9701,
+   "A0": 1.4925
+  },
+  "expert": {
+   "S0": 0.0,
+   "A0": 0.0
+  }
+ },
+ "tier_names": [
+  "Green",
+  "Self-care",
+  "Crew Medical Officer",
+  "Flight surgeon",
+  "Ground / evacuation"
+ ],
+ "tier_rule": "plan section 9 (our product rule); tiers 3-4 are never triggered by the model",
+ "selftest_random_weights": false,
+ "steps": [
+  {
+   "label": "Preflight",
+   "day": null,
+   "field": 184,
+   "image": "fields/184.png",
+   "model": {
+    "n": 77,
+    "spiky_pct": 5.1948,
+    "advanced_pct": 2.5974,
+    "severity": 0.1143,
+    "tier": 0,
+    "tier_name": "Green"
+   },
+   "model_expert_outlines": {
+    "n": 67,
+    "spiky_pct": 5.9701,
+    "advanced_pct": 1.4925,
+    "severity": 0.0833,
+    "tier": 0,
+    "tier_name": "Green"
+   },
+   "expert": {
+    "n": 67,
+    "spiky_pct": 0.0,
+    "advanced_pct": 0.0,
+    "severity": 0.0,
+    "tier": 0,
+    "tier_name": "Green"
+   }
+  },
+  {
+   "label": "Day 30",
+   "day": 30,
+   "field": 121,
+   "image": "fields/121.png",
+   "model": {
+    "n": 54,
+    "spiky_pct": 14.8148,
+    "advanced_pct": 1.8519,
+    "severity": 0.1667,
+    "tier": 0,
+    "tier_name": "Green"
+   },
+   "model_expert_outlines": {
+    "n": 43,
+    "spiky_pct": 18.6047,
+    "advanced_pct": 0.0,
+    "severity": 0.186,
+    "tier": 1,
+    "tier_name": "Self-care"
+   },
+   "expert": {
+    "n": 43,
+    "spiky_pct": 16.2791,
+    "advanced_pct": 0.0,
+    "severity": 0.1628,
+    "tier": 1,
+    "tier_name": "Self-care"
+   }
+  },
+  {
+   "label": "Day 60",
+   "day": 60,
+   "field": 81,
+   "image": "fields/81.png",
+   "model": {
+    "n": 38,
+    "spiky_pct": 44.7368,
+    "advanced_pct": 39.4737,
+    "severity": 1.1622,
+    "tier": 2,
+    "tier_name": "Crew Medical Officer"
+   },
+   "model_expert_outlines": {
+    "n": 35,
+    "spiky_pct": 42.8571,
+    "advanced_pct": 28.5714,
+    "severity": 0.8529,
+    "tier": 2,
+    "tier_name": "Crew Medical Officer"
+   },
+   "expert": {
+    "n": 35,
+    "spiky_pct": 40.0,
+    "advanced_pct": 22.8571,
+    "severity": 0.6471,
+    "tier": 2,
+    "tier_name": "Crew Medical Officer"
+   }
+  },
+  {
+   "label": "Day 90",
+   "day": 90,
+   "field": 96,
+   "image": "fields/96.png",
+   "model": {
+    "n": 53,
+    "spiky_pct": 58.4906,
+    "advanced_pct": 37.7358,
+    "severity": 1.7308,
+    "tier": 2,
+    "tier_name": "Crew Medical Officer"
+   },
+   "model_expert_outlines": {
+    "n": 52,
+    "spiky_pct": 63.4615,
+    "advanced_pct": 40.3846,
+    "severity": 1.8235,
+    "tier": 2,
+    "tier_name": "Crew Medical Officer"
+   },
+   "expert": {
+    "n": 52,
+    "spiky_pct": 53.8462,
+    "advanced_pct": 34.6154,
+    "severity": 1.5192,
+    "tier": 2,
+    "tier_name": "Crew Medical Officer"
+   }
+  }
+ ]
+}

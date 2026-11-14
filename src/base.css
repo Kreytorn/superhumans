@@ -1,0 +1,16 @@
+/* The only global CSS in the app (r3). Everything else is scoped inside a prototype, moment or module folder. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}

@@ -1,0 +1,113 @@
+{
+ "field": 86,
+ "fold": 0,
+ "label_png": "expert/86.png",
+ "ignore_value": 255,
+ "cells": {
+  "1": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "2": {
+   "cls": 1,
+   "name": "E1",
+   "border": false
+  },
+  "3": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "4": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "5": {
+   "cls": 0,
+   "name": "Disc",
+   "border": true
+  },
+  "6": {
+   "cls": 0,
+   "name": "Disc",
+   "border": true
+  },
+  "7": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "8": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "9": {
+   "cls": 0,
+   "name": "Disc",
+   "border": true
+  },
+  "10": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "11": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "12": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "13": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "14": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "15": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "16": {
+   "cls": 5,
+   "name": "Cup",
+   "border": false
+  },
+  "17": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "18": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  }
+ },
+ "expert": {
+  "n": 18,
+  "spiky_pct": 5.5556,
+  "advanced_pct": 0.0,
+  "severity": 0.0588,
+  "counts": {
+   "Disc": 16,
+   "E1": 1,
+   "E2": 0,
+   "E3": 0,
+   "E4": 0,
+   "Cup": 1
+  },
+  "n_unknown": 0
+ }
+}

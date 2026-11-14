@@ -1,0 +1,353 @@
+.tt {
+  position: relative;
+  z-index: 1;
+  width: 120rem;
+  height: 67.5rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+.tt-loading,
+.tt-error {
+  position: relative;
+  z-index: 1;
+  padding: 5rem;
+  font-size: 1.6rem;
+  color: var(--text-2);
+}
+.tt-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 33rem 41rem 1fr;
+  gap: 2.5rem;
+  padding: 1.75rem 5rem 1.25rem;
+  min-height: 0;
+}
+
+/* left column */
+.tt-tag {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--m-tracktrace);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+}
+.tt-tag-rule {
+  width: 3rem;
+  height: 2px;
+  background: var(--m-tracktrace);
+}
+.tt-title {
+  margin: 0.75rem 0 0;
+  font-size: 3.6rem;
+  line-height: 1.02;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.tt-story {
+  margin: 0.9rem 0 0;
+  font-size: 1.6rem;
+  line-height: 1.35;
+  color: var(--text-2);
+  text-wrap: pretty;
+}
+.tt-hero {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-top: 1.4rem;
+}
+.tt-hero-num {
+  font-size: 9rem;
+  line-height: 0.82;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  min-width: 5.5rem;
+}
+.tt-hero-unit {
+  font-size: 1.6rem;
+  line-height: 1.2;
+  color: var(--text-2);
+  padding-bottom: 0.4rem;
+}
+.tt-facts {
+  margin: 1.5rem 0 0;
+  display: grid;
+  gap: 0.9rem;
+}
+.tt-facts > div {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+}
+.tt-facts dt {
+  font-size: 1.3rem;
+  color: var(--text-3);
+}
+.tt-facts dd {
+  margin: 0;
+  font-size: 1.45rem;
+  line-height: 1.25;
+}
+.tt-sub {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 1.15rem;
+  color: var(--text-3);
+}
+.tt-mock {
+  margin-top: 1.25rem;
+  padding: 0.7rem 0.9rem;
+  border: 1.5px dashed var(--accent);
+  border-radius: 0.5rem;
+  font-size: 1.15rem;
+  line-height: 1.35;
+  color: var(--text-2);
+}
+.tt-mock b {
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  margin-right: 0.4rem;
+}
+
+/* centre well */
+.tt-center {
+  display: flex;
+  flex-direction: column;
+}
+.tt-well {
+  position: relative;
+  margin: 0;
+  width: 41rem;
+}
+.tt-stage {
+  position: relative;
+  width: 41rem;
+  height: 41rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: radial-gradient(60% 60% at 50% 50%, #0b0610 0%, var(--well) 70%);
+  border: 1px solid var(--line);
+  animation: tt-in 420ms var(--ease-out) both;
+}
+@keyframes tt-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+}
+.tt-img,
+.tt-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.tt-img {
+  image-rendering: auto;
+  filter: drop-shadow(0 0 1.2rem rgba(255, 122, 69, 0.25));
+}
+.tt-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  background: var(--accent);
+  box-shadow: 0 0 1.2rem 0.3rem rgba(143, 184, 255, 0.55);
+  transform: translateY(-1rem);
+  animation: tt-sweep 900ms var(--ease-in-out) 120ms both;
+}
+@keyframes tt-sweep {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(41rem);
+    opacity: 0;
+  }
+}
+.tt-circle {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 0.55;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  filter: drop-shadow(0 0 1.2px rgba(143, 184, 255, 0.9));
+  animation: tt-pop 260ms var(--ease-out) both;
+}
+@keyframes tt-pop {
+  from {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.tt-line {
+  stroke: var(--accent);
+  stroke-width: 0.7;
+  stroke-linecap: round;
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  filter: drop-shadow(0 0 2px rgba(143, 184, 255, 0.9));
+  animation: tt-draw 600ms var(--ease-out) both;
+}
+@keyframes tt-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.tt-id {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.25rem;
+  background: rgba(0, 0, 0, 0.6);
+  font-size: 1.1rem;
+  color: var(--text-2);
+}
+.tt-corner {
+  position: absolute;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-color: var(--m-tracktrace);
+  border-style: solid;
+  border-width: 0;
+  z-index: 2;
+}
+.tt-corner.tl {
+  left: -0.8rem;
+  top: -0.8rem;
+  border-left-width: 2px;
+  border-top-width: 2px;
+}
+.tt-corner.tr {
+  right: -0.8rem;
+  top: -0.8rem;
+  border-right-width: 2px;
+  border-top-width: 2px;
+}
+.tt-corner.bl {
+  left: -0.8rem;
+  top: 40.2rem;
+  border-left-width: 2px;
+  border-bottom-width: 2px;
+}
+.tt-corner.br {
+  right: -0.8rem;
+  top: 40.2rem;
+  border-right-width: 2px;
+  border-bottom-width: 2px;
+}
+.tt-caption {
+  margin-top: 0.8rem;
+  font-size: 1.2rem;
+  line-height: 1.35;
+  color: var(--text-2);
+}
+
+/* right gallery */
+.tt-right {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-width: 0;
+}
+.tt-right-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 1.45rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+.tt-auto {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-3);
+}
+.tt-row-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.15rem;
+  color: var(--text-2);
+  margin-bottom: 0.25rem;
+}
+.tt-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+}
+.tt-dot.p-fe {
+  background: var(--m-tracktrace);
+}
+.tt-dot.p-xray {
+  background: var(--accent);
+}
+.tt-dot.p-sham {
+  background: var(--text-3);
+}
+.tt-thumbs {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0.35rem;
+}
+.tt-thumb {
+  aspect-ratio: 1;
+  border-radius: 0.4rem;
+  background: var(--well);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  transition: border-color 150ms var(--ease-out), transform 120ms var(--ease-out);
+}
+.tt-thumb canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.tt-thumb:hover {
+  border-color: var(--line-strong);
+}
+.tt-thumb:active {
+  transform: scale(0.97);
+}
+.tt-thumb.on {
+  border: 2px solid var(--m-tracktrace);
+  box-shadow: 0 0 0.8rem rgba(255, 122, 69, 0.45);
+}
+
+/* bottom */
+.tt-act {
+  padding: 0 5rem;
+}
+.tt-credit {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: 0.6rem 5rem 0.9rem;
+  font-size: 1rem;
+  color: var(--text-3);
+}
+.ai-mark {
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  color: var(--text-2);
+}

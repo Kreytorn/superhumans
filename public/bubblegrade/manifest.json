@@ -1,0 +1,287 @@
+{
+ "module": "bubblegrade",
+ "fallbackRow": "A",
+ "fallbackRowSource": "work/BubbleGrade/results/results/gate.txt (every gate passes; L7 is reported, not a gate)",
+ "model": {
+  "name": "bubblegrade_mnv4m_r4.onnx",
+  "bytes": 29417960,
+  "sha256": "8aae1890974a258e6178cb0b6dca371e2e779f035c75ff0af0e4d17abd43e67c",
+  "parts": [
+   "bubblegrade/models/bubblegrade_mnv4m_r4.onnx.part00",
+   "bubblegrade/models/bubblegrade_mnv4m_r4.onnx.part01"
+  ]
+ },
+ "totalBytes": 33133607,
+ "files": [
+  {
+   "path": "bubblegrade/clips/dcs-dive.wav",
+   "bytes": 464990,
+   "sha256": "b2a35e1300d52033491ebea0e908d554bee425227eb83e412b428489a446473c",
+   "role": "input",
+   "source": "(archive clip, see LICENSE-DATA.txt; source name withheld: it holds a subject ID)",
+   "licence": "GPL-3.0-or-later (Zenodo metadata)",
+   "credit": "Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "16 kHz mono 16-bit PCM WAV, the model's exact input"
+  },
+  {
+   "path": "bubblegrade/clips/grade-0.wav",
+   "bytes": 326388,
+   "sha256": "5f7a6ac21ef667b4c900a69407c58a368aee139587a2985676bd5fe7e0be229a",
+   "role": "input",
+   "source": "(archive clip, see LICENSE-DATA.txt; source name withheld: it holds a subject ID)",
+   "licence": "GPL-3.0-or-later (Zenodo metadata)",
+   "credit": "Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "16 kHz mono 16-bit PCM WAV, the model's exact input"
+  },
+  {
+   "path": "bubblegrade/clips/grade-1.wav",
+   "bytes": 336564,
+   "sha256": "6e8c5ff50b5d5ceac125be4478dd14bad478ee2f8af1b8cfdca4130b391474fe",
+   "role": "input",
+   "source": "(archive clip, see LICENSE-DATA.txt; source name withheld: it holds a subject ID)",
+   "licence": "GPL-3.0-or-later (Zenodo metadata)",
+   "credit": "Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "16 kHz mono 16-bit PCM WAV, the model's exact input"
+  },
+  {
+   "path": "bubblegrade/clips/grade-2.wav",
+   "bytes": 579316,
+   "sha256": "838098f94ef0170d9aa18dc6f711fc2f203adb4fd40f43b008a4020c6d0f50cc",
+   "role": "input",
+   "source": "(archive clip, see LICENSE-DATA.txt; source name withheld: it holds a subject ID)",
+   "licence": "GPL-3.0-or-later (Zenodo metadata)",
+   "credit": "Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "16 kHz mono 16-bit PCM WAV, the model's exact input"
+  },
+  {
+   "path": "bubblegrade/clips/grade-3.wav",
+   "bytes": 502316,
+   "sha256": "57f5d42d0309a83ac8ddabae1b63b2562f1f15425b95a5d72dc113468ea3d149",
+   "role": "input",
+   "source": "(archive clip, see LICENSE-DATA.txt; source name withheld: it holds a subject ID)",
+   "licence": "GPL-3.0-or-later (Zenodo metadata)",
+   "credit": "Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "16 kHz mono 16-bit PCM WAV, the model's exact input"
+  },
+  {
+   "path": "bubblegrade/clips/grade-4.wav",
+   "bytes": 447828,
+   "sha256": "289cb150408415e2ae04ee0e438f215a484b3ea66522e0718e1510924869cce0",
+   "role": "input",
+   "source": "(archive clip, see LICENSE-DATA.txt; source name withheld: it holds a subject ID)",
+   "licence": "GPL-3.0-or-later (Zenodo metadata)",
+   "credit": "Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "16 kHz mono 16-bit PCM WAV, the model's exact input"
+  },
+  {
+   "path": "bubblegrade/LICENSE-DATA.txt",
+   "bytes": 1999,
+   "sha256": "8ac50cee76a6100336342cba176e1a7445250aff8a54cdeb4dacfa791890b360",
+   "role": "meta",
+   "source": "written r3 from deck/CREDITS.md and plans/02_BubbleGrade.md section 12",
+   "licence": "n/a",
+   "credit": "team SuperHumans"
+  },
+  {
+   "path": "bubblegrade/meta.json",
+   "bytes": 6820,
+   "sha256": "0881d1a7a545f3ddc18a7dad0dc30604417a599b1b3cc61591d2bd573ba038f0",
+   "role": "meta",
+   "source": "work/BubbleGrade/results/assets/bubble_meta.json, minus the L7 table of Pierleoni's published labels (r3 release: only our own scores ship)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "tau, thresholds, headline metrics with CIs, floors, L2/L3 tables, confusion matrix, per-rotation table, L7 summary and our own scores"
+  },
+  {
+   "path": "bubblegrade/parity/dcs-dive.logmel.f32.gz",
+   "bytes": 340410,
+   "sha256": "002952ce2abce80e122b552ea7d87507a7939fdd2d73857322ff77ab32315db4",
+   "role": "meta",
+   "source": "parity reference: work/BubbleGrade/results/assets/showcase.json + ONNX Runtime CPU (r3)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "used only by app/parity/bubblegrade.html; a screen never needs it"
+  },
+  {
+   "path": "bubblegrade/parity/grade-0.logmel.f32.gz",
+   "bytes": 231890,
+   "sha256": "29ea147f83d4c78d2f9d7836736326e9ac7ce3f6d04270fab63b10cc6991c273",
+   "role": "meta",
+   "source": "parity reference: work/BubbleGrade/results/assets/showcase.json + ONNX Runtime CPU (r3)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "used only by app/parity/bubblegrade.html; a screen never needs it"
+  },
+  {
+   "path": "bubblegrade/parity/reference.json",
+   "bytes": 40938,
+   "sha256": "b458ecdbc75d9bfb5f48afc91fe3dd743f2eb21b92e773517f9a91265d3e039f",
+   "role": "meta",
+   "source": "parity reference: work/BubbleGrade/results/assets/showcase.json + ONNX Runtime CPU (r3)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "used only by app/parity/bubblegrade.html; a screen never needs it"
+  },
+  {
+   "path": "bubblegrade/samples.json",
+   "bytes": 4062,
+   "sha256": "b95b1dc9be89d578eaeeebe9871996e9a3548d07a3b628eb0e0649987e8e4894",
+   "role": "meta",
+   "source": "work/BubbleGrade/results/assets/showcase.json (metadata, neutral ids)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo"
+  },
+  {
+   "path": "bubblegrade/models/bubblegrade_mnv4m_r4.onnx.part00",
+   "bytes": 16777216,
+   "sha256": "9cfbd0534fbdfb72aa880daac2ea7d2bac6a3f91fd367862da8a4d79230a3609",
+   "role": "model",
+   "source": "work/BubbleGrade/results/export/bubblegrade_mnv4m_r4.onnx.part00",
+   "licence": "Team model weights; backbone init timm/mobilenetv4_conv_medium.e500_r256_in1k (Apache-2.0)",
+   "credit": "BubbleGrade MobileNetV4-Conv-Medium, rotation 4 (team SuperHumans); timm (Apache-2.0)",
+   "note": "part of bubblegrade_mnv4m_r4.onnx (29,417,960 B, sha256 8aae1890...e67c); load() joins .part00 + .part01"
+  },
+  {
+   "path": "bubblegrade/models/bubblegrade_mnv4m_r4.onnx.part01",
+   "bytes": 12640744,
+   "sha256": "fb000c83005f3b6943933e3d3b1a2d086bb6b0c9e7620e4403b610bdf983df84",
+   "role": "model",
+   "source": "work/BubbleGrade/results/export/bubblegrade_mnv4m_r4.onnx.part01",
+   "licence": "Team model weights; backbone init timm/mobilenetv4_conv_medium.e500_r256_in1k (Apache-2.0)",
+   "credit": "BubbleGrade MobileNetV4-Conv-Medium, rotation 4 (team SuperHumans); timm (Apache-2.0)",
+   "note": "part of bubblegrade_mnv4m_r4.onnx (29,417,960 B, sha256 8aae1890...e67c); load() joins .part00 + .part01"
+  },
+  {
+   "path": "bubblegrade/dcs_dives.json",
+   "bytes": 26829,
+   "sha256": "c46d3aee5af500834e8b3d45f8a87629f1db23f2206f3fc9777bd22e766c535e",
+   "role": "precomputed",
+   "source": "work/BubbleGrade/results/assets/dcs_dives.json (subject IDs -> diver-NN, file names removed)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo"
+  },
+  {
+   "path": "bubblegrade/dive_curve.json",
+   "bytes": 6351,
+   "sha256": "d318916c2f635e58d83da42acf0812cb5be166ca9eb2239008f66477c9f3c256",
+   "role": "precomputed",
+   "source": "work/BubbleGrade/results/assets/dive_curve.json (diver initials and file names removed)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo"
+  },
+  {
+   "path": "bubblegrade/precomputed/dcs-dive.json",
+   "bytes": 4909,
+   "sha256": "7f0329c8cb50347512287e8f0821d7546db1d16da7075442c3fcf1a55a750882",
+   "role": "precomputed",
+   "source": "work/BubbleGrade/results/assets/showcase.json (per-window PyTorch outputs)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo"
+  },
+  {
+   "path": "bubblegrade/precomputed/dcs-dive.spec.u8.gz",
+   "bytes": 63967,
+   "sha256": "720e643e8716dc22e6a83db400ee433f55b49f2a0ae8d178463f60d36ea936a5",
+   "role": "precomputed",
+   "source": "ONNX Runtime CPU run of work/BubbleGrade/results/export/bubblegrade_mnv4m_r4.onnx on the clip (r3)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "uint8 display spectrogram [64][cols], gzip"
+  },
+  {
+   "path": "bubblegrade/precomputed/grade-0.json",
+   "bytes": 3445,
+   "sha256": "1417b67c4ba263adf92772c4e84d70c700e51c724766aded80df452e02a839eb",
+   "role": "precomputed",
+   "source": "work/BubbleGrade/results/assets/showcase.json (per-window PyTorch outputs)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo"
+  },
+  {
+   "path": "bubblegrade/precomputed/grade-0.spec.u8.gz",
+   "bytes": 48790,
+   "sha256": "5b8e8d6a23a55d0143023a728a9cdd6f1ae243edfff6ea317345289f4a4550f6",
+   "role": "precomputed",
+   "source": "ONNX Runtime CPU run of work/BubbleGrade/results/export/bubblegrade_mnv4m_r4.onnx on the clip (r3)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "uint8 display spectrogram [64][cols], gzip"
+  },
+  {
+   "path": "bubblegrade/precomputed/grade-1.json",
+   "bytes": 3413,
+   "sha256": "a77cca0f5cdee432a7a7d06c8d7024f39fb50374d58c4dcb3f1ac09ea1d1a8f3",
+   "role": "precomputed",
+   "source": "work/BubbleGrade/results/assets/showcase.json (per-window PyTorch outputs)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo"
+  },
+  {
+   "path": "bubblegrade/precomputed/grade-1.spec.u8.gz",
+   "bytes": 45470,
+   "sha256": "12d4666cdaabe0e4e2fb487f5f0931293db367119cf2724c33c69b8d264b6af0",
+   "role": "precomputed",
+   "source": "ONNX Runtime CPU run of work/BubbleGrade/results/export/bubblegrade_mnv4m_r4.onnx on the clip (r3)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "uint8 display spectrogram [64][cols], gzip"
+  },
+  {
+   "path": "bubblegrade/precomputed/grade-2.json",
+   "bytes": 6451,
+   "sha256": "bfc7df332f5514064ccefd52b020a2cc0a91e2c8861af1bffb92dd8d35282d17",
+   "role": "precomputed",
+   "source": "work/BubbleGrade/results/assets/showcase.json (per-window PyTorch outputs)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo"
+  },
+  {
+   "path": "bubblegrade/precomputed/grade-2.spec.u8.gz",
+   "bytes": 80076,
+   "sha256": "b8e1671655e22ad789fbe300471975afc9c8df841474424c34463234756b5483",
+   "role": "precomputed",
+   "source": "ONNX Runtime CPU run of work/BubbleGrade/results/export/bubblegrade_mnv4m_r4.onnx on the clip (r3)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "uint8 display spectrogram [64][cols], gzip"
+  },
+  {
+   "path": "bubblegrade/precomputed/grade-3.json",
+   "bytes": 5196,
+   "sha256": "717598c6c65082a021a1a35529815d32e010cbbb640e408ec9f85c139d9cd2d0",
+   "role": "precomputed",
+   "source": "work/BubbleGrade/results/assets/showcase.json (per-window PyTorch outputs)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo"
+  },
+  {
+   "path": "bubblegrade/precomputed/grade-3.spec.u8.gz",
+   "bytes": 69929,
+   "sha256": "986416fb58cab68a202b59e9764a1240bf51ced786db9c3fccba1411c4b2e4e7",
+   "role": "precomputed",
+   "source": "ONNX Runtime CPU run of work/BubbleGrade/results/export/bubblegrade_mnv4m_r4.onnx on the clip (r3)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "uint8 display spectrogram [64][cols], gzip"
+  },
+  {
+   "path": "bubblegrade/precomputed/grade-4.json",
+   "bytes": 4392,
+   "sha256": "dd943f2b1f038103e29f63c2d21000b789582eff3d9f336b2763a5f9b73e7838",
+   "role": "precomputed",
+   "source": "work/BubbleGrade/results/assets/showcase.json (per-window PyTorch outputs)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo"
+  },
+  {
+   "path": "bubblegrade/precomputed/grade-4.spec.u8.gz",
+   "bytes": 62908,
+   "sha256": "f7db845f2b74cb7c7351e33f27eb055fc677f7c257891ee84be30303999b5697",
+   "role": "precomputed",
+   "source": "ONNX Runtime CPU run of work/BubbleGrade/results/export/bubblegrade_mnv4m_r4.onnx on the clip (r3)",
+   "licence": "GPL-3.0-or-later (derived data)",
+   "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
+   "note": "uint8 display spectrogram [64][cols], gzip"
+  }
+ ]
+}

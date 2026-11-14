@@ -1,0 +1,293 @@
+{
+ "field": 70,
+ "fold": 0,
+ "label_png": "expert/70.png",
+ "ignore_value": 255,
+ "cells": {
+  "1": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "2": {
+   "cls": 1,
+   "name": "E1",
+   "border": false
+  },
+  "3": {
+   "cls": 1,
+   "name": "E1",
+   "border": false
+  },
+  "4": {
+   "cls": 0,
+   "name": "Disc",
+   "border": true
+  },
+  "5": {
+   "cls": 1,
+   "name": "E1",
+   "border": false
+  },
+  "6": {
+   "cls": 5,
+   "name": "Cup",
+   "border": false
+  },
+  "7": {
+   "cls": 1,
+   "name": "E1",
+   "border": false
+  },
+  "8": {
+   "cls": 1,
+   "name": "E1",
+   "border": false
+  },
+  "9": {
+   "cls": 1,
+   "name": "E1",
+   "border": false
+  },
+  "10": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "11": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "12": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "13": {
+   "cls": 1,
+   "name": "E1",
+   "border": false
+  },
+  "14": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "15": {
+   "cls": 1,
+   "name": "E1",
+   "border": false
+  },
+  "16": {
+   "cls": 2,
+   "name": "E2",
+   "border": false
+  },
+  "17": {
+   "cls": 0,
+   "name": "Disc",
+   "border": true
+  },
+  "18": {
+   "cls": 0,
+   "name": "Disc",
+   "border": true
+  },
+  "19": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "20": {
+   "cls": 0,
+   "name": "Disc",
+   "border": true
+  },
+  "21": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "22": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "23": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "24": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "25": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "26": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "27": {
+   "cls": 1,
+   "name": "E1",
+   "border": false
+  },
+  "28": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "29": {
+   "cls": 1,
+   "name": "E1",
+   "border": true
+  },
+  "30": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "31": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "32": {
+   "cls": 0,
+   "name": "Disc",
+   "border": true
+  },
+  "33": {
+   "cls": 1,
+   "name": "E1",
+   "border": false
+  },
+  "34": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "35": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "36": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "37": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "38": {
+   "cls": 0,
+   "name": "Disc",
+   "border": true
+  },
+  "39": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "40": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "41": {
+   "cls": 1,
+   "name": "E1",
+   "border": false
+  },
+  "42": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "43": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "44": {
+   "cls": 1,
+   "name": "E1",
+   "border": false
+  },
+  "45": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "46": {
+   "cls": 2,
+   "name": "E2",
+   "border": true
+  },
+  "47": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "48": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "49": {
+   "cls": 1,
+   "name": "E1",
+   "border": false
+  },
+  "50": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "51": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "52": {
+   "cls": 0,
+   "name": "Disc",
+   "border": true
+  },
+  "53": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  },
+  "54": {
+   "cls": 0,
+   "name": "Disc",
+   "border": false
+  }
+ },
+ "expert": {
+  "n": 54,
+  "spiky_pct": 29.6296,
+  "advanced_pct": 3.7037,
+  "severity": 0.3396,
+  "counts": {
+   "Disc": 37,
+   "E1": 14,
+   "E2": 2,
+   "E3": 0,
+   "E4": 0,
+   "Cup": 1
+  },
+  "n_unknown": 0
+ }
+}

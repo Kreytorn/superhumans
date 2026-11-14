@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- First script: makes a static host (GitHub Pages) cross-origin isolated so the models can use wasm threads.
+         Does nothing where the page is already isolated (dev server, Electron). coi-serviceworker v0.1.7, MIT. -->
+    <script src="./coi-serviceworker.js"></script>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SuperHumans</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

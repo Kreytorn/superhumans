@@ -1,0 +1,1453 @@
+{
+ "_mock": true,
+ "note": "MOCK: real BPS nuclei (NASA BPS Microscopy, no use restrictions); circles = DoG peaks, line = tt_common.fit_track_line. Not IonScan output.",
+ "shape": [
+  48,
+  128,
+  128
+ ],
+ "decode": "x = u8 / 60",
+ "items": [
+  {
+   "index": 0,
+   "id": "P244 G4_011_004",
+   "well": "P244 G4",
+   "condition": "Fe-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [
+    [
+     96.0,
+     48.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 1,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 1,
+   "id": "P244 G4_002_005",
+   "well": "P244 G4",
+   "condition": "Fe-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [],
+   "mock_line": {
+    "n_foci": 0,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 2,
+   "id": "P244 G4_005_018",
+   "well": "P244 G4",
+   "condition": "Fe-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [
+    [
+     75.0,
+     94.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 1,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 3,
+   "id": "P244 G4_019_016",
+   "well": "P244 G4",
+   "condition": "Fe-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [],
+   "mock_line": {
+    "n_foci": 0,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 4,
+   "id": "P244 G4_014_008",
+   "well": "P244 G4",
+   "condition": "Fe-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [],
+   "mock_line": {
+    "n_foci": 0,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 5,
+   "id": "P244 G4_017_013",
+   "well": "P244 G4",
+   "condition": "Fe-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [],
+   "mock_line": {
+    "n_foci": 0,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 6,
+   "id": "P244 G4_019_012",
+   "well": "P244 G4",
+   "condition": "Fe-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [],
+   "mock_line": {
+    "n_foci": 0,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 7,
+   "id": "P244 G4_001_035",
+   "well": "P244 G4",
+   "condition": "Fe-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [],
+   "mock_line": {
+    "n_foci": 0,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 8,
+   "id": "P243 G4_004_010",
+   "well": "P243 G4",
+   "condition": "Fe 0.3 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     96.0,
+     34.0
+    ],
+    [
+     52.0,
+     32.0
+    ],
+    [
+     84.0,
+     31.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 3,
+    "score": 0.9963745671930664,
+    "drawn": true,
+    "p0": [
+     52.01249047895502,
+     31.580111270669107
+    ],
+    "p1": [
+     96.0330313341658,
+     32.88959542857199
+    ],
+    "angle_bin": 90
+   }
+  },
+  {
+   "index": 9,
+   "id": "P243 G4_006_033",
+   "well": "P243 G4",
+   "condition": "Fe 0.3 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     93.0,
+     61.0
+    ],
+    [
+     79.0,
+     62.0
+    ],
+    [
+     35.0,
+     61.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 3,
+    "score": 0.9996659142855592,
+    "drawn": true,
+    "p0": [
+     34.99919363133121,
+     61.14767738525825
+    ],
+    "p1": [
+     92.99746439501874,
+     61.46436763750092
+    ],
+    "angle_bin": 90
+   }
+  },
+  {
+   "index": 10,
+   "id": "P243 G4_001_013",
+   "well": "P243 G4",
+   "condition": "Fe 0.3 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     81.0,
+     60.0
+    ],
+    [
+     59.0,
+     65.0
+    ],
+    [
+     68.0,
+     63.0
+    ],
+    [
+     57.0,
+     87.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 4,
+    "n_inliers": 3,
+    "score": 0.7499962246928575,
+    "drawn": true,
+    "p0": [
+     59.003834033880565,
+     65.01685129322851
+    ],
+    "p1": [
+     81.00264942695244,
+     60.01164472507388
+    ],
+    "angle_bin": 90
+   }
+  },
+  {
+   "index": 11,
+   "id": "P243 G4_013_035",
+   "well": "P243 G4",
+   "condition": "Fe 0.3 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     91.0,
+     76.0
+    ],
+    [
+     68.0,
+     59.0
+    ],
+    [
+     79.0,
+     55.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 2,
+    "score": 0.6666666666666666,
+    "drawn": false,
+    "p0": [
+     68.0,
+     59.0
+    ],
+    "p1": [
+     91.0,
+     76.0
+    ],
+    "angle_bin": 135
+   }
+  },
+  {
+   "index": 12,
+   "id": "P243 G4_009_006",
+   "well": "P243 G4",
+   "condition": "Fe 0.3 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [],
+   "mock_line": {
+    "n_foci": 0,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 13,
+   "id": "P243 G4_004_036",
+   "well": "P243 G4",
+   "condition": "Fe 0.3 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     68.0,
+     49.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 1,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 14,
+   "id": "P243 G4_002_042",
+   "well": "P243 G4",
+   "condition": "Fe 0.3 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     72.0,
+     72.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 1,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 15,
+   "id": "P243 G4_010_016",
+   "well": "P243 G4",
+   "condition": "Fe 0.3 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [],
+   "mock_line": {
+    "n_foci": 0,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 16,
+   "id": "P242 G4_003_003",
+   "well": "P242 G4",
+   "condition": "Fe 0.82 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     99.0,
+     72.0
+    ],
+    [
+     87.0,
+     67.0
+    ],
+    [
+     44.0,
+     54.0
+    ],
+    [
+     67.0,
+     73.0
+    ],
+    [
+     52.0,
+     77.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 5,
+    "n_inliers": 3,
+    "score": 0.5999550831408541,
+    "drawn": false,
+    "p0": [
+     52.02872673356197,
+     77.10026443785293
+    ],
+    "p1": [
+     87.02135557400679,
+     67.07453700290004
+    ],
+    "angle_bin": 90
+   }
+  },
+  {
+   "index": 17,
+   "id": "P242 G4_008_005",
+   "well": "P242 G4",
+   "condition": "Fe 0.82 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     89.0,
+     63.0
+    ],
+    [
+     42.0,
+     66.0
+    ],
+    [
+     60.0,
+     67.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 3,
+    "score": 0.9973385716130576,
+    "drawn": true,
+    "p0": [
+     42.061639537223016,
+     66.86784732962322
+    ],
+    "p1": [
+     89.03773834794822,
+     63.53133306911042
+    ],
+    "angle_bin": 90
+   }
+  },
+  {
+   "index": 18,
+   "id": "P242 G4_004_010",
+   "well": "P242 G4",
+   "condition": "Fe 0.82 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     52.0,
+     81.0
+    ],
+    [
+     67.0,
+     76.0
+    ],
+    [
+     77.0,
+     28.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 2,
+    "score": 0.6666666666666666,
+    "drawn": false,
+    "p0": [
+     52.0,
+     81.0
+    ],
+    "p1": [
+     67.0,
+     76.0
+    ],
+    "angle_bin": 90
+   }
+  },
+  {
+   "index": 19,
+   "id": "P242 G4_020_013",
+   "well": "P242 G4",
+   "condition": "Fe 0.82 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     57.0,
+     85.0
+    ],
+    [
+     101.0,
+     50.0
+    ],
+    [
+     36.0,
+     91.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 2,
+    "score": 0.6666666666666666,
+    "drawn": false,
+    "p0": [
+     57.0,
+     85.0
+    ],
+    "p1": [
+     101.0,
+     50.0
+    ],
+    "angle_bin": 45
+   }
+  },
+  {
+   "index": 20,
+   "id": "P242 G4_012_003",
+   "well": "P242 G4",
+   "condition": "Fe 0.82 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     85.0,
+     59.0
+    ],
+    [
+     63.0,
+     68.0
+    ],
+    [
+     66.0,
+     44.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 2,
+    "score": 0.6666666666666666,
+    "drawn": false,
+    "p0": [
+     63.0,
+     68.0
+    ],
+    "p1": [
+     85.0,
+     59.0
+    ],
+    "angle_bin": 90
+   }
+  },
+  {
+   "index": 21,
+   "id": "P242 G4_004_049",
+   "well": "P242 G4",
+   "condition": "Fe 0.82 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     51.0,
+     73.0
+    ],
+    [
+     43.0,
+     44.0
+    ],
+    [
+     60.0,
+     23.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 2,
+    "score": 0.6666666666666666,
+    "drawn": false,
+    "p0": [
+     43.0,
+     44.0
+    ],
+    "p1": [
+     51.0,
+     73.0
+    ],
+    "angle_bin": 0
+   }
+  },
+  {
+   "index": 22,
+   "id": "P242 G4_018_016",
+   "well": "P242 G4",
+   "condition": "Fe 0.82 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     83.0,
+     82.0
+    ],
+    [
+     59.0,
+     57.0
+    ],
+    [
+     76.0,
+     57.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 2,
+    "score": 0.6666666666666666,
+    "drawn": false,
+    "p0": [
+     59.0,
+     57.0
+    ],
+    "p1": [
+     83.0,
+     82.0
+    ],
+    "angle_bin": 135
+   }
+  },
+  {
+   "index": 23,
+   "id": "P242 G4_003_047",
+   "well": "P242 G4",
+   "condition": "Fe 0.82 Gy, 4 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     83.0,
+     60.0
+    ],
+    [
+     57.0,
+     67.0
+    ],
+    [
+     73.0,
+     65.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 3,
+    "score": 0.9910773566075975,
+    "drawn": true,
+    "p0": [
+     57.149095110520555,
+     67.57728240624779
+    ],
+    "p1": [
+     83.21809038161588,
+     60.84442568129262
+    ],
+    "angle_bin": 90
+   }
+  },
+  {
+   "index": 24,
+   "id": "P248 G4_007_023",
+   "well": "P248 G4",
+   "condition": "Fe 0.82 Gy, 24 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     57.0,
+     38.0
+    ],
+    [
+     43.0,
+     54.0
+    ],
+    [
+     45.0,
+     68.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 2,
+    "score": 0.6666666666666666,
+    "drawn": false,
+    "p0": [
+     43.0,
+     54.0
+    ],
+    "p1": [
+     57.0,
+     38.0
+    ],
+    "angle_bin": 45
+   }
+  },
+  {
+   "index": 25,
+   "id": "P248 G4_013_001",
+   "well": "P248 G4",
+   "condition": "Fe 0.82 Gy, 24 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     77.0,
+     43.0
+    ],
+    [
+     93.0,
+     67.0
+    ],
+    [
+     87.0,
+     57.0
+    ],
+    [
+     61.0,
+     42.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 4,
+    "n_inliers": 3,
+    "score": 0.7496391338378673,
+    "drawn": true,
+    "p0": [
+     77.12253213211142,
+     42.917879948522796
+    ],
+    "p1": [
+     93.18091597557323,
+     66.87875156523342
+    ],
+    "angle_bin": 135
+   }
+  },
+  {
+   "index": 26,
+   "id": "P248 G4_007_043",
+   "well": "P248 G4",
+   "condition": "Fe 0.82 Gy, 24 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     88.0,
+     71.0
+    ],
+    [
+     63.0,
+     31.0
+    ],
+    [
+     79.0,
+     74.0
+    ],
+    [
+     75.0,
+     53.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 4,
+    "n_inliers": 3,
+    "score": 0.7490126538504635,
+    "drawn": true,
+    "p0": [
+     62.606180416454556,
+     31.24544080236665
+    ],
+    "p1": [
+     87.55523271156557,
+     71.27719302112153
+    ],
+    "angle_bin": 135
+   }
+  },
+  {
+   "index": 27,
+   "id": "P248 G4_010_024",
+   "well": "P248 G4",
+   "condition": "Fe 0.82 Gy, 24 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     63.0,
+     54.0
+    ],
+    [
+     66.0,
+     106.0
+    ],
+    [
+     38.0,
+     51.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 2,
+    "score": 0.6666666666666666,
+    "drawn": false,
+    "p0": [
+     63.0,
+     54.0
+    ],
+    "p1": [
+     66.0,
+     106.0
+    ],
+    "angle_bin": 0
+   }
+  },
+  {
+   "index": 28,
+   "id": "P248 G4_008_022",
+   "well": "P248 G4",
+   "condition": "Fe 0.82 Gy, 24 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     65.0,
+     22.0
+    ],
+    [
+     81.0,
+     37.0
+    ],
+    [
+     78.0,
+     42.0
+    ],
+    [
+     63.0,
+     39.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 4,
+    "n_inliers": 2,
+    "score": 0.5,
+    "drawn": false,
+    "p0": [
+     65.0,
+     22.0
+    ],
+    "p1": [
+     81.0,
+     37.0
+    ],
+    "angle_bin": 135
+   }
+  },
+  {
+   "index": 29,
+   "id": "P248 G4_001_045",
+   "well": "P248 G4",
+   "condition": "Fe 0.82 Gy, 24 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     44.0,
+     47.0
+    ],
+    [
+     88.0,
+     38.0
+    ],
+    [
+     95.0,
+     54.0
+    ],
+    [
+     52.0,
+     65.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 4,
+    "n_inliers": 2,
+    "score": 0.5,
+    "drawn": false,
+    "p0": [
+     44.0,
+     47.0
+    ],
+    "p1": [
+     88.0,
+     38.0
+    ],
+    "angle_bin": 90
+   }
+  },
+  {
+   "index": 30,
+   "id": "P248 G4_007_026",
+   "well": "P248 G4",
+   "condition": "Fe 0.82 Gy, 24 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [
+    [
+     42.0,
+     70.0
+    ],
+    [
+     42.0,
+     79.0
+    ],
+    [
+     52.0,
+     37.0
+    ],
+    [
+     51.0,
+     91.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 4,
+    "n_inliers": 3,
+    "score": 0.74813522472042,
+    "drawn": true,
+    "p0": [
+     41.039296482735104,
+     78.75376905991227
+    ],
+    "p1": [
+     51.75687301400034,
+     36.93768588826049
+    ],
+    "angle_bin": 0
+   }
+  },
+  {
+   "index": 31,
+   "id": "P248 G4_002_023",
+   "well": "P248 G4",
+   "condition": "Fe 0.82 Gy, 24 h",
+   "particle_label": "Fe",
+   "mock_circles_rc": [],
+   "mock_line": {
+    "n_foci": 0,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 32,
+   "id": "P278 E5_001_033",
+   "well": "P278 E5",
+   "condition": "X-ray-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [
+    [
+     32.0,
+     79.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 1,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 33,
+   "id": "P278 E5_017_027",
+   "well": "P278 E5",
+   "condition": "X-ray-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [
+    [
+     67.0,
+     85.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 1,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 34,
+   "id": "P278 E5_017_011",
+   "well": "P278 E5",
+   "condition": "X-ray-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [],
+   "mock_line": {
+    "n_foci": 0,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 35,
+   "id": "P278 E5_017_006",
+   "well": "P278 E5",
+   "condition": "X-ray-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [
+    [
+     92.0,
+     78.0
+    ],
+    [
+     89.0,
+     55.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 2,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 36,
+   "id": "P278 E5_010_004",
+   "well": "P278 E5",
+   "condition": "X-ray-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [],
+   "mock_line": {
+    "n_foci": 0,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 37,
+   "id": "P278 E5_023_006",
+   "well": "P278 E5",
+   "condition": "X-ray-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [],
+   "mock_line": {
+    "n_foci": 0,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 38,
+   "id": "P278 E5_018_020",
+   "well": "P278 E5",
+   "condition": "X-ray-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [
+    [
+     110.0,
+     69.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 1,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 39,
+   "id": "P278 E5_021_016",
+   "well": "P278 E5",
+   "condition": "X-ray-plate sham, 4 h",
+   "particle_label": "sham",
+   "mock_circles_rc": [],
+   "mock_line": {
+    "n_foci": 0,
+    "n_inliers": 0,
+    "score": 0.0,
+    "drawn": false,
+    "p0": null,
+    "p1": null,
+    "angle_bin": null
+   }
+  },
+  {
+   "index": 40,
+   "id": "P280 E5_012_005",
+   "well": "P280 E5",
+   "condition": "X-ray 1 Gy, 4 h",
+   "particle_label": "X-ray",
+   "mock_circles_rc": [
+    [
+     54.0,
+     32.0
+    ],
+    [
+     41.0,
+     51.0
+    ],
+    [
+     58.0,
+     56.0
+    ],
+    [
+     48.0,
+     53.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 4,
+    "n_inliers": 3,
+    "score": 0.749990069294256,
+    "drawn": true,
+    "p0": [
+     41.006196758982696,
+     50.97896014435116
+    ],
+    "p1": [
+     58.004320961989,
+     55.98532903784597
+    ],
+    "angle_bin": 90
+   }
+  },
+  {
+   "index": 41,
+   "id": "P280 E5_012_020",
+   "well": "P280 E5",
+   "condition": "X-ray 1 Gy, 4 h",
+   "particle_label": "X-ray",
+   "mock_circles_rc": [
+    [
+     45.0,
+     86.0
+    ],
+    [
+     69.0,
+     58.0
+    ],
+    [
+     95.0,
+     70.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 2,
+    "score": 0.6666666666666666,
+    "drawn": false,
+    "p0": [
+     45.0,
+     86.0
+    ],
+    "p1": [
+     69.0,
+     58.0
+    ],
+    "angle_bin": 45
+   }
+  },
+  {
+   "index": 42,
+   "id": "P280 E5_014_017",
+   "well": "P280 E5",
+   "condition": "X-ray 1 Gy, 4 h",
+   "particle_label": "X-ray",
+   "mock_circles_rc": [
+    [
+     81.0,
+     51.0
+    ],
+    [
+     76.0,
+     64.0
+    ],
+    [
+     93.0,
+     65.0
+    ],
+    [
+     49.0,
+     74.0
+    ],
+    [
+     71.0,
+     78.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 5,
+    "n_inliers": 3,
+    "score": 0.599970918697658,
+    "drawn": false,
+    "p0": [
+     70.94750177489166,
+     77.98056402832859
+    ],
+    "p1": [
+     80.94396680451318,
+     50.97925530629096
+    ],
+    "angle_bin": 0
+   }
+  },
+  {
+   "index": 43,
+   "id": "P280 E5_004_047",
+   "well": "P280 E5",
+   "condition": "X-ray 1 Gy, 4 h",
+   "particle_label": "X-ray",
+   "mock_circles_rc": [
+    [
+     77.0,
+     88.0
+    ],
+    [
+     66.0,
+     81.0
+    ],
+    [
+     71.0,
+     71.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 2,
+    "score": 0.6666666666666666,
+    "drawn": false,
+    "p0": [
+     66.0,
+     81.0
+    ],
+    "p1": [
+     77.0,
+     88.0
+    ],
+    "angle_bin": 135
+   }
+  },
+  {
+   "index": 44,
+   "id": "P280 E5_003_045",
+   "well": "P280 E5",
+   "condition": "X-ray 1 Gy, 4 h",
+   "particle_label": "X-ray",
+   "mock_circles_rc": [
+    [
+     69.0,
+     93.0
+    ],
+    [
+     55.0,
+     94.0
+    ],
+    [
+     63.0,
+     66.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 2,
+    "score": 0.6666666666666666,
+    "drawn": false,
+    "p0": [
+     55.0,
+     94.0
+    ],
+    "p1": [
+     69.0,
+     93.0
+    ],
+    "angle_bin": 90
+   }
+  },
+  {
+   "index": 45,
+   "id": "P280 E5_001_034",
+   "well": "P280 E5",
+   "condition": "X-ray 1 Gy, 4 h",
+   "particle_label": "X-ray",
+   "mock_circles_rc": [
+    [
+     95.0,
+     71.0
+    ],
+    [
+     85.0,
+     77.0
+    ],
+    [
+     50.0,
+     53.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 3,
+    "n_inliers": 2,
+    "score": 0.6666666666666666,
+    "drawn": false,
+    "p0": [
+     85.0,
+     77.0
+    ],
+    "p1": [
+     95.0,
+     71.0
+    ],
+    "angle_bin": 45
+   }
+  },
+  {
+   "index": 46,
+   "id": "P280 E5_008_013",
+   "well": "P280 E5",
+   "condition": "X-ray 1 Gy, 4 h",
+   "particle_label": "X-ray",
+   "mock_circles_rc": [
+    [
+     100.0,
+     48.0
+    ],
+    [
+     54.0,
+     78.0
+    ],
+    [
+     76.0,
+     79.0
+    ],
+    [
+     40.0,
+     59.0
+    ],
+    [
+     48.0,
+     84.0
+    ],
+    [
+     47.0,
+     50.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 6,
+    "n_inliers": 3,
+    "score": 0.4997245360914226,
+    "drawn": false,
+    "p0": [
+     47.582574362423145,
+     83.38400554855187
+    ],
+    "p1": [
+     99.93665319683443,
+     47.90651920784384
+    ],
+    "angle_bin": 45
+   }
+  },
+  {
+   "index": 47,
+   "id": "P280 E5_012_036",
+   "well": "P280 E5",
+   "condition": "X-ray 1 Gy, 4 h",
+   "particle_label": "X-ray",
+   "mock_circles_rc": [
+    [
+     37.0,
+     23.0
+    ],
+    [
+     93.0,
+     87.0
+    ],
+    [
+     54.0,
+     107.0
+    ],
+    [
+     52.0,
+     90.0
+    ],
+    [
+     76.0,
+     43.0
+    ],
+    [
+     66.0,
+     44.0
+    ]
+   ],
+   "mock_line": {
+    "n_foci": 6,
+    "n_inliers": 3,
+    "score": 0.4998559750959526,
+    "drawn": false,
+    "p0": [
+     37.16355428568008,
+     22.965894056407258
+    ],
+    "p1": [
+     54.6585340206054,
+     106.8626760279177
+    ],
+    "angle_bin": 0
+   }
+  }
+ ]
+}

@@ -1,0 +1,52 @@
+/* Direction A "Deep Field" tokens (work/App/PLAYBOOK.md §5A, picked by the team owner, r2). Components read only these. */
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('../assets/fonts/space-grotesk-latin-wght-normal.woff2') format('woff2');
+  font-weight: 300 700;
+  font-display: block;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../assets/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2');
+  font-weight: 100 800;
+  font-display: block;
+}
+
+:root {
+  color-scheme: dark;
+  --bg: #05070f;
+  --surface-1: #0b0f1f;
+  --surface-2: #12172d;
+  --well: #000105;
+  --line-hair: rgba(150, 170, 255, 0.16);
+  --line: #3a4266;
+  --line-strong: #576394;
+  --text-1: #f1f4ff;
+  --text-2: #b3b9cf;
+  --text-3: #9aa3bf;
+  --accent: #8fb8ff;
+  --shadow-text: #000;
+
+  --m-tracktrace: #ff7a45;
+  --m-bubblegrade: #3fd0ff;
+  --m-spikecount: #b78cff;
+  --m-veinsqueeze: #ff4f7b;
+  --m-braindrift: #5cf2b0;
+  --m-garn: #ffd34d;
+
+  --s-green: #2ee6a6;
+  --s-yellow: #ffe14d;
+  --s-amber: #ffb224;
+  --s-orange: #ff8a1f;
+  --s-red: #ff4d5e;
+  --s-reddeep: #c8102e;
+  --s-off: #2a3047;
+  --on-status: #0a0c10;
+
+  --font-display: 'Space Grotesk', 'Segoe UI Variable Display', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-deck: cubic-bezier(0.16, 0.84, 0.24, 1);
+}
