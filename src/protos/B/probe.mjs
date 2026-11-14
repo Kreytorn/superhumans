@@ -1,0 +1,91 @@
+// Interaction probe for prototype B (dev only): real press with the live model, the opening from a body site,
+// hover preview, the second layer, the five previews, and the phone path.
+//   node src/protos/B/probe.mjs <out dir>      (dev server on :5202)
+import { chromium } from 'playwright-core'
+const out = process.argv[2]
+const base = 'http://localhost:5202/#/proto/B/'
+const browser = await chromium.launch({ channel: 'msedge', headless: true, args: ['--hide-scrollbars'] })
+const log = []
+async function page(w, h, phone = false) {
+  const ctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: phone ? 2 : 1, hasTouch: phone, isMobile: phone })
+  const p = await ctx.newPage()
+  p.on('console', (m) => { if (m.type() === 'error') log.push(`[console ${w}] ${m.text().slice(0, 200)}`) })
+  p.on('pageerror', (e) => log.push(`[pageerror ${w}] ${e.message.slice(0, 200)}`))
+  return p
+}
+const ready = (p) => p.waitForSelector('.pb[data-ready="1"]', { timeout: 20000 })
+const state = (p) => p.evaluate(() => document.querySelector('.pb')?.getAttribute('data-state') + ' view=' + document.querySelector('.pb')?.getAttribute('data-view'))
+const hash = (p) => p.evaluate(() => location.hash)
+const text = (p, sel) => p.textContent(sel, { timeout: 1500 }).catch(() => 'none')
+
+// 1. laptop: one press runs the live model
+let p = await page(1440, 900)
+await p.goto(base + 'spikecount'); await ready(p)
+await p.waitForTimeout(600)
+const t0 = Date.now()
+await p.click('[data-qa="primary"]')
+await p.waitForTimeout(150)
+console.log('after press:', await state(p), '| button:', await text(p, '[data-qa="primary"]'))
+await p.screenshot({ path: `${out}/press_running_1440.png` })
+await p.waitForSelector('.pb[data-state="result"]', { timeout: 90000 }).catch(() => console.log('NO RESULT in 90 s'))
+console.log('result after', Date.now() - t0, 'ms:', await state(p), '| tag:', await text(p, '.pb-stage-tag'), '| num:', await text(p, '.pb-hero-num'), '| count:', await text(p, '.pb-count'))
+await p.screenshot({ path: `${out}/press_result_1440.png` })
+await p.focus('.pb-cells svg'); await p.keyboard.press('ArrowRight'); await p.keyboard.press('ArrowRight'); await p.keyboard.press('ArrowRight')
+console.log('picked by keys:', await text(p, '.pb-pick')); await p.screenshot({ path: `${out}/pick_keys_1440.png` })
+await p.mouse.click(955, 240); await p.waitForTimeout(100)
+console.log('picked by click:', await text(p, '.pb-pick'))
+await p.screenshot({ path: `${out}/pick_1440.png` })
+await p.click('.pb-how-btn'); await p.waitForTimeout(600)
+console.log('layer open:', await p.evaluate(() => document.querySelector('dialog.pb-how')?.open), await hash(p))
+await p.screenshot({ path: `${out}/how_spike_1440.png` })
+await p.keyboard.press('Escape'); await p.waitForTimeout(250)
+console.log('layer closed:', await p.evaluate(() => !document.querySelector('dialog.pb-how')?.open), await hash(p))
+await p.click('[data-qa="primary"]'); await p.waitForTimeout(900)
+await p.screenshot({ path: `${out}/again_mid_1440.png` })
+console.log('again mid:', await state(p), await text(p, '.pb-hero-num'))
+await p.click('.pb-back'); await ready(p); console.log('back ->', await hash(p))
+
+// 2. laptop home: hover shows the still, a press opens it from the site
+await p.waitForTimeout(2200)
+await p.hover('.pb-label:nth-child(5)'); await p.waitForTimeout(500)
+console.log('hover vein -> button:', await text(p, '[data-qa="primary"]'), '| tab:', await text(p, '.pb-tab-line'))
+await p.screenshot({ path: `${out}/home_hover_vein_1440.png` })
+await p.hover('.pb-label:nth-child(1)'); await p.waitForTimeout(500)
+await p.click('.pb-label:nth-child(1)'); await p.waitForTimeout(150)
+await p.screenshot({ path: `${out}/opening_mid_1440.png` })
+await p.waitForTimeout(1000)
+console.log('after open ->', await hash(p), await state(p))
+await p.screenshot({ path: `${out}/preview_garnmeter_1440.png` })
+for (const m of ['braindrift', 'bubblegrade', 'veinsqueeze', 'tracktrace']) {
+  await p.goto(base + m); await ready(p); await p.waitForTimeout(300)
+  await p.screenshot({ path: `${out}/preview_${m}_1440.png` })
+}
+await p.goto(base + 'home?state=idle'); await ready(p)
+await p.keyboard.press('Tab'); await p.keyboard.press('Tab')
+console.log('focus after 2 tabs:', await p.evaluate(() => document.activeElement?.className + ' | ' + document.activeElement?.textContent))
+await p.keyboard.press('Enter'); await p.waitForTimeout(1200)
+console.log('enter ->', await hash(p))
+await p.goto(base + 'home?state=idle&layer=how'); await ready(p); await p.waitForTimeout(600)
+await p.screenshot({ path: `${out}/how_home_1440.png` })
+await p.context().close()
+
+// 3. phone: rows are the tap targets; the blood check replays stored outputs
+p = await page(390, 844, true)
+await p.goto(base + 'home'); await ready(p); await p.waitForTimeout(2300)
+await p.tap('.pb-label:nth-child(5)'); await p.waitForTimeout(200)
+await p.screenshot({ path: `${out}/opening_mid_390.png` })
+await p.waitForTimeout(1000)
+console.log('phone open ->', await hash(p))
+await p.screenshot({ path: `${out}/preview_veinsqueeze_390.png` })
+await p.goto(base + 'tracktrace'); await ready(p); await p.waitForTimeout(300)
+await p.screenshot({ path: `${out}/preview_tracktrace_390.png` })
+await p.goto(base + 'spikecount'); await ready(p)
+await p.tap('[data-qa="primary"]'); await p.waitForTimeout(900)
+await p.screenshot({ path: `${out}/press_mid_390.png` })
+await p.waitForSelector('.pb[data-state="result"]', { timeout: 20000 }).catch(() => console.log('phone: NO RESULT'))
+console.log('phone result tag:', await text(p, '.pb-stage-tag'), await text(p, '.pb-hero-num'))
+await p.tap('.pb-how-btn'); await p.waitForTimeout(700)
+await p.screenshot({ path: `${out}/how_spike_390.png` })
+await p.context().close()
+console.log(log.length ? log.join('\n') : 'no console errors')
+await browser.close()

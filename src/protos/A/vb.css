@@ -1,0 +1,1043 @@
+/* Prototype A "Viewbox". Everything is scoped under .vb; the only top-level rules are the view-transition
+   pseudo-elements of this prototype's own films (class vb-film). */
+.vb {
+  --lit: #f2f5f4;
+  --film: #0b0d0e;
+  --ink: #12171a;
+  --ink2: #58636a;
+  --print: #e9eeee;
+  --petrol: #0e4a5a;
+  --cyan: #2fd2f4;
+  --amber: #b96a00;
+  --amber-film: #ffb629;
+  --serif: 'Newsreader Variable', 'Newsreader', Georgia, serif;
+  --sans: 'Geist Variable', 'Geist', system-ui, sans-serif;
+  --pull: cubic-bezier(0.77, 0, 0.175, 1);
+  --out: cubic-bezier(0.23, 1, 0.32, 1);
+  /* the open film on a laptop: what is left of the row after five 44 px spines, six 8 px gaps and the 320 px column */
+  --open-w: calc(100vw - 588px);
+  --sq: min(var(--open-w), calc(100svh - 48px));
+  background: var(--lit);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.4;
+  min-height: 100svh;
+  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+.vb h1,
+.vb h2,
+.vb h3,
+.vb p,
+.vb ul {
+  margin: 0;
+  font-weight: inherit;
+}
+.vb a {
+  color: inherit;
+  text-decoration: none;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+}
+.vb button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.vb :focus-visible {
+  outline: 2px solid var(--petrol);
+  outline-offset: 2px;
+}
+.vb .vb-photo:focus-visible {
+  outline: 2px solid var(--print);
+  outline-offset: -4px;
+}
+
+/* ------------------------------------------------------------ small parts */
+.vb .vb-tag {
+  display: inline-block;
+  font: 500 12px/16px var(--sans);
+  color: var(--ink2);
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  padding: 0 5px;
+  margin-left: 4px;
+  vertical-align: 2px;
+  white-space: nowrap;
+}
+.vb .vb-tag--film {
+  color: var(--print);
+  margin: 0 10px 0 0;
+  letter-spacing: 0.05em;
+  vertical-align: 1px;
+}
+.vb .vb-mark {
+  vertical-align: -3px;
+  margin-right: 3px;
+  color: var(--ink);
+}
+.vb .vb-mark[data-kind='medic'] {
+  color: var(--amber);
+}
+.vb .vb-mark[data-kind='surgeon'] {
+  color: #c4291c;
+}
+.vb .vb-mark[data-kind='abort'] {
+  color: #9aa3a8;
+}
+.vb .vb-mark-cut {
+  fill: var(--lit);
+}
+.vb .vb-nowrap {
+  white-space: nowrap;
+}
+/* the key on the blood film: a filled cell is spiky, an empty one is smooth; one hue, the model's */
+.vb .vb-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 3px;
+  border: 1.5px solid var(--cyan);
+  border-radius: 50%;
+  vertical-align: -2px;
+}
+.vb .vb-swatch[data-spiky='1'] {
+  border-width: 2px;
+  background: rgb(47 210 244 / 0.6);
+}
+.vb .vb-key {
+  margin-left: 14px;
+  white-space: nowrap;
+}
+.vb .vb-name {
+  font: 600 16px/22px var(--sans);
+}
+.vb .vb-status {
+  font: 500 15px/22px var(--sans);
+}
+.vb .vb-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font: 500 15px/20px var(--sans);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.vb .vb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 24px;
+  background: var(--petrol);
+  color: var(--print);
+  font: 600 16px/20px var(--sans);
+  border-radius: 4px;
+  white-space: nowrap;
+  transition:
+    transform 120ms var(--out),
+    background-color 160ms ease;
+}
+.vb .vb-btn:active {
+  transform: scale(0.985);
+}
+.vb .vb-btn[aria-disabled='true'] {
+  cursor: progress;
+  opacity: 0.72;
+}
+.vb .vb-btn[data-quiet] {
+  background: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+.vb .vb-quiet {
+  color: var(--ink2);
+}
+
+/* ------------------------------------------------------------ a film */
+.vb .vb-film {
+  position: relative;
+  display: block;
+  background: var(--film);
+  overflow: hidden;
+  view-transition-class: vb-film;
+}
+.vb .vb-still {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* a film's picture sits in a window; the window is what its crop is measured against */
+.vb .vb-win {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  container-type: size;
+}
+/* The poster is scaled until the crop (set in parts.tsx) covers the window, and centred on the crop's centre. */
+.vb .vb-still--crop {
+  --w: max(100cqw * var(--kx), 100cqh * var(--ky));
+  inset: calc(50cqh - var(--cy) * var(--w) / var(--ar)) auto auto calc(50cqw - var(--cx) * var(--w));
+  width: var(--w);
+  height: calc(var(--w) / var(--ar));
+  object-fit: fill;
+}
+.vb .vb-still--crop[data-turn] {
+  transform-origin: calc(var(--cx) * 100%) calc(var(--cy) * 100%);
+  rotate: 90deg;
+}
+/* the brainwave film is printed like the others: light traces on the film base */
+.vb img.vb-still[data-id='garnmeter'] {
+  filter: invert(1) contrast(1.2);
+}
+.vb .vb-still--blank {
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  text-align: center;
+  font: 500 13px/18px var(--sans);
+  color: var(--print);
+}
+.vb .vb-photo-wrap {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  container-type: size;
+  display: grid;
+  grid-template: 100% / 100%;
+  place-items: center;
+  overflow: hidden;
+}
+.vb .vb-photo {
+  position: relative;
+  flex: none;
+  aspect-ratio: 1;
+}
+.vb .vb-photo-wrap[data-fit='cover'] .vb-photo {
+  width: max(100cqw, 100cqh);
+}
+.vb .vb-photo-wrap[data-fit='contain'] .vb-photo {
+  width: min(100cqw, 100cqh);
+}
+.vb .vb-marks {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.vb .vb-cell {
+  opacity: 0;
+  transition: opacity 140ms linear;
+}
+.vb .vb-cell[data-on='1'] {
+  opacity: 1;
+}
+.vb .vb-cell-key {
+  fill: none;
+  stroke: var(--film);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.85;
+  pointer-events: none;
+}
+.vb .vb-cell-line {
+  fill: var(--cyan);
+  stroke: var(--cyan);
+  stroke-width: 2px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.vb .vb-cell[data-spiky='1'] .vb-cell-line {
+  stroke-width: 2.5px;
+}
+.vb .vb-cell[data-picked] .vb-cell-line {
+  stroke: #fff;
+  stroke-width: 3px;
+}
+.vb .vb-edge {
+  position: relative;
+  z-index: 1;
+  height: 40px;
+  padding: 0 16px;
+  background: var(--film);
+  color: var(--print);
+  font: 500 13px/40px var(--sans);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vb .vb-loupe {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 168px;
+  translate: -50% -100%;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+  @starting-style {
+    opacity: 0;
+  }
+}
+.vb .vb-loupe[data-below] {
+  translate: -50% 0;
+}
+.vb .vb-loupe-glass {
+  display: block;
+  width: 152px;
+  height: 152px;
+  border-radius: 50%;
+  background-color: var(--film);
+  background-repeat: no-repeat;
+  box-shadow:
+    0 0 0 2px var(--print),
+    0 0 0 3px var(--film);
+}
+.vb .vb-loupe[data-below] .vb-loupe-glass {
+  order: 2;
+}
+.vb .vb-loupe-name {
+  padding: 3px 8px;
+  background: var(--film);
+  color: var(--print);
+  font: 500 13px/18px var(--sans);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------ Home */
+.vb[data-layout='home'] {
+  display: grid;
+  grid-template-rows: 132px minmax(0, 1fr);
+  height: 100svh;
+  min-height: 600px;
+}
+.vb .vb-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
+  padding: 0 32px;
+}
+.vb .vb-h1 {
+  max-width: 840px;
+  font: 450 46px/50px var(--serif);
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+.vb .vb-band-side {
+  flex: none;
+}
+.vb .vb-stateline {
+  font: 500 18px/26px var(--sans);
+}
+.vb .vb-rail--home {
+  display: flex;
+  gap: 8px;
+  min-height: 0;
+}
+.vb .vb-col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 86px;
+}
+.vb .vb-col[data-asks] {
+  flex: 0 0 min(660px, 46vw);
+}
+.vb .vb-col .vb-film {
+  transition: transform 120ms var(--out);
+}
+.vb .vb-col:active .vb-film {
+  transform: scale(0.985);
+}
+.vb .vb-col:not([data-asks]) .vb-still {
+  opacity: 0.55;
+  transition: opacity 160ms ease;
+}
+.vb .vb-col:focus-visible .vb-still {
+  opacity: 1;
+}
+.vb .vb-col[data-asks] .vb-film {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 40px;
+}
+.vb .vb-btn--onfilm {
+  position: absolute;
+  left: 24px;
+  bottom: 64px;
+}
+.vb .vb-label {
+  padding: 10px 0 0 12px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.vb .vb-what {
+  font: 400 13px/19px var(--sans);
+  color: var(--ink2);
+}
+.vb .vb-label .vb-status {
+  font-size: 14px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .vb .vb-col:hover .vb-still {
+    opacity: 1;
+  }
+  .vb .vb-col:hover .vb-name,
+  .vb .vb-link:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+  .vb .vb-btn:not([data-quiet]):not([aria-disabled='true']):hover,
+  .vb .vb-col[data-asks]:hover .vb-btn--onfilm {
+    background: #0a3a47;
+  }
+  .vb .vb-spine:hover .vb-win {
+    filter: none;
+  }
+  .vb .vb-spine:hover .vb-spine-name {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+/* ------------------------------------------------------------ a check: spines, the open film, the answer */
+.vb[data-layout='check'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  height: 100svh;
+  min-height: 560px;
+}
+.vb .vb-rail--check {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  min-height: 0;
+  padding-right: 8px;
+}
+.vb .vb-spine {
+  flex: 0 0 44px;
+  transition: transform 120ms var(--out);
+}
+.vb .vb-spine:active {
+  transform: scale(0.985);
+}
+/* A spine is the centre 44 px of the film exactly as it looks when open, so pulling it out only widens it.
+   It stays grey until the pointer or the keyboard is on it, so the open film is the only colour in the row. */
+.vb .vb-spine .vb-win {
+  inset: 0 auto 0 50%;
+  width: var(--open-w);
+  translate: -50% 0;
+  filter: grayscale(1) brightness(0.6);
+  transition: filter 160ms ease;
+}
+.vb .vb-spine:focus-visible .vb-win {
+  filter: none;
+}
+.vb .vb-spine img.vb-still[data-id='spikecount'] {
+  inset: calc((100% - 48px - var(--sq)) / 2) auto auto calc(50% - var(--sq) / 2);
+  width: var(--sq);
+  height: var(--sq);
+}
+.vb .vb-spine-name {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: block;
+  width: 44px;
+  padding: 14px 0 12px;
+  background: var(--film);
+  color: var(--print);
+  font: 500 13px/44px var(--sans);
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+  white-space: nowrap;
+}
+.vb .vb-open {
+  flex: 1 1 0;
+  min-width: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 48px;
+}
+.vb .vb-open .vb-photo-wrap {
+  grid-row: 1;
+}
+.vb .vb-open .vb-edge {
+  grid-row: 2;
+  height: 48px;
+  padding: 0 20px;
+  font-size: 14px;
+  line-height: 48px;
+}
+.vb .vb-answer {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 14px 28px 14px 20px;
+}
+.vb .vb-wordmark {
+  align-self: flex-start;
+  font: 600 16px/44px var(--sans);
+  letter-spacing: -0.01em;
+}
+.vb .vb-sentence {
+  margin: 22px 0 24px;
+  font: 450 30px/36px var(--serif);
+  letter-spacing: -0.008em;
+  text-wrap: pretty;
+}
+.vb .vb-name--lead {
+  display: block;
+  margin-bottom: 10px;
+  letter-spacing: 0;
+}
+.vb .vb-answer .vb-btn {
+  align-self: flex-start;
+}
+.vb .vb-result {
+  margin-top: 30px;
+}
+.vb .vb-number {
+  font: 500 16px/26px var(--sans);
+}
+.vb .vb-hero {
+  display: inline-block;
+  font: 500 64px/66px var(--serif);
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: -0.02em;
+}
+.vb .vb-hero-unit {
+  font: 450 30px/36px var(--serif);
+}
+/* the percentage lands once, when the last cell is drawn */
+.vb .vb-hero,
+.vb .vb-hero-unit {
+  transition:
+    opacity 200ms var(--out),
+    translate 200ms var(--out);
+  @starting-style {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+.vb .vb-compare,
+.vb .vb-act {
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+.vb .vb-compare[data-on='1'],
+.vb .vb-act[data-on='1'] {
+  opacity: 1;
+}
+.vb .vb-act {
+  margin-top: 26px;
+}
+.vb .vb-act-text {
+  display: inline-block;
+  margin-top: 4px;
+  font: 450 24px/30px var(--serif);
+}
+.vb .vb-act-text--quiet {
+  font: 400 15px/22px var(--sans);
+  color: var(--ink2);
+}
+.vb .vb-act + .vb-btn {
+  margin-top: 24px;
+}
+.vb .vb-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+/* ------------------------------------------------------------ "How do we know?" */
+.vb .vb-how {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(560px, 100vw);
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--lit);
+  color: var(--ink);
+  overflow: hidden;
+}
+.vb .vb-how::backdrop {
+  background: rgba(11, 13, 14, 0.3);
+}
+.vb .vb-how[open] {
+  transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+  @starting-style {
+    transform: translateX(100%);
+  }
+}
+.vb .vb-how-body {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 32px 40px;
+}
+.vb .vb-how-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0 10px;
+  background: var(--lit);
+}
+.vb .vb-how-head h2 {
+  font: 450 30px/36px var(--serif);
+}
+.vb .vb-how-close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-right: -12px;
+  border-radius: 4px;
+}
+.vb .vb-how-list section {
+  padding: 16px 0 18px;
+  border-top: 1px solid rgba(18, 23, 26, 0.14);
+}
+.vb .vb-how-list h3 {
+  margin-bottom: 6px;
+  font: 600 16px/22px var(--sans);
+}
+.vb .vb-how-list p,
+.vb .vb-how-list li {
+  font: 400 15px/22px var(--sans);
+}
+.vb .vb-how-list p + p,
+.vb .vb-how-list ul + p,
+.vb .vb-how-list ul + ul {
+  margin-top: 6px;
+}
+.vb .vb-how-list ul {
+  padding-left: 18px;
+}
+.vb .vb-how-list .vb-ladder,
+.vb .vb-how-list .vb-proofs {
+  padding-left: 0;
+  list-style: none;
+}
+.vb .vb-how-list .vb-ladder li,
+.vb .vb-how-list .vb-proofs li {
+  margin-top: 6px;
+}
+.vb .vb-how-list b {
+  font-weight: 600;
+}
+.vb .vb-greyed,
+.vb .vb-ladder li[data-kind='abort'] {
+  color: #7d878c;
+}
+.vb .vb-chart {
+  display: block;
+  width: min(300px, 100%);
+  margin: 10px 0 4px;
+}
+.vb .vb-chart-axis {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1;
+}
+.vb .vb-chart-diag {
+  stroke: var(--ink2);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.vb .vb-chart-dot {
+  fill: var(--ink);
+  opacity: 0.42;
+}
+.vb .vb-chart-here {
+  fill: none;
+  stroke: var(--petrol);
+  stroke-width: 2;
+}
+.vb .vb-chart-tick,
+.vb .vb-chart-label {
+  font: 500 11px var(--sans);
+  fill: var(--ink2);
+}
+.vb .vb-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 10px 0 8px;
+}
+.vb .vb-step {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  min-height: 92px;
+  padding: 8px 0 8px;
+  font: 500 13px/18px var(--sans);
+  text-align: left;
+  color: var(--ink2);
+  box-shadow: inset 0 -2px 0 rgba(18, 23, 26, 0.14);
+  transition: transform 120ms var(--out);
+}
+.vb .vb-step:active {
+  transform: scale(0.985);
+}
+.vb .vb-step-bar {
+  display: block;
+  width: 100%;
+  background: var(--ink2);
+}
+.vb .vb-step[aria-pressed='true'] {
+  color: var(--ink);
+  box-shadow: inset 0 -2px 0 var(--ink);
+}
+.vb .vb-step[aria-pressed='true'] .vb-step-bar {
+  background: var(--ink);
+}
+
+/* ------------------------------------------------------------ phones */
+@media (max-width: 760px) {
+  .vb[data-layout='home'],
+  .vb[data-layout='check'] {
+    display: block;
+    height: auto;
+    min-height: 100svh;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  /* the answer fills what is left of the screen, so "How do we know?" stays put from idle to result */
+  .vb[data-layout='check'] {
+    display: flex;
+    flex-direction: column;
+  }
+  .vb .vb-open {
+    flex: none;
+  }
+  .vb .vb-band {
+    display: block;
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 12px;
+  }
+  .vb .vb-h1 {
+    font-size: 28px;
+    line-height: 33px;
+  }
+  .vb .vb-stateline {
+    margin-top: 8px;
+    font-size: 16px;
+    line-height: 21px;
+  }
+  .vb .vb-rail--home {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .vb .vb-col,
+  .vb .vb-col[data-asks] {
+    flex: none;
+    grid-template-columns: 150px minmax(0, 1fr);
+    grid-template-rows: 70px;
+    background: var(--film);
+    color: var(--print);
+  }
+  .vb .vb-col .vb-film {
+    grid-area: 1 / 2;
+  }
+  .vb .vb-col .vb-label {
+    grid-area: 1 / 1;
+    padding: 8px 0 0 16px;
+    font-size: 13px;
+    line-height: 16px;
+  }
+  .vb .vb-col .vb-name {
+    line-height: 20px;
+  }
+  .vb .vb-col .vb-what {
+    font-size: 13px;
+    line-height: 16px;
+    color: var(--print);
+    opacity: 0.72;
+  }
+  .vb .vb-col .vb-status {
+    font-size: 13px;
+    line-height: 18px;
+  }
+  .vb .vb-col .vb-mark {
+    width: 14px;
+    height: 14px;
+  }
+  .vb .vb-col .vb-mark {
+    color: var(--print);
+  }
+  .vb .vb-col .vb-mark[data-kind='medic'] {
+    color: var(--amber-film);
+  }
+  .vb .vb-col[data-asks] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 40px 236px;
+  }
+  .vb .vb-col[data-asks] .vb-film {
+    grid-area: 2 / 1;
+    grid-template-rows: minmax(0, 1fr) 36px;
+  }
+  .vb .vb-col[data-asks] .vb-label {
+    grid-area: 1 / 1;
+    padding: 9px 16px 0;
+  }
+  .vb .vb-col[data-asks] .vb-label br,
+  .vb .vb-col[data-asks] .vb-what {
+    display: none;
+  }
+  .vb .vb-col[data-asks] .vb-name,
+  .vb .vb-col[data-asks] .vb-status {
+    font-size: 16px;
+    line-height: 22px;
+  }
+  .vb .vb-col[data-asks] .vb-name {
+    margin-right: 14px;
+  }
+  .vb .vb-btn--onfilm {
+    left: 16px;
+    bottom: 50px;
+    min-height: 48px;
+  }
+  .vb .vb-edge {
+    height: 36px;
+    padding: 0 12px;
+    line-height: 36px;
+  }
+  .vb .vb-key {
+    margin-left: 8px;
+  }
+  .vb .vb-tag--film {
+    margin-right: 8px;
+  }
+  .vb .vb-cell-line,
+  .vb .vb-cell[data-spiky='1'] .vb-cell-line {
+    stroke-width: 1.5px;
+  }
+  .vb .vb-cell-key {
+    stroke-width: 3px;
+  }
+  .vb .vb-loupe-glass {
+    width: 124px;
+    height: 124px;
+  }
+  .vb .vb-home-foot {
+    padding: 4px 16px 12px;
+  }
+
+  .vb .vb-open {
+    height: min(112vw, 56svh);
+    grid-template-rows: minmax(0, 1fr) 30px;
+  }
+  .vb .vb-open .vb-photo-wrap {
+    grid-row: 1;
+  }
+  .vb .vb-open .vb-edge {
+    grid-row: 2;
+    height: 30px;
+    padding: 0 12px;
+    font-size: 13px;
+    line-height: 30px;
+  }
+  /* six slivers with their names: one line of inline boxes, so the names read as one row of print */
+  .vb .vb-strip {
+    flex: none;
+    display: block;
+    margin: 4px 0 8px;
+    font-size: 0;
+    white-space: nowrap;
+  }
+  .vb .vb-sliver {
+    display: inline-block;
+    width: calc((100% - 20px) / 6);
+    margin-right: 4px;
+    vertical-align: top;
+    transition: transform 120ms var(--out);
+  }
+  .vb .vb-sliver:last-child {
+    margin-right: 0;
+  }
+  .vb .vb-sliver:active {
+    transform: scale(0.97);
+  }
+  .vb .vb-sliver-pic {
+    height: 40px;
+  }
+  .vb .vb-sliver-name {
+    display: inline-block;
+    width: 100%;
+    margin-top: 3px;
+    padding-top: 2px;
+    font: 500 min(10px, 2.55vw)/14px var(--sans);
+    letter-spacing: -0.02em;
+    text-align: center;
+    color: var(--ink2);
+    overflow: hidden;
+  }
+  .vb .vb-sliver[aria-current] .vb-sliver-name {
+    color: var(--ink);
+    font-weight: 650;
+    box-shadow: inset 0 2px 0 var(--ink);
+  }
+  .vb .vb-answer {
+    flex: 1 0 auto;
+    padding: 0 16px 8px;
+  }
+  .vb .vb-sentence {
+    margin: 2px 0 12px;
+    font-size: 22px;
+    line-height: 28px;
+  }
+  .vb .vb-answer .vb-btn {
+    align-self: stretch;
+  }
+  .vb .vb-result {
+    margin-top: 12px;
+  }
+  .vb .vb-hero {
+    font-size: 44px;
+    line-height: 46px;
+  }
+  .vb .vb-hero-unit {
+    font-size: 22px;
+    line-height: 28px;
+  }
+  .vb .vb-act {
+    margin-top: 12px;
+  }
+  .vb .vb-act-text {
+    font-size: 20px;
+    line-height: 25px;
+  }
+  .vb .vb-act-text--quiet {
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .vb .vb-foot {
+    padding-top: 0;
+  }
+  .vb .vb-wordmark {
+    font-size: 15px;
+  }
+
+  .vb .vb-how {
+    inset: auto 0 0 0;
+    width: 100%;
+    height: auto;
+    max-height: 88dvh;
+  }
+  .vb .vb-how[open] {
+    @starting-style {
+      transform: translateY(100%);
+    }
+  }
+  .vb .vb-how-body {
+    max-height: 88dvh;
+    padding: 0 16px calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vb .vb-how[open],
+  .vb .vb-loupe,
+  .vb .vb-cell,
+  .vb .vb-compare,
+  .vb .vb-hero,
+  .vb .vb-hero-unit,
+  .vb .vb-spine .vb-win,
+  .vb .vb-act,
+  .vb .vb-btn,
+  .vb .vb-film {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------ pull a film (view transitions of this prototype's films only) */
+::view-transition-group(.vb-film) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
+}
+::view-transition-old(.vb-film),
+::view-transition-new(.vb-film) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  overflow: clip;
+  animation-duration: 420ms;
+}
+/* From one check to the next the films only slide and crop: no fade. */
+:root:has(.vb[data-vt='slide'])::view-transition-old(.vb-film),
+:root:has(.vb[data-vt='slide'])::view-transition-new(.vb-film) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+/* Per film, the script says which picture keeps its own size (see go() in index.tsx). */
+::view-transition-old(vb-film-tracktrace) {
+  object-fit: var(--vb-old-tracktrace, cover);
+}
+::view-transition-new(vb-film-tracktrace) {
+  object-fit: var(--vb-new-tracktrace, cover);
+  opacity: var(--vb-newop-tracktrace, 1);
+}
+::view-transition-old(vb-film-bubblegrade) {
+  object-fit: var(--vb-old-bubblegrade, cover);
+}
+::view-transition-new(vb-film-bubblegrade) {
+  object-fit: var(--vb-new-bubblegrade, cover);
+  opacity: var(--vb-newop-bubblegrade, 1);
+}
+::view-transition-old(vb-film-spikecount) {
+  object-fit: var(--vb-old-spikecount, cover);
+}
+::view-transition-new(vb-film-spikecount) {
+  object-fit: var(--vb-new-spikecount, cover);
+  opacity: var(--vb-newop-spikecount, 1);
+}
+::view-transition-old(vb-film-veinsqueeze) {
+  object-fit: var(--vb-old-veinsqueeze, cover);
+}
+::view-transition-new(vb-film-veinsqueeze) {
+  object-fit: var(--vb-new-veinsqueeze, cover);
+  opacity: var(--vb-newop-veinsqueeze, 1);
+}
+::view-transition-old(vb-film-braindrift) {
+  object-fit: var(--vb-old-braindrift, cover);
+}
+::view-transition-new(vb-film-braindrift) {
+  object-fit: var(--vb-new-braindrift, cover);
+  opacity: var(--vb-newop-braindrift, 1);
+}
+::view-transition-old(vb-film-garnmeter) {
+  object-fit: var(--vb-old-garnmeter, cover);
+}
+::view-transition-new(vb-film-garnmeter) {
+  object-fit: var(--vb-new-garnmeter, cover);
+  opacity: var(--vb-newop-garnmeter, 1);
+}

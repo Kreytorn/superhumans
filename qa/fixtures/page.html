@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QA fixture</title>
+<link rel="icon" href="data:,">
+<!-- Test page for qa/gate.mjs and qa/capture.mjs. Clean by default; add ?fault=a,b to switch faults on:
+     dead, flash, noise, scroll, hero, words, numbers, console, external, axe, nokey, badlink, covered.
+     Honours ?state=idle|result and ?t=<ms> (pins the progress bar). Not part of the site. -->
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 16px/1.4 system-ui, sans-serif; background: #10141a; color: #f2f4f7; }
+  main { display: flex; flex-direction: column; min-height: 100vh; }
+  #hero { height: 62vh; background: linear-gradient(135deg, #1d3b53, #2e6f6a); position: relative; }
+  #bar { position: absolute; left: 0; bottom: 0; height: 10px; width: 0; background: #ffd166; }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px 16px; }
+  button, a, summary, .fake { min-height: 44px; min-width: 44px; padding: 10px 16px; font: inherit; color: #10141a; background: #f2f4f7; border: 0; border-radius: 8px; cursor: pointer; }
+  a { display: inline-flex; align-items: center; text-decoration: underline; }
+  button:hover, .fake:hover { background: #ffd166; }
+  :focus-visible { outline: 3px solid #ffd166; outline-offset: 2px; }
+  input[type="range"] { width: 160px; height: 44px; }
+  h1 { font-size: 20px; margin: 0; }
+  p { margin: 0; }
+</style>
+</head>
+<body>
+<main id="root" data-state="idle">
+  <div id="hero" data-qa="hero" role="img" aria-label="Sample area"><div id="bar"></div></div>
+  <div class="row">
+    <h1>Fixture check</h1>
+    <p id="answer">Press run.</p>
+  </div>
+  <div class="row" id="controls">
+    <button id="run" data-qa="primary">Run</button>
+    <button id="holdme" data-hold>Hold to reset</button>
+    <label for="level">Level</label>
+    <input id="level" type="range" min="0" max="10" value="5">
+    <output id="levelOut" for="level" aria-live="polite">Level five</output>
+    <details><summary>How do we know?</summary><p>Because the fixture says so. <button id="inner">Flip</button> <span id="innerOut">off</span></p></details>
+    <a id="next" href="other.html">Second page</a>
+  </div>
+  <div id="faults"></div>
+</main>
+<script>
+  const q = new URLSearchParams(location.search)
+  const faults = new Set((q.get('fault') || '').split(',').filter(Boolean))
+  const root = document.getElementById('root')
+  const answer = document.getElementById('answer')
+  const bar = document.getElementById('bar')
+  const zone = document.getElementById('faults')
+  const setResult = () => { root.dataset.state = 'result'; answer.textContent = 'Done. Result is 42 units, normal is 40.'; bar.style.width = '100%' }
+  const setIdle = () => { root.dataset.state = 'idle'; answer.textContent = 'Press run.'; bar.style.width = '0' }
+  document.getElementById('run').addEventListener('click', () => {
+    root.dataset.state = 'running'; answer.textContent = 'Running.'
+    const t0 = performance.now()
+    const step = () => { const t = performance.now() - t0; bar.style.width = Math.min(100, t / 20) + '%'; if (t < 2000) requestAnimationFrame(step); else setResult() }
+    requestAnimationFrame(step)
+  })
+  // Hold: fires only after 700 ms of continuous press (pointer or keyboard).
+  const holdBtn = document.getElementById('holdme'); let timer = 0
+  const down = () => { clearTimeout(timer); timer = setTimeout(() => { setIdle(); answer.textContent = 'Reset by hold.' }, 700) }
+  const up = () => clearTimeout(timer)
+  holdBtn.addEventListener('pointerdown', down); holdBtn.addEventListener('pointerup', up); holdBtn.addEventListener('pointercancel', up)
+  holdBtn.addEventListener('contextmenu', (e) => e.preventDefault())
+  const words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
+  document.getElementById('level').addEventListener('input', (e) => { document.getElementById('levelOut').textContent = 'Level ' + words[e.target.value] })
+  document.getElementById('inner').addEventListener('click', () => { const o = document.getElementById('innerOut'); o.textContent = o.textContent === 'off' ? 'on' : 'off' })
+
+  if (faults.has('dead')) zone.insertAdjacentHTML('beforeend', '<div class="row"><button id="dead">Export report</button></div>')
+  if (faults.has('flash')) {
+    // Looks alive for a moment (pressed flag on itself), leaves no trace: still dead.
+    zone.insertAdjacentHTML('beforeend', '<div class="row"><button id="flash">Share</button></div>')
+    document.getElementById('flash').addEventListener('click', (e) => { e.currentTarget.dataset.pressed = '1'; setTimeout(() => delete document.getElementById('flash').dataset.pressed, 150) })
+  }
+  if (faults.has('noise')) {
+    // A clock that ticks by itself must not make a dead button look alive.
+    zone.insertAdjacentHTML('beforeend', '<div class="row"><span id="clock" aria-hidden="true">tick</span><button id="deadnoisy">Print</button></div>')
+    let n = 0; setInterval(() => { document.getElementById('clock').textContent = 'tick ' + (n++ % 10) }, 90)
+  }
+  if (faults.has('covered')) zone.insertAdjacentHTML('beforeend', '<div class="row" style="position:relative"><button id="under" onclick="this.textContent=\'opened\'">Open log</button><div id="veil" style="position:absolute;inset:0;background:rgba(0,0,0,.01)"></div></div>')
+  if (faults.has('scroll')) zone.insertAdjacentHTML('beforeend', '<div id="wide" style="width:640px;height:24px;background:#444"></div>')
+  if (faults.has('hero')) document.getElementById('hero').style.height = '22vh'
+  if (faults.has('words')) zone.insertAdjacentHTML('beforeend', '<p class="row" id="wordy">' + Array.from({ length: 90 }, (_, i) => 'word').join(' ') + '</p>')
+  if (faults.has('numbers')) zone.insertAdjacentHTML('beforeend', '<p class="row" id="numbery">Rate 71, level 98 percent, 36.6 degrees, 120 over 80, 5 samples.</p>')
+  if (faults.has('console')) console.error('fixture: deliberate console error')
+  if (faults.has('external')) fetch('https://example.com/fixture.json').catch(() => {})
+  if (faults.has('axe')) zone.insertAdjacentHTML('beforeend', '<div class="row"><button id="noname" onclick="this.dataset.on=1"></button><img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" width="20" height="20"></div>')
+  if (faults.has('badlink')) zone.insertAdjacentHTML('beforeend', '<div class="row"><a id="bad" href="/#/proto/does-not-exist/home">Broken link</a></div>')
+  if (faults.has('nokey')) {
+    // A div that works with the mouse only: not focusable, so the keyboard cannot reach the primary action.
+    const b = document.getElementById('run'); const d = document.createElement('div')
+    d.className = 'fake'; d.textContent = 'Run'; d.dataset.qa = 'primary'; d.addEventListener('click', setResult); b.replaceWith(d)
+  }
+
+  if (q.get('state') === 'result') setResult()
+  if (q.has('t')) { const t = Number(q.get('t')); bar.style.width = Math.min(100, t / 20) + '%'; if (t >= 2000) setResult(); else if (t > 0) { root.dataset.state = 'running'; answer.textContent = 'Running.' } }
+  setTimeout(() => { root.dataset.ready = '1' }, 150)
+</script>
+</body>
+</html>

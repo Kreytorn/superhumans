@@ -1,0 +1,1001 @@
+/* Prototype D "Drape". Every selector is scoped under .drp (the prototype root). */
+@import '@fontsource-variable/anybody/wdth.css';
+@import '@fontsource-variable/hanken-grotesk/index.css';
+
+.drp {
+  --green: #12574a;
+  --ink: #f2eee3;
+  --quiet: #a9c4b8;
+  --lilac: #cdb8ff;
+  --key: #0c1f1b;
+  --amber: #ffc53d;
+  --red: #ff8473;
+  --off: #6f9186;
+  /* one design pixel of the 1440 x 900 poster */
+  --u: min(100vw / 1440, 100svh / 900);
+  --cut: cubic-bezier(0.77, 0, 0.175, 1);
+  --out: cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  min-height: 100svh;
+  background: var(--green);
+  color: var(--ink);
+  font-family: 'Hanken Grotesk Variable', sans-serif;
+  font-weight: 500;
+  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+.drp,
+.drp *,
+.drp *::before,
+.drp *::after {
+  box-sizing: border-box;
+}
+.drp :where(button) {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.drp :where(a) {
+  color: inherit;
+  text-decoration: none;
+  touch-action: manipulation;
+}
+.drp :where(h1, h2, h3, p, ol, ul) {
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  list-style: none;
+}
+.drp :focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+.drp-probe {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  visibility: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.drp-probe,
+.drp-fit {
+  font-family: 'Anybody Variable', sans-serif;
+  letter-spacing: -0.01em;
+  font-kerning: normal;
+}
+.drp-fit {
+  display: inline-block;
+  white-space: nowrap;
+}
+.drp-fit[data-fit='0'] {
+  visibility: hidden;
+}
+
+/* ---------- shared pieces ---------- */
+.drp-stage {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--key);
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 480ms var(--cut);
+}
+.drp-stage[data-shut='1'] {
+  clip-path: inset(0 100% 0 0);
+  transition-duration: 240ms;
+}
+.drp-stage svg,
+.drp-stage img {
+  position: absolute;
+  display: block;
+}
+.drp-field {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.drp-field path {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: butt;
+}
+.drp-field .drp-keyline {
+  stroke: var(--key);
+}
+.drp-field .drp-line {
+  stroke: var(--lilac);
+  fill: var(--lilac);
+  fill-opacity: 0;
+}
+.drp-poster {
+  object-fit: cover;
+}
+.drp-field[data-pickable='1'] {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.drp .drp-field {
+  outline: none;
+}
+.drp .drp-field:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: -6px;
+}
+.drp-tab {
+  position: absolute;
+  z-index: 2;
+  background: var(--green);
+  color: var(--ink);
+}
+.drp-tag {
+  font-size: max(13px, calc(14 * var(--u)));
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--quiet);
+  white-space: nowrap;
+}
+.drp-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: var(--green);
+  font-weight: 600;
+  white-space: nowrap;
+  transition: transform 120ms var(--out);
+}
+.drp .drp-btn {
+  background: var(--ink);
+  color: var(--green);
+}
+.drp .drp-btn:active {
+  transform: scale(0.98);
+}
+.drp .drp-btn[disabled] {
+  cursor: progress;
+}
+.drp .drp-link {
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.22em;
+  white-space: nowrap;
+  transition: transform 120ms var(--out);
+}
+.drp .drp-link:active {
+  transform: scale(0.98);
+}
+.drp-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.drp-row,
+.drp-btn,
+.drp-stage,
+.drp-back {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.drp-mark {
+  display: block;
+  flex: none;
+}
+.drp-act b,
+.drp-state b {
+  font-weight: 800;
+}
+.drp-hide {
+  visibility: hidden;
+}
+/* the key to the outlines: a filled shape is a spiky cell, a hollow one is not */
+.drp-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  margin-left: 1.1em;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.drp-key i {
+  display: block;
+  width: 0.86em;
+  height: 0.86em;
+  border-radius: 50%;
+  border: 2px solid var(--lilac);
+}
+.drp-key i[data-fill='1'] {
+  background: var(--lilac);
+}
+@media (hover: hover) and (pointer: fine) {
+  .drp .drp-btn:hover {
+    background: #fffdf6;
+  }
+  .drp .drp-link:hover,
+  .drp .drp-back:hover {
+    text-decoration-thickness: 2.5px;
+  }
+  .drp .drp-back:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
+  }
+}
+
+/* ---------- desktop poster: 1440 x 900 design units, centred ---------- */
+@media (min-width: 821px) and (min-aspect-ratio: 1/1) and (min-height: 540px) {
+  .drp {
+    height: 100svh;
+    overflow: hidden;
+  }
+  .drp-sheet {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: calc(1440 * var(--u));
+    height: calc(900 * var(--u));
+  }
+  .drp-win {
+    position: absolute;
+    left: calc(584 * var(--u));
+    top: calc(44 * var(--u));
+    width: calc(812 * var(--u));
+    height: calc(812 * var(--u));
+  }
+  .drp-sheet[data-shape='tall'] .drp-win {
+    left: calc(710 * var(--u));
+    top: 0;
+    width: calc(730 * var(--u));
+    height: calc(900 * var(--u));
+  }
+  .drp-sheet[data-shape='band'] .drp-win {
+    left: 0;
+    top: 0;
+    width: calc(1440 * var(--u));
+    height: calc(470 * var(--u));
+  }
+  .drp-col {
+    position: absolute;
+    left: calc(44 * var(--u));
+    top: calc(44 * var(--u));
+    width: calc(496 * var(--u));
+    height: calc(812 * var(--u));
+  }
+  .drp-sentence {
+    font-size: calc(26 * var(--u));
+    line-height: calc(32 * var(--u));
+    max-width: calc(480 * var(--u));
+    text-wrap: balance;
+  }
+  .drp-btn {
+    height: calc(52 * var(--u));
+    padding: 0 calc(28 * var(--u));
+    font-size: max(13px, calc(16 * var(--u)));
+  }
+  .drp-link,
+  .drp-back {
+    font-size: max(13px, calc(16 * var(--u)));
+    line-height: calc(28 * var(--u));
+  }
+  .drp-bar {
+    display: contents;
+  }
+  .drp-tab-tr {
+    top: 0;
+    right: 0;
+    padding: calc(9 * var(--u)) calc(12 * var(--u));
+  }
+  .drp-mark {
+    height: calc(22 * var(--u));
+    width: auto;
+  }
+
+  /* Home */
+  .drp-home .drp-sentence {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .drp-rows {
+    position: absolute;
+    top: calc(84 * var(--u));
+    left: 0;
+    width: 100%;
+  }
+  .drp-row {
+    position: relative;
+    display: block;
+    height: calc(104 * var(--u));
+    line-height: 0;
+    white-space: nowrap;
+  }
+  /* the status shapes hang in the margin, clear of the first letters */
+  .drp-row .drp-mark {
+    position: absolute;
+    right: calc(100% + 14 * var(--u));
+    top: calc(63 * var(--u));
+    transform: translateY(-50%);
+    height: calc(16 * var(--u));
+  }
+  .drp-row .drp-mark[data-level='medic'] {
+    right: calc(100% + 10 * var(--u));
+    height: calc(24 * var(--u));
+  }
+  .drp-row .drp-fit {
+    width: var(--fitw);
+    vertical-align: baseline;
+    line-height: calc(112 * var(--u));
+    height: calc(104 * var(--u));
+  }
+  /* the status word sits on the name's baseline */
+  .drp-who {
+    display: inline-block;
+    vertical-align: baseline;
+    width: calc(100% - var(--fitw));
+    text-align: right;
+    font-size: max(13px, calc(17 * var(--u)));
+    line-height: 1;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .drp-state {
+    position: absolute;
+    top: calc(722 * var(--u));
+    left: 0;
+    font-size: calc(18 * var(--u));
+    line-height: calc(26 * var(--u));
+    white-space: nowrap;
+  }
+  .drp-state .drp-tag {
+    margin-left: calc(10 * var(--u));
+  }
+  .drp-home .drp-btn {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+  }
+  .drp-home .drp-how-link {
+    position: absolute;
+    right: 0;
+    bottom: calc(12 * var(--u));
+  }
+  .drp-numtab {
+    left: 0;
+    bottom: 0;
+    padding: calc(12 * var(--u)) calc(18 * var(--u)) calc(10 * var(--u)) 0;
+    font-size: calc(18 * var(--u));
+    line-height: calc(40 * var(--u));
+    white-space: nowrap;
+  }
+  .drp-numtab b {
+    font-family: 'Anybody Variable', sans-serif;
+    font-weight: 800;
+    font-stretch: 110%;
+    font-size: calc(40 * var(--u));
+    margin-right: calc(4 * var(--u));
+  }
+  .drp-cap {
+    position: absolute;
+    font-size: calc(20 * var(--u));
+    line-height: calc(28 * var(--u));
+    max-height: calc(112 * var(--u));
+    text-wrap: balance;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .drp-celltab {
+    left: 0;
+    bottom: 0;
+    padding: calc(10 * var(--u)) calc(16 * var(--u)) calc(10 * var(--u)) calc(14 * var(--u));
+    font-size: max(13px, calc(16 * var(--u)));
+    line-height: calc(22 * var(--u));
+    max-width: 80%;
+  }
+
+  /* A check (SpikeCount and the five previews) */
+  .drp-check .drp-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .drp-check .drp-name {
+    position: absolute;
+    top: calc(40 * var(--u));
+    left: 0;
+    height: calc(124 * var(--u));
+    line-height: calc(124 * var(--u));
+  }
+  .drp-check .drp-sentence {
+    position: absolute;
+    top: calc(180 * var(--u));
+    left: 0;
+  }
+  .drp-check .drp-btn {
+    position: absolute;
+    top: calc(272 * var(--u));
+    left: 0;
+    min-width: calc(232 * var(--u));
+  }
+  /* the blood check: the title is smaller than the answer */
+  .drp-spike .drp-name {
+    top: calc(36 * var(--u));
+    height: calc(96 * var(--u));
+    line-height: calc(96 * var(--u));
+  }
+  .drp-spike .drp-sentence {
+    top: calc(150 * var(--u));
+  }
+  .drp-spike .drp-btn {
+    top: calc(244 * var(--u));
+  }
+  /* the answer runs from the margin to the edge of the photo it measures, and stops there */
+  .drp-hero {
+    right: 100%;
+    top: calc(346 * var(--u));
+    height: calc(104 * var(--u));
+    padding: 0 calc(14 * var(--u)) 0 0;
+    line-height: calc(104 * var(--u));
+    white-space: nowrap;
+  }
+  .drp-count {
+    position: absolute;
+    top: calc(462 * var(--u));
+    left: 0;
+    font-size: calc(18 * var(--u));
+    line-height: calc(26 * var(--u));
+    color: var(--quiet);
+  }
+  .drp-compare {
+    position: absolute;
+    top: calc(490 * var(--u));
+    left: 0;
+    font-size: calc(18 * var(--u));
+    line-height: calc(26 * var(--u));
+    white-space: nowrap;
+  }
+  .drp-compare .drp-tag {
+    margin-left: calc(10 * var(--u));
+  }
+  .drp-act {
+    position: absolute;
+    top: calc(552 * var(--u));
+    left: 0;
+    width: 100%;
+    padding-left: calc(36 * var(--u));
+    font-size: calc(20 * var(--u));
+    line-height: calc(28 * var(--u));
+    text-wrap: balance;
+  }
+  .drp-act .drp-mark {
+    position: absolute;
+    left: 0;
+    top: calc(3 * var(--u));
+  }
+  .drp-check .drp-how-link {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+  }
+  .drp-check .drp-err {
+    position: absolute;
+    top: calc(346 * var(--u));
+    left: 0;
+    font-size: calc(18 * var(--u));
+    line-height: calc(26 * var(--u));
+  }
+  .drp-note {
+    position: absolute;
+    top: calc(346 * var(--u));
+    left: 0;
+    font-size: calc(18 * var(--u));
+    line-height: calc(26 * var(--u));
+    color: var(--quiet);
+  }
+  .drp-preview .drp-sentence {
+    font-size: calc(22 * var(--u));
+    line-height: calc(30 * var(--u));
+  }
+  .drp-preview .drp-btn {
+    top: auto;
+    bottom: 0;
+  }
+  .drp-preview .drp-how-link {
+    left: auto;
+    right: 0;
+    bottom: calc(12 * var(--u));
+  }
+  .drp-preview .drp-note {
+    top: calc(346 * var(--u));
+  }
+  /* band previews: the window runs the full width, the words sit under it */
+  .drp-sheet[data-shape='band'] .drp-col {
+    top: calc(470 * var(--u));
+    height: calc(386 * var(--u));
+    width: calc(1352 * var(--u));
+  }
+  .drp-sheet[data-shape='band'] .drp-back {
+    top: calc(26 * var(--u));
+  }
+  .drp-sheet[data-shape='band'] .drp-name {
+    top: calc(64 * var(--u));
+  }
+  .drp-sheet[data-shape='band'] .drp-sentence {
+    top: calc(28 * var(--u));
+    left: calc(600 * var(--u));
+    max-width: calc(700 * var(--u));
+  }
+  .drp-sheet[data-shape='band'] .drp-note {
+    top: calc(196 * var(--u));
+    left: calc(600 * var(--u));
+  }
+  .drp-sheet[data-shape='band'] .drp-how-link {
+    right: auto;
+    left: calc(600 * var(--u));
+    bottom: calc(12 * var(--u));
+  }
+
+  /* layer two: the drape turned over, covering only the words */
+  .drp-how {
+    left: 0;
+    top: 0;
+    width: calc((100vw - 1440 * var(--u)) / 2 + 584 * var(--u));
+    height: 100svh;
+    max-height: none;
+    padding: calc(44 * var(--u)) calc(44 * var(--u)) calc(44 * var(--u)) calc((100vw - 1440 * var(--u)) / 2 + 44 * var(--u));
+    font-size: calc(16 * var(--u));
+    line-height: calc(24 * var(--u));
+    transform: translateX(0);
+    transition: transform 320ms var(--out);
+  }
+  @starting-style {
+    .drp-how[open] {
+      transform: translateX(-100%);
+    }
+  }
+  .drp-how h2 {
+    font-size: calc(26 * var(--u));
+    line-height: calc(32 * var(--u));
+  }
+}
+
+/* ---------- phone: the window is the top half, the words flow under it ---------- */
+@media (max-width: 820px), (max-aspect-ratio: 999/1000), (max-height: 539px) {
+  .drp {
+    --u: 1px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  .drp-win {
+    position: relative;
+    width: 100%;
+    height: max(50.4svh, 300px);
+  }
+  .drp-col {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px;
+  }
+  .drp-sentence {
+    font-size: 19px;
+    line-height: 26px;
+    text-wrap: balance;
+  }
+  .drp-btn {
+    height: 52px;
+    width: 100%;
+    font-size: 16px;
+  }
+  .drp-link,
+  .drp-back {
+    font-size: 16px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .drp-how-link {
+    align-self: flex-start;
+  }
+  .drp-tab-tr {
+    top: 0;
+    right: 0;
+    padding: 9px 12px;
+  }
+  .drp-tag {
+    font-size: 13px;
+  }
+  .drp-mark {
+    height: 18px;
+    width: auto;
+  }
+  /* the main action and the second layer share one row */
+  .drp-bar {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .drp-bar .drp-btn {
+    flex: 1;
+    width: auto;
+  }
+  .drp-bar .drp-how-link {
+    flex: none;
+    align-self: center;
+  }
+
+  /* Home: the photo and its caption, the sentence, the six names, then the action pinned in thumb reach */
+  .drp[data-view='home'] {
+    padding-bottom: 0;
+  }
+  .drp-home .drp-sentence {
+    margin-top: 6px;
+  }
+  .drp-home .drp-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    background: var(--green);
+    padding: 6px 0 calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+  .drp-row {
+    position: relative;
+    display: block;
+    height: 42px;
+    line-height: 0;
+    white-space: nowrap;
+    padding-left: 30px;
+  }
+  .drp-row .drp-mark {
+    position: absolute;
+    left: 2px;
+    top: calc(50% + 3px);
+    transform: translateY(-50%);
+    height: 14px;
+  }
+  .drp-row .drp-mark[data-level='medic'] {
+    left: 0;
+    height: 18px;
+  }
+  .drp-row .drp-fit {
+    width: var(--fitw);
+    vertical-align: baseline;
+    height: 42px;
+    line-height: 45px;
+  }
+  .drp-who {
+    display: inline-block;
+    vertical-align: baseline;
+    width: calc(100% - var(--fitw));
+    text-align: right;
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .drp-row:active {
+    transform: scale(0.98);
+  }
+  .drp-state {
+    margin-top: 2px;
+    font-size: 14px;
+    line-height: 20px;
+    white-space: nowrap;
+  }
+  .drp-state .drp-tag {
+    margin-left: 6px;
+  }
+  .drp-cap {
+    display: none;
+  }
+  /* the caption that says what the outlines are, on the photo's lower-left edge */
+  .drp-numtab {
+    left: 0;
+    bottom: 0;
+    padding: 6px 14px 4px 16px;
+    font-size: 14px;
+    line-height: 30px;
+    white-space: nowrap;
+  }
+  .drp-numtab b {
+    font-family: 'Anybody Variable', sans-serif;
+    font-weight: 800;
+    font-stretch: 110%;
+    font-size: 24px;
+    margin-right: 3px;
+  }
+
+  /* A check */
+  .drp-check .drp-back {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 2;
+    background: var(--green);
+    padding: 0 14px 0 16px;
+    font-size: 14px;
+  }
+  .drp-check .drp-win {
+    height: max(55svh, 300px);
+  }
+  .drp-check .drp-col {
+    margin-top: -16px;
+  }
+  .drp-check .drp-name {
+    align-self: flex-start;
+    margin-left: -16px;
+    padding: 4px 14px 0 16px;
+    background: var(--green);
+    position: relative;
+    z-index: 2;
+    height: 64px;
+    line-height: 64px;
+  }
+  .drp-check .drp-sentence {
+    margin-top: 6px;
+    min-height: 52px;
+  }
+  .drp-check .drp-btn {
+    margin-top: 20px;
+  }
+  .drp-check .drp-how-link {
+    margin-top: 6px;
+  }
+  /* the blood check: the button never moves; the answer lands in the space kept under it */
+  .drp-spike .drp-bar {
+    margin-top: 16px;
+  }
+  .drp-spike .drp-btn,
+  .drp-spike .drp-how-link {
+    margin-top: 0;
+  }
+  .drp-hero {
+    position: relative;
+    display: block;
+    margin-top: 8px;
+    height: 60px;
+    line-height: 60px;
+    white-space: nowrap;
+    background: none;
+  }
+  .drp-count {
+    font-size: 15px;
+    line-height: 22px;
+    color: var(--quiet);
+  }
+  .drp-compare {
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .drp-compare .drp-tag {
+    margin-left: 8px;
+  }
+  .drp-act {
+    position: relative;
+    margin-top: 12px;
+    padding-left: 28px;
+    font-size: 17px;
+    line-height: 24px;
+    min-height: 48px;
+    text-wrap: balance;
+  }
+  .drp-act .drp-mark {
+    position: absolute;
+    left: 0;
+    top: 3px;
+  }
+  .drp-celltab {
+    left: 0;
+    bottom: 16px;
+    padding: 7px 12px 7px 16px;
+    font-size: 14px;
+    line-height: 20px;
+    max-width: 94%;
+  }
+  .drp-err {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .drp-note {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 22px;
+    color: var(--quiet);
+  }
+
+  /* layer two: a bone bottom sheet */
+  .drp-how {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    width: 100%;
+    max-width: none;
+    max-height: 76svh;
+    padding: 20px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+    font-size: 15px;
+    line-height: 22px;
+    transform: translateY(0);
+    transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  @starting-style {
+    .drp-how[open] {
+      transform: translateY(100%);
+    }
+  }
+  .drp-how h2 {
+    font-size: 22px;
+    line-height: 28px;
+  }
+}
+
+/* ---------- "How do we know?" (both sizes) ---------- */
+.drp dialog.drp-how {
+  position: fixed;
+  margin: 0;
+  border: 0;
+  background: var(--ink);
+  color: var(--green);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.drp dialog.drp-how::backdrop {
+  background: transparent;
+}
+.drp-how :focus-visible {
+  outline-color: var(--green);
+}
+.drp-how-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 0.9em;
+}
+.drp-how h2 {
+  font-weight: 700;
+}
+.drp .drp-how .drp-close {
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -8px -10px 0 0;
+  display: grid;
+  place-items: center;
+  color: var(--green);
+}
+.drp-how section {
+  padding: 0.7em 0 1.1em;
+}
+.drp-table {
+  border-collapse: collapse;
+  margin-top: 1em;
+  font-size: 0.82em;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.drp-table caption {
+  text-align: left;
+  padding-bottom: 0.5em;
+  opacity: 0.82;
+}
+.drp-table th {
+  font-weight: 500;
+  text-align: right;
+  padding: 0.28em 0.5em 0.28em 0;
+  white-space: nowrap;
+  opacity: 0.82;
+}
+.drp-table td {
+  text-align: right;
+  padding: 0.28em 0.5em;
+}
+.drp-table td[data-hit='1'] {
+  font-weight: 800;
+  background: var(--green);
+  color: var(--ink);
+}
+.drp-how h3 {
+  font-weight: 800;
+  font-size: 1.12em;
+  margin-bottom: 0.3em;
+}
+.drp-how p + p {
+  margin-top: 0.45em;
+}
+.drp-how .drp-fine {
+  font-size: 0.86em;
+  line-height: 1.45;
+  opacity: 0.82;
+}
+.drp-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 0.6em 0;
+}
+.drp .drp-how .drp-step {
+  min-height: 56px;
+  padding: 6px 4px;
+  text-align: center;
+  color: var(--green);
+  box-shadow: inset 0 0 0 1.5px var(--green);
+  font-weight: 600;
+  line-height: 1.25;
+  transition: transform 120ms var(--out);
+}
+.drp .drp-how .drp-step:active {
+  transform: scale(0.97);
+}
+.drp .drp-how .drp-step[aria-pressed='true'] {
+  background: var(--green);
+  color: var(--ink);
+}
+.drp-step span {
+  display: block;
+  font-weight: 500;
+  font-size: 0.86em;
+}
+.drp-scatter {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  margin: 0.6em 0 0.2em;
+  overflow: visible;
+}
+.drp-scatter text {
+  font-size: 11px;
+  fill: var(--green);
+}
+.drp-ladder li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 0.22em 0;
+}
+.drp-ladder .drp-mark {
+  height: 16px;
+  width: 16px;
+  position: relative;
+  top: 3px;
+}
+.drp-ladder li[data-off='1'] {
+  opacity: 0.55;
+}
+.drp-ladder b {
+  font-weight: 800;
+  white-space: nowrap;
+}
+.drp-checks6 li {
+  padding: 0.3em 0;
+}
+.drp-checks6 b {
+  font-weight: 800;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drp-stage,
+  .drp .drp-btn,
+  .drp .drp-link,
+  .drp-how {
+    transition: none !important;
+  }
+}
