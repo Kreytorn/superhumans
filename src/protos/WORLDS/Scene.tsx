@@ -1,6 +1,7 @@
 // WORLDS "Six worlds": one small solar system, drawn by code. Every world wears one of our real samples as its
 // surface, lit by one sun. Pressing a world stops time, flies the camera to it and turns it to face the viewer.
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Bloom, EffectComposer } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { replay } from '../../engine/spikecount'
@@ -177,7 +178,14 @@ void main(){
   vec3 tex = texture2D(uMap, uv).rgb;
   vec3 n = vec3(c.x, -c.y, sqrt(1.-r2));
   float ndl = clamp(dot(n, normalize(uLight + vec3(0.,0.,1.05)))*0.9+0.2, 0., 1.);
-  vec3 lit = clamp((tex-0.47)*3.0+0.6, 0.05, 1.5)*vec3(1.2,0.5,0.46)*(0.74+0.4*ndl)*uShade;
+  // the cell's own rim (membrane and spikes) from the photo's local contrast, so a far cell still reads as a real cell
+  vec2 px = vRect.zw*0.035;
+  float gx = dot(texture2D(uMap, uv+vec2(px.x,0.)).rgb - texture2D(uMap, uv-vec2(px.x,0.)).rgb, vec3(0.333));
+  float gy = dot(texture2D(uMap, uv+vec2(0.,px.y)).rgb - texture2D(uMap, uv-vec2(0.,px.y)).rgb, vec3(0.333));
+  float edge = smoothstep(0.02, 0.12, length(vec2(gx,gy)));
+  float l = dot(tex, vec3(0.333));
+  vec3 body = clamp((l-0.47)*1.9+0.46, 0.04, 1.2)*vec3(1.12,0.4,0.36)*(0.66+0.5*ndl);
+  vec3 lit = (body + edge*vec3(1.05,0.78,0.66)*(0.5+0.55*ndl))*uShade;
   vec3 col = mix(lit, tex, uReal);
   float a = smoothstep(1., mix(0.78,0.9,uReal), r2);
   gl_FragColor = vec4(col, a*uDim);
@@ -394,7 +402,7 @@ function build(): Built {
     uLight: { value: new THREE.Vector3(0, 0, 1) },
     uReal: { value: 0 },
     uPx: { value: 800 },
-    uBoost: { value: 2.05 },
+    uBoost: { value: 2.35 },
     uTime: { value: 0 },
     uDim: { value: 1 },
     uShade: { value: dim },
@@ -459,7 +467,7 @@ function build(): Built {
       const r = R + (rnd() - 0.5) * 1.1
       bp.set([Math.cos(a) * r, (rnd() - 0.5) * 0.5, Math.sin(a) * r], k * 3)
       br.set([(b.cx - b.r) / W, 1 - (b.cy + b.r) / H, (2 * b.r) / W, (2 * b.r) / H], k * 4)
-      bs[k] = ((2 * b.r) / W) * FIELD_SIDE * (0.3 + rnd() * 0.4)
+      bs[k] = ((2 * b.r) / W) * FIELD_SIDE * (0.45 + rnd() * 0.45)
       bd[k] = rnd()
     }
     const bg2 = beltPoints.geometry
@@ -542,8 +550,8 @@ function setPose(out: Pose, P: THREE.Vector3, dir: THREE.Vector3, dist: number, 
     .addScaledVector(_u, -ndcY * hh)
 }
 
-/** Where a world is on its orbit: a slow swing around its composed place. */
-const angleOf = (w: { a0: number; speed: number; orbit: number }, i: number, t: number) => w.a0 - (1.0 / w.orbit + 0.05) * Math.sin(w.speed * t + i * 0.9)
+/** Where a world is on its orbit: a full circle around the sun, inner worlds faster (angular speed ~ r^-1.5, as in a real system). */
+const angleOf = (w: { a0: number; orbit: number }, _i: number, t: number) => w.a0 + t * (1.05 / Math.pow(w.orbit, 1.5))
 const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
 const smooth = (a: number, b: number, x: number) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)))
@@ -765,7 +773,7 @@ function System({ focus, hover, labels, onPick, onHover, onArrive, onReady }: Sc
         b.cells.uniforms.uReal.value = smooth(0.15, 0.9, st.real[i])
         b.cells.uniforms.uDim.value = alphaOf(i)
         b.belt.uniforms.uDim.value = others
-        b.cells.uniforms.uBoost.value = (2.05 + 0.35 * st.hov[i]) * ws
+        b.cells.uniforms.uBoost.value = (2.35 + 0.35 * st.hov[i]) * ws
         b.field.uniforms.uReal.value = smooth(0.78, 1, st.real[i])
         // light direction for the cells, in view space
         tmp.v.copy(g.position).negate().normalize().transformDirection(camera.matrixWorldInverse)
@@ -893,6 +901,10 @@ export default function Scene(p: SceneProps) {
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
     >
       <System {...p} />
+      {/* one cheap, real glow: only what is brighter than the threshold blooms (the sun, lit rims, the bright spots) */}
+      <EffectComposer multisampling={touch ? 0 : 4}>
+        <Bloom mipmapBlur intensity={0.85} luminanceThreshold={0.88} luminanceSmoothing={0.2} radius={0.74} resolutionScale={touch ? 0.35 : 0.5} />
+      </EffectComposer>
     </Canvas>
   )
 }

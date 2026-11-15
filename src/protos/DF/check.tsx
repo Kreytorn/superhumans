@@ -9,7 +9,9 @@ import type { BubbleGradeMomentHandle } from '../../moments/bubblegrade'
 import type { VeinSqueezeMomentHandle } from '../../moments/veinsqueeze'
 import type { BrainDriftMomentHandle } from '../../moments/braindrift'
 import type { GarnMomentHandle } from '../../moments/garnmeter'
-import type { SpikeHandle } from './check_spike'
+import type { SpikeCountMomentHandle } from '../../moments/spikecount'
+import { HONESTY_BANDS, HONESTY_HELD_OUT, HONESTY_HERO_PAIR, HONESTY_SQUEEZE } from '../../engine/veinsqueeze/honesty'
+import StorySection from './story'
 
 // Each stage is its own chunk, fetched only when its page has landed.
 const TrackTrace = lazy(() => import('../../moments/tracktrace'))
@@ -17,7 +19,7 @@ const BubbleGrade = lazy(() => import('../../moments/bubblegrade'))
 const VeinSqueeze = lazy(() => import('../../moments/veinsqueeze'))
 const BrainDrift = lazy(() => import('../../moments/braindrift'))
 const Garn = lazy(() => import('../../moments/garnmeter'))
-const Spike = lazy(() => import('./check_spike'))
+const Spike = lazy(() => import('../../moments/spikecount'))
 
 type Phase = 'idle' | 'running' | 'result' | 'error'
 export interface Outcome {
@@ -30,6 +32,10 @@ export interface Outcome {
   source?: 'LIVE' | 'REPLAY'
   /** The decision's fixed honesty lines, verbatim, behind "How do we know?". */
   fine: string[]
+  /** A short tag the stage asks the page to show (VeinSqueeze: "Best case"), with its sentence. */
+  flag?: { tag: string; line: string }
+  /** One fixed honesty line shown in the open with the action (BubbleGrade). */
+  note?: string
 }
 
 type Tokens = CSSProperties & Record<`--${string}`, string>
@@ -48,6 +54,7 @@ const TOKENS: Record<string, Tokens> = {
   tracktrace: { ...BASE_TOKENS, '--m-mark': '#FF7A45', '--m-accent': '#FFFFFF', '--m-specimen': '#ECE7DB' },
   bubblegrade: { ...BASE_TOKENS, '--m-stage': '#071421', '--m-mark': '#FF8F3A', '--m-mark-hot': '#FFE8BE', '--m-accent': '#3FD0FF' },
   veinsqueeze: { ...BASE_TOKENS, '--m-mark': '#FFD34D', '--m-accent': '#FF4F7B', aspectRatio: 'auto' },
+  spikecount: { ...BASE_TOKENS, '--m-stage': '#070A14', '--m-pane': '#04060C', '--m-rule': '#2A3150', '--m-size': '16px' },
   braindrift: { ...BASE_TOKENS, '--m-mark': '#5CF2B0', '--m-mark-2': '#F4FFFA', '--m-accent': '#F1F4FF' },
   garnmeter: {
     ...BASE_TOKENS,
@@ -79,7 +86,9 @@ const BUTTON: Record<string, string | null> = {
   garnmeter: 'Play the session',
 }
 
-const BASE = import.meta.env.BASE_URL
+/** Engine honesty lines, verbatim (engine/tracktrace HONESTY.batch, engine/bubblegrade HONESTY.card). */
+const TT_BATCH = 'The model separates the two exposures, but part of that comes from lab batch; the foci and the sample-level call are what we trust.'
+const BG_CARD = 'A bubble is a warning; symptoms are the diagnosis.'
 
 const fineOf = (a: unknown): string[] => {
   const c = (a as { caveats?: unknown } | null)?.caveats
@@ -129,7 +138,7 @@ export default function CheckPage({ mod, live }: { mod: Mod; live: boolean }) {
   const vs = useRef<VeinSqueezeMomentHandle>(null)
   const bd = useRef<BrainDriftMomentHandle>(null)
   const gm = useRef<GarnMomentHandle>(null)
-  const sc = useRef<SpikeHandle>(null)
+  const sc = useRef<SpikeCountMomentHandle>(null)
   const stageRef = useRef<HTMLElement>(null)
   // Every stage marks its root data-ready="1" once its sample is on screen; the main button waits for that.
   const [ready, setReady] = useState(false)
@@ -144,7 +153,6 @@ export default function CheckPage({ mod, live }: { mod: Mod; live: boolean }) {
   }, [live, ready])
 
   const onPhase = useCallback((s: Phase) => setPhase(s), [])
-  const onSpike = useCallback((o: Outcome | null) => setOutcome(o), [])
 
   const reset = () => {
     setOutcome(null)
@@ -175,7 +183,10 @@ export default function CheckPage({ mod, live }: { mod: Mod; live: boolean }) {
           style={style}
           promise=""
           onState={onPhase}
-          onResult={(r, a) => setOutcome({ big: String(r.count), bigLabel: 'DNA-damage spots circled in this nucleus', ...acts(a) })}
+          onResult={(r, a) => {
+            const o = acts(a)
+            setOutcome({ big: String(r.count), bigLabel: 'DNA-damage spots circled in this nucleus', ...o, fine: [...o.fine, TT_BATCH] })
+          }}
         />
       )
     else if (id === 'bubblegrade')
@@ -184,7 +195,7 @@ export default function CheckPage({ mod, live }: { mod: Mod; live: boolean }) {
           ref={bg}
           style={style}
           onState={onPhase}
-          onResult={(r, a) => setOutcome({ big: String(r.clip.grade), bigLabel: 'bubble grade', source: r.source === 'live' ? 'LIVE' : 'REPLAY', ...acts(a) })}
+          onResult={(r, a) => setOutcome({ big: String(r.clip.grade), bigLabel: 'bubble grade', source: r.source === 'live' ? 'LIVE' : 'REPLAY', ...acts(a), note: BG_CARD })}
         />
       )
     else if (id === 'veinsqueeze')
@@ -194,7 +205,11 @@ export default function CheckPage({ mod, live }: { mod: Mod; live: boolean }) {
           style={style}
           onState={onPhase}
           onResult={(r, a) => {
-            const done = (big: string) => setOutcome({ big, bigLabel: 'AI clot chance', ...acts(a) })
+            const o = acts(a)
+            const hon = Array.isArray(r.honesty) ? r.honesty : []
+            const fine = [...hon, HONESTY_SQUEEZE, HONESTY_BANDS, HONESTY_HELD_OUT, ...o.fine]
+            const flag = hon.includes(HONESTY_HERO_PAIR) ? { tag: 'Best case', line: HONESTY_HERO_PAIR } : undefined
+            const done = (big: string) => setOutcome({ big, bigLabel: 'AI clot chance', ...o, fine, flag })
             // The stage's own formatter, so the page and the stage print the same value.
             import('../../moments/veinsqueeze').then((m) => done(m.formatChance(r.clotProb))).catch(() => done(`${(r.clotProb * 100).toFixed(1)}%`))
           }}
@@ -217,7 +232,8 @@ export default function CheckPage({ mod, live }: { mod: Mod; live: boolean }) {
           }
         />
       )
-    else stage = <Spike ref={sc} onState={onPhase} onOutcome={onSpike} />
+    // The SpikeCount stage prints its own number, LIVE / REPLAY tag and next step, so the page adds no panel.
+    else stage = <Spike ref={sc} style={style} promise="" onState={onPhase} onResult={(_r, a) => setOutcome({ ...acts(a) })} />
   }
 
   const label = BUTTON[id]
@@ -237,6 +253,11 @@ export default function CheckPage({ mod, live }: { mod: Mod; live: boolean }) {
           </a>
           <h1 className="df-check-name">{mod.name}</h1>
           <p className="df-check-sent">{mod.sentence}</p>
+          {id === 'spikecount' && showButton && (
+            <button type="button" data-qa="primary" className={`df-check-btn is-head${phase === 'result' ? ' is-quiet' : ''}`} onClick={press} disabled={!live || waiting || phase === 'running'}>
+              {buttonText}
+            </button>
+          )}
         </header>
 
         <div className="df-check-main">
@@ -250,10 +271,16 @@ export default function CheckPage({ mod, live }: { mod: Mod; live: boolean }) {
             )}
           </section>
 
+          {id !== 'spikecount' && (
           <aside className="df-check-panel" aria-live="polite">
             <p className="df-check-eyebrow">
               {outcome ? 'Result' : phase === 'running' ? 'Working' : 'What it does'}
               {outcome?.source && <span className="df-check-tag">{outcome.source}</span>}
+              {outcome?.flag && (
+                <span className="df-check-tag is-flag" title={outcome.flag.line}>
+                  {outcome.flag.tag}
+                </span>
+              )}
             </p>
             {phase === 'error' && !outcome ? (
               <p className="df-check-before">This check could not load its sample. Try again.</p>
@@ -268,10 +295,12 @@ export default function CheckPage({ mod, live }: { mod: Mod; live: boolean }) {
                 {outcome.who && (
                   <p className="df-check-who">
                     <span>Who acts</span>
-                    {outcome.who}
+                    {outcome.who.split(' (')[0]}
+                    {outcome.who.includes(' (') && <small>({outcome.who.split(' (').slice(1).join(' (')}</small>}
                   </p>
                 )}
                 {outcome.action && <p className="df-check-action">{outcome.action}</p>}
+                {outcome.note && <p className="df-check-note">{outcome.note}</p>}
                 {outcome.fine.length > 0 && (
                   <details className="df-check-fine">
                     <summary>How do we know?</summary>
@@ -287,21 +316,22 @@ export default function CheckPage({ mod, live }: { mod: Mod; live: boolean }) {
               <p className="df-check-before">{BEFORE[id]}</p>
             )}
             {showButton && (
-              <button type="button" className={`df-check-btn${phase === 'result' ? ' is-quiet' : ''}`} onClick={press} disabled={!live || waiting || phase === 'running'}>
+              <button type="button" data-qa="primary" className={`df-check-btn${phase === 'result' ? ' is-quiet' : ''}`} onClick={press} disabled={!live || waiting || phase === 'running'}>
                 {buttonText}
               </button>
             )}
           </aside>
+          )}
         </div>
 
-        {id === 'tracktrace' && (
-          <figure className="df-check-arch">
-            <div className="df-check-arch-card">
-              <img src={`${BASE}tracktrace/ionscan_architecture.svg`} alt="Diagram of the IonScan network: the layers a nucleus image passes through" loading="lazy" />
-            </div>
-            <figcaption>{'IonScan, our own 3.2 M-parameter network'}</figcaption>
-          </figure>
-        )}
+        <button type="button" className="df-check-more" onClick={(e) => (e.currentTarget.closest('.df-check')?.querySelector('.df-story') as HTMLElement | null)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
+          The problem, and how it works
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+
+        <StorySection mod={mod} />
       </div>
     </div>
   )

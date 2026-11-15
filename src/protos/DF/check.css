@@ -14,7 +14,8 @@
 .df-check .df-check-sent{margin:0;max-width:30em;font:500 21px/1.3 var(--sans);letter-spacing:-.005em;color:var(--text-2);text-wrap:balance}
 
 /* main: the stage, large, and the result beside it */
-.df-check .df-check-main{flex:1 1 auto;display:grid;grid-template-columns:minmax(0,1fr) 348px;gap:24px;min-height:560px;height:calc(100svh - 28px - 56px - 22px - 32px)}
+.df-check .df-check-main{flex:none;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;min-height:540px;height:calc(100svh - 28px - 56px - 22px - 22px - 44px - 14px)}
+.df-check[data-module="spikecount"] .df-check-main{grid-template-columns:minmax(0,1fr)}
 .df-check .df-check-stage{position:relative;min-width:0;min-height:0;overflow:hidden;border:1px solid var(--line-hair);border-radius:18px;background:#070A14;
   box-shadow:0 0 0 1px rgba(0,0,0,.4),0 30px 80px rgba(0,0,6,.55),0 0 90px color-mix(in srgb,var(--mc) 9%,transparent)}
 .df-check[data-module="bubblegrade"] .df-check-stage{background:#071421}
@@ -38,6 +39,10 @@
 .df-check .df-check-big b{font:700 112px/.86 var(--sans);letter-spacing:-.05em;color:var(--text-1);text-shadow:0 0 44px color-mix(in srgb,var(--mc) 55%,transparent);font-variant-numeric:tabular-nums}
 .df-check .df-check-big span{font:500 18px/1.3 var(--sans);color:var(--text-2);text-wrap:balance}
 .df-check .df-check-who{display:flex;flex-direction:column;gap:7px;margin:0;padding-top:18px;border-top:1px solid var(--line-hair);font:600 22px/1.25 var(--sans);letter-spacing:-.01em;color:var(--mc)}
+.df-check .df-check-who small{font:500 16px/1.3 var(--sans);letter-spacing:0;color:var(--text-2)}
+.df-check .df-check-note{margin:0;padding:12px 14px;border-left:3px solid var(--mc);border-radius:0 8px 8px 0;background:color-mix(in srgb,var(--mc) 9%,transparent);font:600 17px/1.35 var(--sans);color:var(--text-1);text-wrap:pretty}
+.df-check .df-check-tag.is-flag{border-color:color-mix(in srgb,var(--mc) 70%,transparent);color:var(--mc);font-family:var(--sans);letter-spacing:.02em;font-size:13px;cursor:help}
+.df-check .df-check-btn.is-head{margin:0 0 0 auto;flex:none;min-height:56px}
 .df-check .df-check-who span{font:600 13px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--text-3)}
 .df-check .df-check-action{margin:0;font:500 22px/1.32 var(--sans);letter-spacing:-.01em;color:var(--text-1);text-wrap:pretty}
 .df-check .df-check-fine{font:500 14px/1.45 var(--sans);color:var(--text-2)}
@@ -102,6 +107,7 @@
   .df-check .df-check-btn{margin-top:4px;min-height:56px}
   .df-check .df-check-arch{grid-template-columns:minmax(0,1fr);gap:12px}
   .df-check .df-check-arch figcaption{padding-bottom:0;font-size:20px}
+  .df-check .df-check-head .df-check-btn.is-head{margin:4px 0 0;width:100%}
 }
 @media (prefers-reduced-motion:reduce){
   .df-check .df-check-result,.df-check .df-check-wait i,.df-check .df-check-spike-sweep{animation:none}

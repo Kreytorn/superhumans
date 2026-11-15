@@ -1,0 +1,477 @@
+/* HOLE "The black hole": the scroll section below each check's first screen (story.tsx), the cue down to it, and
+   room for the shared SpikeCount stage. Scoped under .hole. */
+
+/* SpikeCount: the shared stage needs room for two squares and its strip of example cells */
+.hole .hole-mod[data-id='spikecount'] .hole-stage,
+.hole .hole-mod[data-id='veinsqueeze'] .hole-stage {
+  height: clamp(560px, 80vh, 820px);
+}
+
+/* ---------- the cue down to the story ---------- */
+.hole .hole-cue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  margin-top: clamp(28px, 5vh, 52px);
+  padding: 14px 0;
+  font-family: var(--h-mono);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--h-ice);
+}
+.hole .hole-cue svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: hole-cue 2.2s ease-in-out infinite;
+}
+@keyframes hole-cue {
+  50% {
+    transform: translateY(5px);
+  }
+}
+.hole .hole-cue:hover,
+.hole .hole-cue:focus-visible {
+  color: var(--h-ink);
+  outline: none;
+}
+
+/* ---------- the story ---------- */
+.hole .hole-story {
+  position: relative;
+  margin-top: clamp(12px, 2vh, 24px);
+  padding: clamp(40px, 7vh, 80px) clamp(22px, 4.4vw, 64px) clamp(36px, 6vh, 64px);
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 70% at 85% 0%, rgba(255, 150, 60, 0.1), rgba(255, 150, 60, 0) 60%),
+    rgba(4, 4, 5, 0.88);
+  box-shadow:
+    0 0 0 1px rgba(255, 196, 130, 0.18),
+    0 40px 120px rgba(0, 0, 0, 0.6);
+  scroll-margin-top: 20px;
+}
+.hole .hole-kicker {
+  font-family: var(--h-mono);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--h-amber);
+}
+.hole .hole-kicker.is-ice {
+  color: var(--h-ice);
+}
+.hole .hole-story-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: clamp(28px, 4.4vw, 72px);
+  align-items: center;
+}
+.hole .hole-story h3 {
+  margin-top: 18px;
+  font-family: var(--h-display);
+  font-weight: 340;
+  font-size: clamp(30px, 3.3vw, 48px);
+  line-height: 1.12;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+.hole .hole-story-p {
+  margin-top: 22px;
+  max-width: 34em;
+  font-size: clamp(17px, 1.42vw, 21px);
+  line-height: 1.55;
+  color: rgba(246, 241, 232, 0.8);
+  text-wrap: pretty;
+}
+.hole .hole-story-p + .hole-story-p {
+  margin-top: 14px;
+}
+.hole .hole-story-media {
+  margin: 0;
+}
+.hole .hole-story-frame {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  box-shadow:
+    0 0 0 1px rgba(255, 196, 130, 0.42),
+    0 0 0 7px rgba(5, 5, 6, 0.9),
+    0 0 0 8px rgba(255, 196, 130, 0.16),
+    0 0 80px rgba(255, 150, 60, 0.16);
+}
+.hole .hole-story-frame:has(video) {
+  max-width: 470px;
+  margin: 0 auto;
+  aspect-ratio: 370 / 372;
+}
+.hole .hole-story-frame video {
+  height: 100%;
+}
+.hole .hole-story-media:has(video) figcaption {
+  max-width: 470px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.hole .hole-story-frame img,
+.hole .hole-story-frame video {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 520px;
+  object-fit: cover;
+}
+.hole .hole-story-media figcaption {
+  margin-top: 18px;
+  font-family: var(--h-serif);
+  font-style: italic;
+  font-size: clamp(17px, 1.4vw, 21px);
+  line-height: 1.35;
+  color: var(--h-ink-2);
+}
+
+.hole .hole-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(18px, 3vw, 44px);
+  margin-top: clamp(40px, 7vh, 72px);
+  padding: clamp(26px, 4vh, 40px) 0;
+  border-top: 1px solid rgba(246, 241, 232, 0.12);
+  border-bottom: 1px solid rgba(246, 241, 232, 0.12);
+}
+.hole .hole-facts[data-n='2'] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.hole .hole-facts p {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.hole .hole-facts b {
+  font-family: var(--h-display);
+  font-weight: 300;
+  font-size: clamp(40px, 4.6vw, 68px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--h-ink);
+}
+.hole .hole-facts span {
+  max-width: 26em;
+  font-size: clamp(15px, 1.15vw, 17px);
+  line-height: 1.45;
+  color: var(--h-ink-2);
+}
+
+.hole .hole-how {
+  margin-top: clamp(40px, 7vh, 76px);
+}
+.hole .hole-how h3 {
+  margin-top: 16px;
+  font-size: clamp(26px, 2.6vw, 38px);
+}
+.hole .hole-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(14px, 1.8vw, 24px);
+  margin-top: clamp(24px, 4vh, 36px);
+  padding: 0;
+  list-style: none;
+}
+.hole .hole-steps[data-n='4'] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.hole .hole-steps li {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 22px 24px;
+  border-radius: 12px;
+  background: rgba(246, 241, 232, 0.035);
+  box-shadow: 0 0 0 1px rgba(246, 241, 232, 0.1);
+}
+.hole .hole-steps i {
+  font-style: normal;
+  font-family: var(--h-mono);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: var(--h-ice);
+}
+.hole .hole-steps b {
+  font-weight: 600;
+  font-size: clamp(18px, 1.5vw, 21px);
+  line-height: 1.25;
+}
+.hole .hole-steps span {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--h-ink-2);
+  text-wrap: pretty;
+}
+.hole .hole-note {
+  margin-top: clamp(26px, 4vh, 40px);
+  max-width: 60em;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--h-ink-3);
+}
+
+/* ---------- the eight scans ---------- */
+.hole .hole-scan {
+  position: relative;
+  margin: clamp(26px, 4vh, 40px) 0 0;
+  padding: clamp(22px, 3vw, 36px) clamp(22px, 3vw, 36px) clamp(30px, 3.4vw, 40px);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 1px rgba(169, 216, 255, 0.2);
+}
+.hole .hole-scan-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(14px, 2.4vw, 36px);
+}
+.hole .hole-scan-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.hole .hole-scan-cell svg {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+}
+.hole .hole-scan-cell > span {
+  font-family: var(--h-display);
+  font-weight: 350;
+  font-size: clamp(20px, 1.8vw, 26px);
+}
+.hole .hole-scan-cell > span i {
+  font-style: normal;
+  font-family: var(--h-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--h-ice);
+  margin-left: 6px;
+}
+.hole .hole-scan .g-bg {
+  fill: rgba(169, 216, 255, 0.03);
+  stroke: rgba(169, 216, 255, 0.45);
+  stroke-width: 1.5;
+}
+.hole .hole-scan .g-grid {
+  fill: none;
+  stroke: rgba(169, 216, 255, 0.13);
+  stroke-width: 0.6;
+}
+.hole .hole-scan .g-row {
+  stroke: rgba(169, 216, 255, 0.16);
+  stroke-width: 1.4;
+}
+.hole .hole-scan .g-f,
+.hole .hole-scan .g-b {
+  stroke: #a9d8ff;
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-dasharray: 70 460;
+  opacity: 0.9;
+  animation: hole-scan-f 2.6s linear infinite;
+}
+.hole .hole-scan .g-b {
+  stroke: #ffb86b;
+  animation-name: hole-scan-b;
+}
+@keyframes hole-scan-f {
+  from {
+    stroke-dashoffset: 40;
+  }
+  to {
+    stroke-dashoffset: -480;
+  }
+}
+@keyframes hole-scan-b {
+  from {
+    stroke-dashoffset: -480;
+  }
+  to {
+    stroke-dashoffset: 40;
+  }
+}
+.hole .hole-scan .g-arrow {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.9;
+}
+.hole .hole-scan figcaption {
+  margin-top: 22px;
+  text-align: center;
+  font-family: var(--h-serif);
+  font-style: italic;
+  font-size: clamp(19px, 1.7vw, 24px);
+  color: var(--h-ink-2);
+}
+.hole .hole-scan figcaption b {
+  font-family: var(--h-sans);
+  font-style: normal;
+  font-weight: 600;
+  color: var(--h-ink);
+}
+.hole .hole-scan-mark,
+.hole .hole-arch-mark {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  font-family: var(--h-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--h-ink-3);
+}
+.hole .hole-arch-card {
+  position: relative;
+}
+.hole .hole-arch-mark {
+  color: rgba(0, 0, 0, 0.5);
+  right: 10px;
+  bottom: 6px;
+}
+.hole .hole-how .hole-arch {
+  max-width: 1040px;
+  margin: clamp(36px, 6vh, 60px) auto 0 !important;
+}
+.hole .hole-arch figcaption small {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--h-mono);
+  font-style: normal;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--h-amber);
+}
+
+@media (max-width: 900px) {
+  .hole .hole-story-top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hole .hole-steps,
+  .hole .hole-steps[data-n='4'] {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .hole .hole-scan-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 720px) {
+  .hole .hole-mod[data-id='spikecount'] .hole-stage {
+    height: clamp(560px, 84svh, 760px);
+  }
+  .hole .hole-mod[data-id='veinsqueeze'] .hole-stage {
+    height: clamp(520px, 78svh, 700px);
+  }
+  .hole .hole-story {
+    padding: 34px 18px 30px;
+    border-radius: 14px;
+  }
+  .hole .hole-story h3 {
+    font-size: 27px;
+  }
+  .hole .hole-how h3 {
+    font-size: 23px;
+  }
+  .hole .hole-story-p {
+    font-size: 17px;
+  }
+  .hole .hole-facts,
+  .hole .hole-facts[data-n='2'] {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+  .hole .hole-facts b {
+    font-size: 42px;
+  }
+  .hole .hole-steps,
+  .hole .hole-steps[data-n='4'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hole .hole-steps li {
+    padding: 18px;
+  }
+  .hole .hole-scan {
+    padding: 18px 14px 38px;
+  }
+  .hole .hole-scan-cell > span {
+    font-size: 18px;
+  }
+  .hole .hole-scan-cell > span i {
+    display: block;
+    margin: 4px 0 0;
+    text-align: center;
+    font-size: 10px;
+  }
+  .hole .hole-cue {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hole .hole-cue svg,
+  .hole .hole-scan .g-f,
+  .hole .hole-scan .g-b {
+    animation: none;
+  }
+}
+
+/* keyboard focus on a light: a ring round its press spot */
+.hole .hole-light:focus-visible {
+  outline: none;
+}
+.hole .hole-light:focus-visible .hole-light-ring {
+  opacity: 1;
+  box-shadow:
+    0 0 0 2px var(--h-ice),
+    0 0 24px rgba(169, 216, 255, 0.6);
+}
+
+/* TrackTrace story: two real nuclei side by side */
+.hole .hole-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: #000;
+}
+.hole .hole-pair > div {
+  position: relative;
+}
+.hole .hole-pair canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+.hole .hole-pair span {
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  font-family: var(--h-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--h-amber);
+}
+.hole .hole-pair > div + div span {
+  color: var(--h-ice);
+}

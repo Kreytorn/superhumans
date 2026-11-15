@@ -887,14 +887,35 @@ export class BrainScene {
   }
 
   dispose() {
+    // every geometry, material and texture the scene holds: a judge opens this stage many times in one tab
+    const disposeTex = (v: unknown) => {
+      if (v && (v as THREE.Texture).isTexture) (v as THREE.Texture).dispose()
+    }
     this.scene.traverse((o) => {
       const m = o as THREE.Mesh
-      if (m.isMesh) (m.material as THREE.Material).dispose()
+      if (!m.isMesh && !(o as THREE.Points).isPoints && !(o as THREE.Line).isLine) return
+      m.geometry?.dispose()
+      for (const mat of Array.isArray(m.material) ? m.material : [m.material]) {
+        if (!mat) continue
+        for (const v of Object.values(mat)) disposeTex(v)
+        const u = (mat as THREE.ShaderMaterial).uniforms
+        if (u) for (const k in u) disposeTex(u[k]?.value)
+        mat.dispose()
+      }
     })
     for (const g of this.vents.values()) g.dispose()
+    this.vents.clear()
     this.far?.geometry.dispose()
     this.face.geometry.dispose()
     this.faceTex.dispose()
+    this.scene.clear()
+    this.renderer.renderLists.dispose()
     this.renderer.dispose()
+  }
+
+  /** Frees the GL context itself. Only once the canvas has left the page: a lost context cannot be revived, and a
+   *  re-run of the stage's effect (new pin, retry, React's dev double mount) builds the next scene on the same canvas. */
+  loseContext() {
+    this.renderer.forceContextLoss()
   }
 }

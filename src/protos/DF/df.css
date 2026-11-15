@@ -171,3 +171,14 @@
 
 .df.is-still *,.df.is-still *::before,.df.is-still *::after{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){.df-lab,.df-photo,.df-lamp.breathe{animation:none}}
+
+/* the figure's still poster: shown at once while the shader compiles, then cross-faded to the live canvas.
+   During the fade both add up in their own group (plus-lighter), so the glass never dips or doubles. */
+.df-glw{position:absolute;left:0;top:0;pointer-events:none}
+.df-poster{position:absolute;display:block;max-width:none;opacity:0;pointer-events:none;user-select:none}
+.df-glw[data-p="poster"] .df-poster{opacity:1}
+.df-glw[data-p="poster"] .df-gl{opacity:0}
+.df-glw[data-p="fade"]{isolation:isolate}
+.df-glw[data-p="fade"] .df-poster,.df-glw[data-p="fade"] .df-gl{mix-blend-mode:plus-lighter;transition:opacity .6s ease-in-out}
+.df-glw[data-p="fade"] .df-poster{opacity:0}
+.df-glw[data-p="gl"] .df-poster{display:none}

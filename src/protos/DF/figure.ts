@@ -8,6 +8,8 @@ uniform vec2 uRes;uniform float uS;uniform float uDpr;uniform vec2 uOff;
 uniform vec3 uCo;uniform vec3 uCf;uniform vec3 uCr;uniform vec3 uCu;
 uniform float uF;uniform vec2 uPP;uniform float uRot;uniform float uRev;uniform float uT;uniform float uBeat;uniform float uZoom;
 uniform float uOrg[6];
+/* always 0: loops start here so the D3D compiler cannot unroll them (each unrolled step would copy the whole body) */
+uniform int uZ;
 out vec4 o;
 
 float smin(float a,float b,float k){float h=max(k-abs(a-b),0.)/k;return min(a,b)-h*h*k*.25;}
@@ -40,6 +42,16 @@ float hand(vec3 q){
   float t=min(sdCap(l,vec3(-.034,.03,.012),vec3(-.052,.066,.03),.0105),sdCap(l,vec3(-.052,.066,.03),vec3(-.05,.096,.046),.009));
   return smin(d,t,.01);}
 
+/* legs, slightly apart (q = body point mirrored to x >= 0); alone it is also the floor contact, since nothing else comes near the floor */
+float legs(vec3 q){
+  float g=sdRC(q,vec3(.086,.925,0.),vec3(.118,.50,.006),.081,.051);
+  g=smin(g,sdEll(q-vec3(.101,.755,.024),vec3(.069,.15,.07)),.04);
+  g=smin(g,sdEll(q-vec3(.118,.488,.020),vec3(.046,.052,.046)),.025);
+  g=smin(g,sdRC(q,vec3(.118,.48,-.002),vec3(.142,.085,-.014),.047,.028),.03);
+  g=smin(g,sdEll(q-vec3(.124,.355,-.024),vec3(.050,.105,.052)),.04);
+  float ft=max(sdRC(q,vec3(.146,.042,-.03),vec3(.172,.026,.15),.040,.026),-q.y);
+  g=smin(g,ft,.03);
+  return g;}
 float body(vec3 p){
   vec3 q=vec3(abs(p.x),p.y,p.z);
   /* head */
@@ -64,25 +76,19 @@ float body(vec3 p){
   a=smin(a,sdEll(q-vec3(.238,1.052,-.008),vec3(.037,.07,.035)),.025);
   a=smin(a,hand(q),.012);
   d=smin(d,a,.03);
-  /* legs, slightly apart */
-  float g=sdRC(q,vec3(.086,.925,0.),vec3(.118,.50,.006),.081,.051);
-  g=smin(g,sdEll(q-vec3(.101,.755,.024),vec3(.069,.15,.07)),.04);
-  g=smin(g,sdEll(q-vec3(.118,.488,.020),vec3(.046,.052,.046)),.025);
-  g=smin(g,sdRC(q,vec3(.118,.48,-.002),vec3(.142,.085,-.014),.047,.028),.03);
-  g=smin(g,sdEll(q-vec3(.124,.355,-.024),vec3(.050,.105,.052)),.04);
-  float ft=max(sdRC(q,vec3(.146,.042,-.03),vec3(.172,.026,.15),.040,.026),-q.y);
-  g=smin(g,ft,.03);
-  return smin(d,g,.04);}
+  return smin(d,legs(q),.04);}
 
-vec3 nrm(vec3 p){const vec2 k=vec2(1,-1);float h=.0007;
-  return normalize(k.xyy*body(p+k.xyy*h)+k.yyx*body(p+k.yyx*h)+k.yxy*body(p+k.yxy*h)+k.xxx*body(p+k.xxx*h));}
+/* tetrahedral normal (corners +--, --+, -+-, +++), as a loop so the body is compiled once here, not four times */
+vec3 nrm(vec3 p){vec3 n=vec3(0.);
+  for(int i=uZ;i<4;i++){vec3 e=vec3(float(((i+3)>>1)&1),float((i>>1)&1),float(i&1))*2.-1.;n+=e*body(p+e*.0007);}
+  return normalize(n);}
 
 float pglow(vec3 ro,vec3 rd,vec3 c,float r){vec3 v=c-ro;float t=max(dot(v,rd),0.);float d=length(v-rd*t);return exp(-d*d/(r*r));}
 float sglow(vec3 ro,vec3 rd,vec3 a,vec3 b,float r){ /* exact ray-to-segment distance */
   vec3 v=b-a,w=ro-a;float bb=dot(rd,v),cc=dot(v,v),dd=dot(rd,w),ee=dot(v,w);
   float s=clamp((ee-bb*dd)/max(cc-bb*bb,1e-9),0.,1.);vec3 c=a+v*s;float t=max(dot(c-ro,rd),0.);vec3 e=ro+rd*t-c;return exp(-dot(e,e)/(r*r));}
 /* cells drifting down the vessel; only seen once the camera dives in */
-float cells(vec3 ro,vec3 rd,vec3 a,vec3 b,float r,float ph){float g=0.;for(int i=0;i<16;i++){float u=fract((float(i)+ph)/16.);g+=pglow(ro,rd,mix(a,b,u)+vec3(.0025*sin(float(i)*2.3),0.,.0025*cos(float(i)*1.7)),r)*sin(3.1416*u);}return g;}
+float cells(vec3 ro,vec3 rd,vec3 a,vec3 b,float r,float ph){float g=0.;for(int i=uZ;i<16;i++){float u=fract((float(i)+ph)/16.);g+=pglow(ro,rd,mix(a,b,u)+vec3(.0025*sin(float(i)*2.3),0.,.0025*cos(float(i)*1.7)),r)*sin(3.1416*u);}return g;}
 
 void main(){
   vec2 sp=vec2(gl_FragCoord.x,uRes.y-gl_FragCoord.y)/uS+uOff;
@@ -96,13 +102,16 @@ void main(){
   float pixAng=1./(uF*uS);
   float t=tN,dmin=1e9,ymin=0.;bool hit=false;
   if(tF>tN){
-    for(int i=0;i<150;i++){
+    /* up to 150 march steps, then 3 full steps onto the surface after a hit, in one loop so the body is compiled once */
+    int k=0;
+    for(int i=uZ;i<153;i++){
       vec3 p=rob+rdb*t;float d=body(p);
+      if(hit){t+=d;if(++k==3)break;continue;}
+      if(i>=150)break;
       float dp=d/(t*pixAng);if(dp<dmin){dmin=dp;ymin=p.y;}
-      if(d<.00007*t){hit=true;break;}
+      if(d<.00007*t){hit=true;continue;}
       t+=d*.86;if(t>tF)break;
     }
-    if(hit){for(int j=0;j<3;j++)t+=body(rob+rdb*t);}
   }
   vec3 pb=rob+rdb*t;
   /* derivatives taken in uniform control flow */
@@ -127,17 +136,17 @@ void main(){
     L+=ACC*.07*key;
     /* scan line while revealing */
     L+=vec3(.9,.95,1.)*(1.-smoothstep(0.,.006,abs(pb.y-uRev)))*step(uRev,1.79);
+    /* inner rim: last px inside the edge */
+    L+=RIM*smoothstep(.86,.985,1.-ndv)*.55;
   }
   /* bright rim just outside the silhouette (closest approach of the ray) */
   if(!hit&&ymin<uRev){float rim=1.-smoothstep(hw*.9,hw*2.3,dmin);L+=RIM*rim*.9;cov=max(cov,rim*.6);}
-  if(shown){ /* inner rim: last px inside the edge */
-    vec3 n=nrm(pb);float e=1.-clamp(dot(n,-rdb),0.,1.);L+=RIM*smoothstep(.86,.985,e)*.55;}
 
   /* organs: faint glows inside the glass, in module accents (pitch order) */
   if(shown){
     float beat=1.+.18*uBeat;
     float g;
-    g=0.;for(int k=0;k<5;k++){vec3 off=vec3(.012*cos(float(k)*2.4),.012*sin(float(k)*1.7),.008*sin(float(k)*3.1));g+=pglow(rob,rdb,vec3(-.192,1.405,.012)+off,.0085);}
+    g=0.;for(int k=uZ;k<5;k++){vec3 off=vec3(.012*cos(float(k)*2.4),.012*sin(float(k)*1.7),.008*sin(float(k)*3.1));g+=pglow(rob,rdb,vec3(-.192,1.405,.012)+off,.0085);}
     g=min(g,1.2)+.35*pglow(rob,rdb,vec3(-.192,1.405,.012),.032);
     L+=vec3(1.,.478,.271)*g*.55*uOrg[0];
     g=pglow(rob,rdb,vec3(.028,1.30,.035),.034*beat)*.8+.3*pglow(rob,rdb,vec3(.028,1.30,.035),.07);
@@ -163,7 +172,7 @@ void main(){
     float r2=(1.-smoothstep(hw-.8,hw+.6,abs(fr-.58)/fwR))*step(.45,fract(ang*96.));
     float disc=exp(-fr*fr/.10)*.10;
     float cont=0.;
-    if(fr<.5){vec3 fb=W2B*fp;cont=exp(-max(body(fb+vec3(0.,.004,0.)),0.)/.012)*.35*step(fb.y,uRev+.01);}
+    if(fr<.5){vec3 fb=W2B*fp,pf=fb+vec3(0.,.004,0.);cont=exp(-max(legs(vec3(abs(pf.x),pf.y,pf.z)),0.)/.012)*.35*step(fb.y,uRev+.01);}
     float rev=smoothstep(-.05,.05,uRev);
     L+=ACC*(r1*.55+r2*.28+disc+cont)*behind*rev;
     cov=max(cov,(r1*.4+disc)*behind*rev);
@@ -245,6 +254,7 @@ const REV1 = 1650
 const IGN = 1700
 const STEP = 170
 export const END = 3400
+export const REV1_MS = REV1
 const ROT0 = 0.16
 
 /** The figure at ms after load: scan-line reveal from the feet up, then the six organs light in pitch order. */
@@ -280,7 +290,8 @@ export function settled(ms: number, live: boolean): FigState {
 export interface FigureGL {
   /** Sets the backing size: the canvas shows stageW stage px across, starting at stage x = offX. */
   resize(pxW: number, pxH: number, stageW: number, offX: number, dpr: number): void
-  draw(st: FigState, cam: Cam): void
+  /** Draws one frame; false while the shader is still compiling (or failed), so nothing was drawn. */
+  draw(st: FigState, cam: Cam): boolean
 }
 
 const figCache = new WeakMap<HTMLCanvasElement, FigureGL | null>()
@@ -302,20 +313,17 @@ function makeFigure(cv: HTMLCanvasElement): FigureGL | null {
   const g = gl
   const U: Record<string, WebGLUniformLocation | null> = {}
   let prog: WebGLProgram | null = null
-  try {
-    const sh = (type: number, src: string) => {
-      const s = g.createShader(type)
-      if (!s) throw new Error('no shader')
-      g.shaderSource(s, src)
-      g.compileShader(s)
-      if (!g.getShaderParameter(s, g.COMPILE_STATUS)) throw new Error(g.getShaderInfoLog(s) ?? 'shader error')
-      return s
-    }
-    prog = g.createProgram()
+  // The raymarched figure is a big shader; some drivers take many seconds to compile it. With
+  // KHR_parallel_shader_compile the page keeps running and the figure appears once the program is ready.
+  const par = g.getExtension('KHR_parallel_shader_compile') as { COMPLETION_STATUS_KHR: number } | null
+  let pending = false
+  let failed = false
+  const t0 = performance.now()
+  performance.mark('df-fig-compile')
+  const shaders: WebGLShader[] = []
+  const finish = () => {
     if (!prog) throw new Error('no program')
-    g.attachShader(prog, sh(g.VERTEX_SHADER, '#version 300 es\nin vec2 p;void main(){gl_Position=vec4(p,0.,1.);}'))
-    g.attachShader(prog, sh(g.FRAGMENT_SHADER, FS))
-    g.linkProgram(prog)
+    for (const s of shaders) if (!g.getShaderParameter(s, g.COMPILE_STATUS)) throw new Error(g.getShaderInfoLog(s) ?? 'shader error')
     if (!g.getProgramParameter(prog, g.LINK_STATUS)) throw new Error(g.getProgramInfoLog(prog) ?? 'link error')
     g.useProgram(prog)
     const buf = g.createBuffer()
@@ -324,12 +332,53 @@ function makeFigure(cv: HTMLCanvasElement): FigureGL | null {
     const loc = g.getAttribLocation(prog, 'p')
     g.enableVertexAttribArray(loc)
     g.vertexAttribPointer(loc, 2, g.FLOAT, false, 0, 0)
-    for (const n of ['uRes', 'uS', 'uDpr', 'uOff', 'uCo', 'uCf', 'uCr', 'uCu', 'uF', 'uPP', 'uRot', 'uRev', 'uT', 'uBeat', 'uZoom', 'uOrg'])
+    for (const n of ['uRes', 'uS', 'uDpr', 'uOff', 'uCo', 'uCf', 'uCr', 'uCu', 'uF', 'uPP', 'uRot', 'uRev', 'uT', 'uBeat', 'uZoom', 'uOrg', 'uZ'])
       U[n] = g.getUniformLocation(prog, n)
+  }
+  /** True when the program can draw now. */
+  const usable = () => {
+    if (failed) return false
+    if (!pending) return true
+    // after 6 s stop waiting and finish it in place (some drivers never report completion on their own)
+    if (prog && par && performance.now() - t0 < 6000 && !g.getProgramParameter(prog, par.COMPLETION_STATUS_KHR)) {
+      // the compile runs only once the commands reach the GPU process
+      g.flush()
+      return false
+    }
+    if (performance.now() - t0 >= 6000) performance.mark('df-fig-forced')
+    pending = false
+    try {
+      finish()
+      performance.mark('df-fig-ready')
+      return true
+    } catch (err) {
+      console.warn(err)
+      failed = true
+      return false
+    }
+  }
+  try {
+    const sh = (type: number, src: string) => {
+      const s = g.createShader(type)
+      if (!s) throw new Error('no shader')
+      g.shaderSource(s, src)
+      g.compileShader(s)
+      shaders.push(s)
+      return s
+    }
+    prog = g.createProgram()
+    if (!prog) throw new Error('no program')
+    g.attachShader(prog, sh(g.VERTEX_SHADER, '#version 300 es\nin vec2 p;void main(){gl_Position=vec4(p,0.,1.);}'))
+    g.attachShader(prog, sh(g.FRAGMENT_SHADER, FS))
+    g.linkProgram(prog)
+    g.flush()
+    if (par) pending = true
+    else finish()
   } catch (err) {
     console.error(err)
     return null
   }
+  let drewOnce = false
   let sc = 1
   let dprNow = 1
   let off = 0
@@ -343,6 +392,7 @@ function makeFigure(cv: HTMLCanvasElement): FigureGL | null {
       g.viewport(0, 0, cv.width, cv.height)
     },
     draw(st, cam) {
+      if (!usable()) return false
       g.uniform2f(U.uRes, cv.width, cv.height)
       g.uniform1f(U.uS, sc)
       g.uniform1f(U.uDpr, dprNow)
@@ -359,9 +409,15 @@ function makeFigure(cv: HTMLCanvasElement): FigureGL | null {
       g.uniform1f(U.uBeat, st.beat)
       g.uniform1f(U.uZoom, cam.f / cam.f0)
       g.uniform1fv(U.uOrg, st.org)
+      g.uniform1i(U.uZ, 0)
       g.clearColor(0, 0, 0, 0)
       g.clear(g.COLOR_BUFFER_BIT)
       g.drawArrays(g.TRIANGLES, 0, 3)
+      if (!drewOnce) {
+        drewOnce = true
+        performance.mark('df-fig-drawn')
+      }
+      return true
     },
   }
 }

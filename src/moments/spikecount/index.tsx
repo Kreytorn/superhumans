@@ -545,7 +545,10 @@ export default function SpikeCountMoment(props: SpikeCountMomentProps) {
     }
     setWait('Loading the two models')
     const mb = (b: number) => (b / 1048576).toFixed(0)
-    const limit = new Promise<never>((_, no) => setTimeout(() => no(new Error('timeout')), 30000))
+    let limitTimer = 0
+    const limit = new Promise<never>((_, no) => {
+      limitTimer = window.setTimeout(() => no(new Error('timeout')), 30000)
+    })
     Promise.race([
       (async () => {
         await spike.load((p) => S.token === my && p.stage !== 'ready' && setWait(`Loading the two models · ${mb(p.loadedBytes)} of ${mb(p.totalBytes)} MB`))
@@ -561,11 +564,25 @@ export default function SpikeCountMoment(props: SpikeCountMomentProps) {
       .catch(() => {
         /* keep the stored outputs: the stage then says REPLAY */
       })
-      .finally(go)
+      .finally(() => {
+        clearTimeout(limitTimer)
+        go()
+      })
   }, [finish, mode, startClock, stop])
 
   useImperativeHandle(ref, () => ({ run, reset }), [run, reset])
-  useEffect(() => () => stop(), [stop])
+  // unmount mid-run: a new token stops any pending model load from starting the clock on a stage that is gone
+  useEffect(
+    () => () => {
+      sim.current.token++
+      stop()
+      // free the two offscreen layers (full-size canvases); a remount rebuilds them from the loaded data
+      const L = layers.current
+      if (L) L.outline.width = L.outline.height = L.grade.width = L.grade.height = 0
+      layers.current = null
+    },
+    [stop],
+  )
 
   // ---- pins
   useEffect(() => {

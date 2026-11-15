@@ -45,6 +45,11 @@ export default function Home() {
     [leaving, reduced, gl],
   )
   useEffect(() => () => window.clearTimeout(timer.current), [])
+  // the page counts as ready once the scene has settled, or after 2.5 s at the latest (a slow GPU must not hold it back)
+  useEffect(() => {
+    const t = window.setTimeout(() => setSettled(true), 2500)
+    return () => window.clearTimeout(t)
+  }, [])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -62,9 +67,9 @@ export default function Home() {
   const featured = hover ? CHECKS.find((c) => c.id === hover)! : CHECKS[tour]
 
   return (
-    <div className={`s2 s2-home${leaving ? ' is-leaving' : ''}${settled ? ' is-settled' : ''}`} data-ready={settled ? '1' : undefined} data-proto="S2">
+    <div className={`s2 s2-home${leaving ? ' is-leaving' : ''}${settled ? ' is-settled' : ''}`} data-ready={settled ? '1' : undefined} data-state="idle" data-proto="S2">
       {gl && (
-        <div className="s2-stagewrap" aria-hidden="true">
+        <div className="s2-stagewrap" data-qa="hero" aria-hidden="true">
           <Suspense fallback={null}>
             <Scene labels={labels} active={hover} featured={featured.id} leaving={leaving} onActive={onActive} onOpen={open} onSettled={() => setSettled(true)} reduced={reduced} />
           </Suspense>
@@ -115,7 +120,7 @@ export default function Home() {
         </h1>
         <p className="s2-line">{SITE_LINE}</p>
         <div className="s2-cta">
-          <button type="button" className="s2-btn" onClick={() => open('tracktrace')}>
+          <button type="button" className="s2-btn" data-qa="primary" onClick={() => open('tracktrace')}>
             Start with TrackTrace
             <ArrowRight weight="bold" />
           </button>

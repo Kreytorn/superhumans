@@ -15,7 +15,7 @@ function limb(s: number): Prim[] {
     // arm, hand
     cap([0.215 * s, 0.632, 0], [0.285 * s, 0.33, -0.012], 0.05, 0.038),
     cap([0.285 * s, 0.33, -0.012], [0.335 * s, 0.045, 0.03], 0.039, 0.025),
-    ell([0.35 * s, -0.045, 0.042], [0.028, 0.07, 0.02]),
+    // the hand itself is sampled directly (see HAND) so the fingers stay apart
     // thigh, shin, calf, foot
     cap([0.088 * s, 0.03, 0], [0.104 * s, -0.43, 0.004], 0.086, 0.052),
     cap([0.104 * s, -0.43, 0.004], [0.108 * s, -0.9, -0.012], 0.05, 0.03),
@@ -25,9 +25,18 @@ function limb(s: number): Prim[] {
 }
 
 const PRIMS: Prim[] = [
-  ell([0, 0.878, 0.008], [0.086, 0.112, 0.098]), // head
-  ell([0, 0.812, 0.03], [0.062, 0.07, 0.07]), // jaw
-  cap([0, 0.7, -0.004], [0, 0.79, 0.004], 0.047, 0.043), // neck
+  ell([0, 0.905, -0.008], [0.083, 0.094, 0.096]), // cranium
+  ell([0, 0.842, 0.022], [0.07, 0.084, 0.074]), // face
+  ell([0, 0.79, 0.04], [0.038, 0.03, 0.034]), // chin
+  cap([0, 0.87, 0.086], [0, 0.84, 0.099], 0.008, 0.012), // nose
+  cap([-0.038, 0.884, 0.079], [0.038, 0.884, 0.079], 0.011, 0.011), // brow
+  ell([-0.078, 0.852, -0.002], [0.011, 0.026, 0.016]), // ears
+  ell([0.078, 0.852, -0.002], [0.011, 0.026, 0.016]),
+  cap([0, 0.69, -0.012], [0, 0.8, 0.0], 0.046, 0.041), // neck
+  cap([0, 0.742, -0.018], [-0.165, 0.656, -0.01], 0.032, 0.03), // the slope from neck to shoulder
+  cap([0, 0.742, -0.018], [0.165, 0.656, -0.01], 0.032, 0.03),
+  ell([-0.205, 0.622, 0], [0.054, 0.07, 0.058]), // shoulder caps
+  ell([0.205, 0.622, 0], [0.054, 0.07, 0.058]),
   cap([-0.16, 0.64, 0], [0.16, 0.64, 0], 0.062, 0.062, 1.2), // shoulders
   ell([0, 0.515, 0.006], [0.178, 0.16, 0.108]), // chest
   cap([0, 0.47, 0], [0, 0.25, 0.004], 0.142, 0.118, 1.5), // waist
@@ -35,6 +44,43 @@ const PRIMS: Prim[] = [
   ...limb(-1),
   ...limb(1),
 ]
+
+// Fingers and thumb, relaxed, palms toward the thighs: sampled on their surfaces, not through the joined shape,
+// so the smooth join cannot melt them into a mitten. Each finger has two segments that curl a little toward the palm.
+type Seg = { a: [number, number, number]; b: [number, number, number]; ra: number; rb: number }
+function hand(s: number): Seg[] {
+  const segs: Seg[] = []
+  // the palm as three flat bands from the wrist to the knuckles
+  for (const z of [0.006, 0.028, 0.05]) segs.push({ a: [0.337 * s, 0.03, 0.028 + (z - 0.028) * 0.7], b: [0.341 * s, -0.044, z], ra: 0.0135, rb: 0.012 })
+  const fingers: [number, number, number][] = [
+    // z at the knuckle, length, fan
+    [0.056, 0.088, 0.007], // index (front)
+    [0.037, 0.099, 0.002], // middle
+    [0.018, 0.092, -0.002], // ring
+    [0.0, 0.074, -0.006], // little
+  ]
+  for (const [z, L, f] of fingers) {
+    const y0 = -0.046
+    const k: [number, number, number] = [0.341 * s, y0, z]
+    const m: [number, number, number] = [0.343 * s, y0 - L * 0.56, z + f]
+    const t: [number, number, number] = [0.334 * s, y0 - L, z + f * 1.7 + 0.004]
+    segs.push({ a: k, b: m, ra: 0.0088, rb: 0.0078 }, { a: m, b: t, ra: 0.0078, rb: 0.0064 })
+  }
+  // thumb: from the base of the palm, forward and down
+  const tb: [number, number, number] = [0.332 * s, 0.022, 0.05]
+  const tm: [number, number, number] = [0.327 * s, -0.02, 0.074]
+  const tt: [number, number, number] = [0.322 * s, -0.056, 0.082]
+  segs.push({ a: tb, b: tm, ra: 0.013, rb: 0.0098 }, { a: tm, b: tt, ra: 0.0098, rb: 0.0074 })
+  // turn the whole hand about the wrist so the palm opens a little toward the front (a calm, open pose)
+  const wx = 0.335 * s, wz = 0.03
+  const c = Math.cos(0.75), sn = Math.sin(0.75) * s
+  const turn = (p: [number, number, number]): [number, number, number] => {
+    const dx = p[0] - wx, dz = p[2] - wz
+    return [wx + dx * c + dz * sn, p[1], wz - dx * sn + dz * c]
+  }
+  return segs.map((g) => ({ ...g, a: turn(g.a), b: turn(g.b) }))
+}
+const HAND: Seg[] = [...hand(-1), ...hand(1)]
 
 const K = 0.035 // smooth-join radius
 const dists = new Float32Array(PRIMS.length)
@@ -118,12 +164,14 @@ export function buildBody(total: number): Cloud {
     return Math.sqrt(-2 * Math.log(u)) * Math.cos(6.2831853 * R())
   }
   const nCluster = Math.round(total * 0.022)
-  const nBody = total - nCluster * 6 - 6 - 900
+  const nHand = Math.round(total * 0.02)
+  const nBody = total - nCluster * 6 - 6 - 900 - nHand
   const position = new Float32Array(total * 3)
   const normal = new Float32Array(total * 3)
   const data = new Float32Array(total * 4)
   let n = 0
   const put = (x: number, y: number, z: number, nx: number, ny: number, nz: number, kind: number, cl: number, size: number) => {
+    if (n >= total) return
     position[n * 3] = x
     position[n * 3 + 1] = y
     position[n * 3 + 2] = z
@@ -174,6 +222,35 @@ export function buildBody(total: number): Cloud {
       const big = R() < 0.03 ? 2.2 + R() * 1.6 : 0.75 + R() * 0.7
       put(x, y, z, nx, ny, nz, 0, -1, big)
     }
+  }
+
+  // --- fingers and thumbs, on their surfaces (area-weighted)
+  {
+    const areas = HAND.map((g) => Math.hypot(g.b[0] - g.a[0], g.b[1] - g.a[1], g.b[2] - g.a[2]) * (g.ra + g.rb))
+    const sum = areas.reduce((a, b) => a + b, 0)
+    HAND.forEach((g, gi) => {
+      const m = Math.round((nHand * areas[gi]) / sum)
+      const ax = g.b[0] - g.a[0], ay = g.b[1] - g.a[1], az = g.b[2] - g.a[2]
+      const al = Math.hypot(ax, ay, az)
+      const ux = ax / al, uy = ay / al, uz = az / al
+      // two axes across the segment
+      let px = -uy, py = ux, pz = 0
+      const pl = Math.hypot(px, py, pz) || 1
+      px /= pl
+      py /= pl
+      const qx = uy * pz - uz * py, qy = uz * px - ux * pz, qz = ux * py - uy * px
+      for (let j = 0; j < m; j++) {
+        const t = R()
+        const r = g.ra + (g.rb - g.ra) * t
+        const a = 6.2831853 * R()
+        const nx = px * Math.cos(a) + qx * Math.sin(a)
+        const ny = py * Math.cos(a) + qy * Math.sin(a)
+        const nz = pz * Math.cos(a) + qz * Math.sin(a)
+        // a rounded tip on each finger's last segment
+        const over = gi % 13 >= 4 && gi % 13 % 2 === 0 && t > 0.92 ? (t - 0.92) * 0.6 : 0
+        put(g.a[0] + ax * t + nx * r + ux * over * r * 6, g.a[1] + ay * t + ny * r + uy * over * r * 6, g.a[2] + az * t + nz * r + uz * over * r * 6, nx, ny, nz, 0, -1, R() < 0.03 ? 1.8 + R() : 0.7 + R() * 0.6)
+      }
+    })
   }
 
   // --- six clusters, each in the shape of what its check reads

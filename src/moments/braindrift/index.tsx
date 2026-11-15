@@ -167,6 +167,14 @@ function readTokens(probe: HTMLElement): SceneTokens {
   }
 }
 
+/** A progress callback handed to the engine through a box: on unmount the box is emptied, so whatever the engine
+ *  keeps (a queued live run, a cached request) no longer holds the closed stage, its canvas and its buffers. Module
+ *  level on purpose: a closure made inside the component would keep the stage's whole scope alive. */
+type Box<T> = { fn: ((p: T) => void) | null }
+function boxed<T>(box: Box<T>): (p: T) => void {
+  return (p) => box.fn?.(p)
+}
+
 export const BrainDriftMoment = forwardRef<BrainDriftMomentHandle, BrainDriftMomentProps>(function BrainDriftMoment(props, ref) {
   const { sampleId, mode = 'auto', state: pinState, t: pinT, labels = true, tags = true, controls = true, className, style } = props
   const rootRef = useRef<HTMLDivElement>(null)
@@ -229,6 +237,12 @@ export const BrainDriftMoment = forwardRef<BrainDriftMomentHandle, BrainDriftMom
     let warmK = 0
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
     const coarse = matchMedia('(pointer: coarse)').matches
+    const boxes: Box<never>[] = []
+    const relay = <T,>(fn: (p: T) => void): ((p: T) => void) => {
+      const box: Box<T> = { fn }
+      boxes.push(box as Box<never>)
+      return boxed(box)
+    }
     const clock: Clock = { t: 0, startT: 0, last: 0, running: false, target: DEFAULT_TARGET, runId: 0, live: false, result: null, liveSeg: null, frontier: -1, fired: false }
 
     const setPhase = (p: MomentState) => {
@@ -286,11 +300,12 @@ export const BrainDriftMoment = forwardRef<BrainDriftMomentHandle, BrainDriftMom
 
     const startWarm = () => {
       if (!warm && store) {
+        const preId = store.frames[0].id
         warm = bd
           .load()
           .then(() =>
-            bd.analyzeBrain(store!.frames[0].id, {
-              onProgress: (p) => {
+            bd.analyzeBrain(preId, {
+              onProgress: relay((p) => {
                 if (dead) return
                 warmSeg = p.seg
                 for (const k of p.slices) if (k > warmFrontier) warmFrontier = k
@@ -298,7 +313,7 @@ export const BrainDriftMoment = forwardRef<BrainDriftMomentHandle, BrainDriftMom
                   scene?.dirtyFace()
                   invalidate()
                 }
-              },
+              }),
             }),
           )
           .then(() => {
@@ -312,15 +327,17 @@ export const BrainDriftMoment = forwardRef<BrainDriftMomentHandle, BrainDriftMom
     }
 
     const analyzeLive = async (idx: number, runId: number): Promise<FlightResult> => {
+      const frameId = store!.frames[idx].id
       await startWarm()
-      const r = await bd.analyze(store!.frames[idx].id, {
-        onProgress: (p) => {
+      if (dead) throw new Error('stage closed')
+      const r = await bd.analyze(frameId, {
+        onProgress: relay((p) => {
           if (dead || clock.runId !== runId) return
           clock.liveSeg = p.seg
           for (const k of p.slices) if (k > clock.frontier) clock.frontier = k
           scene?.dirtyFace()
           invalidate()
-        },
+        }),
       })
       if (r.kind !== 'flight') throw new Error('not a flight frame')
       return r
@@ -907,7 +924,20 @@ export const BrainDriftMoment = forwardRef<BrainDriftMomentHandle, BrainDriftMom
       document.removeEventListener('visibilitychange', onVisible)
       scheme.removeEventListener('change', onScheme)
       api.current = null
-      scene?.dispose()
+      const gone = scene
+      gone?.dispose()
+      // the browser keeps only ~16 live WebGL contexts per tab: once the canvas has left the page (the stage closed),
+      // lose its context now instead of waiting for garbage collection
+      if (gone) window.setTimeout(() => !canvas.isConnected && gone.loseContext(), 0)
+      // drop the big buffers so a detached fiber holding this closure does not keep ~70 MB of volumes alive
+      for (const b of boxes) b.fn = null
+      clock.result = null
+      clock.liveSeg = null
+      scene = null
+      store = null
+      warm = null
+      warmSeg = null
+      idleEl = null
     }
     // the stage is rebuilt only when what it shows is re-pinned or retried
     // eslint-disable-next-line react-hooks/exhaustive-deps

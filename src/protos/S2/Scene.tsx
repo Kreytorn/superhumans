@@ -23,8 +23,8 @@ function sample(keys: Key[], y: number): number[] | null {
   return null
 }
 
-const SEG = 40
-const DY = 0.0265
+const SEG = 48
+const DY = 0.0195
 
 interface Ring {
   x: number
@@ -32,20 +32,37 @@ interface Ring {
   z: number
   rx: number
   rz: number
+  /** extra radius at angle a (front of the body is a = pi/2, +z) */
+  f?: (a: number) => number
 }
+
+const bell = (v: number, at: number, w: number) => Math.exp(-(((v - at) / w) ** 2))
 
 function figureParts(): Ring[][] {
   const ys: number[] = []
   for (let y = 0.992; y >= -1.0; y -= DY) ys.push(y)
   const parts: Ring[][] = []
-  // head (an ellipsoid with a narrower jaw)
+  // head: an egg with a narrower jaw, and a face: brow, eye sockets, nose, lips, chin
   const head: Ring[] = []
-  for (const y of ys) {
-    const d = (y - 0.868) / 0.134
+  const F = Math.PI / 2
+  for (let y = 0.997; y >= 0.738; y -= DY * 0.62) {
+    const d = (y - 0.868) / 0.13
     if (Math.abs(d) >= 1) continue
     const s = Math.sqrt(1 - d * d)
-    const jaw = d < 0 ? 1 + d * 0.16 : 1
-    head.push({ x: 0, y, z: 0.012, rx: 0.099 * s * jaw, rz: 0.115 * s })
+    const jaw = d < 0 ? 1 + d * 0.24 : 1
+    const face = (a: number) => {
+      const front = bell(a, F, 0.5)
+      const mid = bell(a, F, 0.2)
+      return (
+        0.007 * bell(y, 0.905, 0.012) * front + // brow
+        -0.007 * bell(y, 0.884, 0.011) * (bell(a, F - 0.42, 0.2) + bell(a, F + 0.42, 0.2)) + // eye sockets
+        0.02 * bell(y, 0.852, 0.02) * bell(a, F, 0.13) * (y < 0.875 ? 1 : 0.4) + // nose
+        0.006 * bell(y, 0.818, 0.008) * bell(a, F, 0.32) + // lips
+        0.008 * bell(y, 0.778, 0.014) * mid + // chin
+        0.006 * bell(y, 0.865, 0.03) * (bell(a, 0.05, 0.16) + bell(a, Math.PI - 0.05, 0.16)) // ears
+      )
+    }
+    head.push({ x: 0, y, z: 0.01, rx: 0.094 * s * jaw, rz: 0.112 * s * (d < 0 ? 1 + d * 0.1 : 1), f: face })
   }
   parts.push(head)
   // neck + torso: [y, rx, rz]
@@ -63,20 +80,39 @@ function figureParts(): Ring[][] {
   const t: Ring[] = []
   for (const y of ys) {
     const v = sample(torso, y)
-    if (v) t.push({ x: 0, y, z: 0, rx: v[0], rz: v[1] })
+    // chest and shoulder blades: a little more depth front and back
+    const chest = (a: number) => 0.012 * bell(y, 0.53, 0.06) * (bell(a, F - 0.5, 0.35) + bell(a, F + 0.5, 0.35)) + 0.006 * bell(y, 0.56, 0.07) * bell(a, -F, 0.6)
+    if (v) t.push({ x: 0, y, z: 0, rx: v[0], rz: v[1], f: chest })
   }
   parts.push(t)
-  // arms: [y, cx, rx, rz]
+  // arms: [y, cx, rx, rz], down to the wrist
   const arm: Key[] = [
-    [0.668, 0.226, 0.018, 0.03],
-    [0.62, 0.252, 0.054, 0.06],
+    [0.652, 0.232, 0.016, 0.026],
+    [0.612, 0.254, 0.05, 0.056],
     [0.46, 0.283, 0.05, 0.053],
     [0.335, 0.3, 0.04, 0.042],
     [0.23, 0.314, 0.041, 0.04],
-    [0.085, 0.332, 0.027, 0.023],
-    [0.02, 0.339, 0.031, 0.02],
-    [-0.085, 0.345, 0.012, 0.012],
+    [0.085, 0.332, 0.027, 0.025],
+    [0.035, 0.337, 0.022, 0.024],
   ]
+  // hands: flat (thin side to side, wide front to back), a thumb to the front, fingers tapering: [y, cx, rx, rz, cz]
+  const hand: Key[] = [
+    [0.035, 0.337, 0.021, 0.024, 0],
+    [0.0, 0.34, 0.019, 0.04, 0.004],
+    [-0.04, 0.342, 0.017, 0.042, 0.002],
+    [-0.085, 0.344, 0.014, 0.034, -0.002],
+    [-0.125, 0.344, 0.009, 0.02, -0.004],
+    [-0.14, 0.344, 0.003, 0.006, -0.004],
+  ]
+  for (const side of [-1, 1]) {
+    const h: Ring[] = []
+    for (let y = 0.035; y >= -0.14; y -= DY * 0.55) {
+      const v = sample(hand, y)
+      const thumb = (a: number) => 0.016 * bell(y, -0.02, 0.026) * bell(a, F - side * 0.35, 0.3)
+      if (v) h.push({ x: side * v[0], y, z: v[3], rx: v[1], rz: v[2], f: thumb })
+    }
+    parts.push(h)
+  }
   // legs and feet: [y, cx, rx, rz, cz]
   const leg: Key[] = [
     [0.1, 0.097, 0.09, 0.106, 0],
@@ -114,7 +150,8 @@ function buildFigure() {
         const a = (j / SEG) * Math.PI * 2
         const c = Math.cos(a)
         const s = Math.sin(a)
-        pos.push(r.x + r.rx * c, r.y, r.z + r.rz * s)
+        const e = r.f ? r.f(a) : 0
+        pos.push(r.x + (r.rx + e) * c, r.y, r.z + (r.rz + e) * s)
         const nx = c / Math.max(r.rx, 1e-3)
         const nz = s / Math.max(r.rz, 1e-3)
         const n = Math.hypot(nx, nz) || 1
@@ -122,6 +159,8 @@ function buildFigure() {
         const p = base + i * SEG + j
         const q = base + i * SEG + ((j + 1) % SEG)
         lin.push(p, q)
+        // a few meridians run down each part, so the figure reads as a contoured body, not a stack of hoops
+        if (i < rings.length - 1 && j % 6 === 0) lin.push(p, p + SEG)
         if (i < rings.length - 1) tri.push(p, q, p + SEG, q, q + SEG, p + SEG)
       }
     })

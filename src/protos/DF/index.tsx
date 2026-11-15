@@ -6,6 +6,7 @@
 import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, type ComponentType, type CSSProperties, type RefObject } from 'react'
 import './df.css'
 import { ASK, MODS, QUIET, href, type Mod } from './data'
+import posterUrl from './body_poster.webp'
 import { END, eout, fitCam, initFigure, initSky, project, settled, stateAt, type FigState } from './figure'
 import { initAurora } from './sky'
 
@@ -23,6 +24,10 @@ interface CheckProps {
 const checkLoader = import.meta.glob<{ default: ComponentType<CheckProps> }>('./check.tsx')['./check.tsx']
 const RealCheck = checkLoader ? lazy(checkLoader) : null
 
+/** The figure camera's zoom during a flight: factor z about stage point (x, y). */
+type FigZoom = { z: number; x: number; y: number; dx: number; dy: number; view: StageRect }
+/** A rectangle in the figure's stage px. */
+type StageRect = { L: number; T: number; W: number; H: number }
 /** Where the figure and its callout columns sit. Desktop: viewport px. Phone: a 780x1064 stage scaled by s. */
 interface Geom {
   phone: boolean
@@ -70,11 +75,16 @@ const rowY = (g: Geom, m: Mod) => (g.phone ? m.ayP : g.top + (m.ay - 112) * g.k)
 const STAR = 'M0 -8C.9 -2.2 2.2 -.9 8 0C2.2 .9 .9 2.2 0 8C-.9 2.2 -2.2 .9 -8 0C-2.2 -.9 -.9 -2.2 0 -8Z'
 /** The callouts finish fading in a little after the figure's own reveal. */
 const READY_MS = END + 500
+/** If the shader has not drawn by then (it compiles slowly on some laptops), its still poster stands in for it. */
+const GRACE_MS = 300
+/** The poster (body_poster.webp) is the 1440x900 home's figure box: 616 x 900 px around a figure 770 px tall
+ *  whose head top is at y 63; as fractions of the figure height it is placed the same way at any size. */
+const PST = { x: -0.4, y: -63 / 770, w: 0.8, h: 900 / 770 }
 const BASE = import.meta.env.BASE_URL
 /** A real sample still of each check: its result poster, or for SpikeCount a real microscope field. */
 const stillOf = (m: Mod) => (m.id === 'spikecount' ? `${BASE}spikecount/fields/96.png` : `${BASE}_posters/${m.id}.jpg`)
-/** The Garn Meter poster is drawn on a light ground; it is shown inverted so it sits in the dark window. */
-const stillClass = (m: Mod) => (m.id === 'garnmeter' ? 'inv' : '')
+/** Every poster is drawn on a dark ground now (Garn Meter too), so none is shown inverted. */
+const stillClass = (_m: Mod) => ""
 /** The window starts on the check that asks for attention, then goes round in pitch order. */
 const ASK_INDEX = Math.max(0, MODS.findIndex((m) => m.ask))
 
@@ -222,12 +232,18 @@ function Figure({
   hot,
   setHot,
   onReady,
-}: HotProps & { g: Geom; still: boolean; intro: boolean; pausedRef: RefObject<boolean>; onReady: () => void }) {
+  zoomRef,
+}: HotProps & { g: Geom; still: boolean; intro: boolean; pausedRef: RefObject<boolean>; onReady: () => void; zoomRef: RefObject<FigZoom | null> }) {
   const cvRef = useRef<HTMLCanvasElement>(null)
   const gRefs = useRef<(SVGGElement | null)[]>([])
   const readyRef = useRef(onReady)
   const startRef = useRef<number | null>(null)
-  const [nogl, setNogl] = useState(false)
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const posterRef = useRef<HTMLImageElement>(null)
+  /** True once the poster has stood in: the shader then never replays the reveal, it takes over the still body. */
+  const restRef = useRef(false)
+  /** When the shader first drew after the poster (its slow sway starts there). */
+  const liveRef = useRef(0)
 
   useEffect(() => {
     readyRef.current = onReady
@@ -237,8 +253,35 @@ function Figure({
     const cv = cvRef.current
     if (!cv) return
     const fig = initFigure(cv)
-    setNogl(!fig)
     const cam = fitCam(g.cx, g.top, g.bottom)
+    // poster states on the wrapper: '' waiting, 'poster' standing in, 'fade' cross-fading to the canvas, 'gl' live
+    const wrap = wrapRef.current
+    const poster = posterRef.current
+    let mode = wrap?.dataset.p ?? ''
+    let live = false
+    let fadeTimer = 0
+    const setMode = (m: string) => {
+      mode = m
+      if (wrap) wrap.dataset.p = m
+      if (m === 'poster') restRef.current = true
+    }
+    const goLive = (now: number) => {
+      if (live) return
+      live = true
+      if (restRef.current && !liveRef.current) liveRef.current = now
+      if (mode === 'poster') {
+        setMode('fade')
+        fadeTimer = window.setTimeout(() => setMode('gl'), 700)
+      } else if (mode !== 'fade') setMode('gl')
+    }
+    if (!fig) setMode('poster')
+    // the poster's own reveal: cut at the scan line's height, like the shader's reveal from the feet up
+    const pTop = g.top + PST.y * (g.bottom - g.top)
+    const clipPoster = (rev: number, rot: number) => {
+      if (!poster) return
+      const c = rev <= -0.05 ? 'inset(0 0 100% 0)' : rev < 1.8 ? `inset(${Math.max(0, project(cam, [0, rev, 0], rot)[1] - pTop).toFixed(1)}px 0 0 0)` : ''
+      if (poster.style.clipPath !== c) poster.style.clipPath = c
+    }
     const els = MODS.map((_, i) => {
       const el = gRefs.current[i]
       return {
@@ -266,50 +309,159 @@ function Figure({
         hs.style.opacity = Math.min(1, u * 2).toFixed(3)
       })
     }
-    const render = (st: FigState) => {
-      fig?.draw(st, cam)
+    const render = (st: FigState, now: number) => {
+      let fs = st
+      if (restRef.current) {
+        // after the poster: the body as the poster shows it (lit, still), swaying only once the shader has it
+        fs = settled(liveRef.current ? now - liveRef.current : 0, liveRef.current > 0 && !pausedRef.current)
+        fs.rev = Math.min(fs.rev, st.rev)
+        st = { ...st, rot: fs.rot }
+        clipPoster(fs.rev, fs.rot)
+      }
+      if (fig?.draw(fs, cam)) goLive(now)
       place(st)
     }
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
+    let dpr = Math.min(window.devicePixelRatio || 1, 1.5)
+    cv.style.left = `${g.glX}px`
+    cv.style.width = `${g.glW}px`
     fig?.resize(g.glW * g.s * dpr, g.H * g.s * dpr, g.glW, g.glX, dpr)
+    // During the flight into a check the camera itself moves in (sharp, with the finer cell detail the shader adds
+    // at close range), on a canvas widened to the whole stage; the page counter-scales it against the scene's zoom.
+    let wide = ''
+    let lastZoom = ''
+    const widen = (v: StageRect | null) => {
+      const key = v ? `${v.L} ${v.T} ${v.W} ${v.H}` : ''
+      if (key === wide) return
+      wide = key
+      if (v) {
+        cv.style.left = `${v.L}px`
+        cv.style.top = `${v.T}px`
+        cv.style.width = `${v.W}px`
+        cv.style.height = `${v.H}px`
+        fig?.resize(v.W * g.s * dpr, v.H * g.s * dpr, v.W, v.L, dpr)
+      } else {
+        cv.style.left = `${g.glX}px`
+        cv.style.top = '0px'
+        cv.style.width = `${g.glW}px`
+        cv.style.height = `${g.H}px`
+        cv.style.transform = ''
+        fig?.resize(g.glW * g.s * dpr, g.H * g.s * dpr, g.glW, g.glX, dpr)
+      }
+    }
+    const zoomed = () => {
+      const zm = zoomRef.current
+      if (!zm || zm.z <= 1.001) {
+        if (wide) {
+          widen(null)
+          lastZoom = ''
+          return false
+        }
+        return null
+      }
+      widen(zm.view)
+      const key = `${zm.z.toFixed(4)} ${zm.x.toFixed(1)} ${zm.y.toFixed(1)} ${zm.dx.toFixed(1)} ${zm.dy.toFixed(1)}`
+      if (key === lastZoom) return true
+      lastZoom = key
+      const Z = zm.z
+      // the scene's zoom (scale Z about the spot, then the slide toward the centre) done by the camera; y has no
+      // canvas offset in the shader, so the canvas top goes into the principal point
+      const drew = fig?.draw(settled(1e7, false), {
+        f: cam.f * Z,
+        f0: cam.f0,
+        ppx: zm.x + (cam.ppx - zm.x) * Z + zm.dx,
+        ppy: zm.y + (cam.ppy - zm.y) * Z + zm.dy - zm.view.T,
+      })
+      if (drew) goLive(performance.now())
+      return true
+    }
     let ready = false
     const markReady = () => {
       if (ready) return
       ready = true
       readyRef.current()
     }
+    let raf = 0
+    const cleanup = () => {
+      cancelAnimationFrame(raf)
+      window.clearTimeout(fadeTimer)
+      if (mode === 'fade') setMode('gl')
+    }
     if (still) {
-      render(stateAt(1e6, false))
+      // the poster shows the still body at once; the shader replaces it as soon as it has drawn
+      const st = stateAt(1e6, false)
+      const tryDraw = (now: number) => {
+        render(st, now)
+        if (live || !fig) return
+        if (!mode) setMode('poster')
+        raf = requestAnimationFrame(tryDraw)
+      }
+      tryDraw(performance.now())
       markReady()
-      return
+      return cleanup
     }
     if (startRef.current === null) startRef.current = intro ? performance.now() : -1e7
     const start = startRef.current
-    let raf = 0
+    const mountAt = performance.now()
+    // no intro to play (the page opened on a check): the poster can stand in at once
+    if (!intro && !live && !mode && fig) setMode('poster')
     let lastDraw = 0
     let drawn = false
+    // A slow GPU (frames over 120 ms apart, three in a row) gets a lighter canvas, so the reveal still plays.
+    let prevNow = 0
+    let slowFrames = 0
+    // The page is usable even if the reveal crawls: the body spots and callouts are links from the start.
+    const readyTimer = window.setTimeout(markReady, READY_MS + 1500)
     const loop = (now: number) => {
       raf = requestAnimationFrame(loop)
+      // only frames the shader drew count (while it compiles, slow frames are not its fault)
+      if (live && prevNow && now - prevNow > 120 && !wide) slowFrames++
+      else slowFrames = 0
+      prevNow = now
+      if (slowFrames >= 3 && dpr > 0.5) {
+        slowFrames = 0
+        dpr = Math.max(0.5, dpr * 0.6)
+        fig?.resize(g.glW * g.s * dpr, g.H * g.s * dpr, g.glW, g.glX, dpr)
+        drawn = false
+      }
+      if (!live && !mode && now - mountAt > GRACE_MS) setMode('poster')
+      const zs = zoomed()
+      if (zs) return
+      if (zs === false) drawn = false
       const paused = pausedRef.current
-      if (paused && drawn) return
+      if (paused && drawn && live) return
       const ms = paused ? 1e7 : now - start
       if (ms < END) {
-        render(stateAt(ms, false))
-      } else if (now - lastDraw > 33 || !drawn) {
-        render(settled(ms - END, !paused))
+        render(stateAt(ms, false), now)
+      } else if (now - lastDraw > 33 || !drawn || !live) {
+        render(settled(ms - END, !paused), now)
         if (ms > READY_MS) markReady()
       } else return
       lastDraw = now
       drawn = true
     }
     raf = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(raf)
-  }, [g, still, intro, pausedRef])
+    return () => {
+      cleanup()
+      window.clearTimeout(readyTimer)
+    }
+  }, [g, still, intro, pausedRef, zoomRef])
+
+  const fh = g.bottom - g.top
 
   return (
     <>
-      <canvas ref={cvRef} className="df-gl" style={{ left: g.glX, width: g.glW, height: g.H }} aria-hidden="true" />
-      <svg className={`df-fig${nogl ? ' nogl' : ''}`} viewBox={`0 0 ${g.W} ${g.H}`} width={g.W} height={g.H} aria-label="Crew body map: six checks">
+      <div className="df-glw" ref={wrapRef}>
+        <img
+          ref={posterRef}
+          className="df-poster"
+          src={posterUrl}
+          alt=""
+          draggable={false}
+          style={{ left: g.cx + PST.x * fh, top: g.top + PST.y * fh, width: PST.w * fh, height: PST.h * fh }}
+        />
+        <canvas ref={cvRef} className="df-gl" style={{ left: g.glX, width: g.glW, height: g.H }} aria-hidden="true" />
+      </div>
+      <svg className="df-fig" viewBox={`0 0 ${g.W} ${g.H}`} width={g.W} height={g.H} aria-label="Crew body map: six checks">
         {MODS.map((m, i) => (
           <g
             key={m.id}
@@ -350,7 +502,6 @@ function Callouts({ g, hot, setHot }: HotProps & { g: Geom }) {
             href={href(m.id)}
             className={`df-lab ${m.side}${hot === i ? ' is-hot' : ''}`}
             style={{ ...mc(m.color), ...pos, top: rowY(g, m) - (g.phone ? 16 : 17 * g.k), '--d': `${2050 + i * 170}ms` } as CSSProperties}
-            aria-label={`Open ${m.name}: ${m.hook}. ${m.ask ? ASK : QUIET}.`}
             {...hotHandlers(i, setHot)}
           >
             {g.phone ? (
@@ -378,7 +529,7 @@ function SampleWindow({ shown, hot, setHot }: HotProps & { shown: number }) {
   const m = MODS[shown]
   return (
     <section className="df-win" style={mc(m.color)} aria-label="Real samples of the six checks">
-      <a className="df-win-frame" href={href(m.id)} aria-label={`Open ${m.name}`} {...hotHandlers(shown, setHot)}>
+      <a className="df-win-frame" data-qa="primary" href={href(m.id)} {...hotHandlers(shown, setHot)}>
         <span className="df-win-head">
           <StarIcon />
           <span className="df-win-name">{m.name}</span>
@@ -448,6 +599,8 @@ function Check(props: CheckProps) {
 }
 
 const PHOTO_CREDIT = 'Photo: NASA / Chris Williams (ISS), public domain'
+/** A spot on screen (viewport px) and, when known, the same spot in the figure's stage px. */
+type Origin = { x: number; y: number; st?: { x: number; y: number; k: number; view: StageRect } }
 type LayerStyle = Partial<Record<'transform' | 'transformOrigin' | 'opacity' | 'filter' | 'visibility' | 'pointerEvents', string>>
 const setStyle = (el: HTMLElement | null, st: LayerStyle) => {
   if (el) Object.assign(el.style, st)
@@ -468,7 +621,8 @@ export default function DF({ view, params }: Props) {
   /** Zoom position: 0 = home, 1 = inside a check. */
   const z = useRef(mod ? 1 : 0)
   const raf = useRef(0)
-  const origin = useRef<{ x: number; y: number } | null>(null)
+  const origin = useRef<Origin | null>(null)
+  const zoomRef = useRef<FigZoom | null>(null)
   const pausedRef = useRef(!!mod)
   const fadeOnly = useRef(reduce)
   const [intro] = useState(!mod)
@@ -507,6 +661,7 @@ export default function DF({ view, params }: Props) {
       setStyle(uiRef.current, { transform: '', filter: '', opacity: String(1 - v), visibility: seen })
       setStyle(farRef.current, { transform: '', opacity: String(1 - 0.7 * v) })
       setStyle(glowRef.current, { opacity: '0' })
+      zoomRef.current = null
       setStyle(pageRef.current, { transform: '', filter: '', opacity: String(v), visibility: home ? 'hidden' : 'visible', pointerEvents: there ? 'auto' : 'none' })
       return
     }
@@ -523,7 +678,7 @@ export default function DF({ view, params }: Props) {
         : {
             transformOrigin: org,
             transform: `translate3d(${tx.toFixed(1)}px,${ty.toFixed(1)}px,0) scale(${sc.toFixed(4)})`,
-            filter: `blur(${(ss(0.12, 0.8, v) * 9).toFixed(2)}px) brightness(${(1 + 0.5 * ss(0.25, 0.85, v)).toFixed(3)})`,
+            filter: `blur(${(ss(0.55, 0.97, v) * 3).toFixed(2)}px) brightness(${(1 + 0.45 * ss(0.25, 0.85, v)).toFixed(3)})`,
             opacity: (1 - ss(0.6, 0.97, v)).toFixed(3),
             visibility: seen,
             pointerEvents: 'none',
@@ -547,6 +702,19 @@ export default function DF({ view, params }: Props) {
         ? { transform: '', opacity: '1' }
         : { transformOrigin: org, transform: `translate3d(${(tx * 0.22).toFixed(1)}px,${(ty * 0.22).toFixed(1)}px,0) scale(${(1 + 0.32 * fall).toFixed(4)})`, opacity: (1 - 0.72 * ss(0.3, 1, v)).toFixed(3) },
     )
+    // the figure: drawn by its own camera at this zoom, so it stays sharp; its canvas cancels the scene's scale
+    const cv = sceneRef.current?.querySelector<HTMLCanvasElement>('.df-gl') ?? null
+    if (cv) {
+      if (!home && o.st) {
+        const { k, view } = o.st
+        zoomRef.current = { z: sc, x: o.st.x, y: o.st.y, dx: tx / k, dy: ty / k, view }
+        cv.style.transformOrigin = `${(o.st.x - view.L).toFixed(1)}px ${(o.st.y - view.T).toFixed(1)}px`
+        cv.style.transform = `scale(${(1 / sc).toFixed(5)}) translate(${(-tx / k).toFixed(1)}px,${(-ty / k).toFixed(1)}px)`
+      } else {
+        zoomRef.current = null
+        cv.style.transform = ''
+      }
+    }
     const gx = o.x + (vw / 2 - o.x) * mv
     const gy = o.y + (vh / 2 - o.y) * mv
     setStyle(glowRef.current, {
@@ -600,19 +768,46 @@ export default function DF({ view, params }: Props) {
     [apply],
   )
 
-  /** Where the check's body spot is on screen right now (viewport px), with the scene's own zoom taken off. */
-  const measure = useCallback((id: string) => {
-    const centre = { x: window.innerWidth / 2, y: window.innerHeight / 2 }
+  /** Where the check's body spot is on screen right now (viewport px), with the scene's own zoom taken off,
+   *  and the same spot in the figure's stage px. On a phone the list sits under the body, so the body spot is
+   *  scrolled into view first: the flight then goes into the body, not the middle of the screen. */
+  const measure = useCallback((id: string): Origin => {
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+    const centre = { x: vw / 2, y: vh / 2 }
     const scene = sceneRef.current
     if (!scene) return centre
     const prev = scene.style.transform
     scene.style.transform = 'none'
-    const r = scene.querySelector(`.df-hs[data-id="${id}"]`)?.getBoundingClientRect()
+    const cv = scene.querySelector<HTMLCanvasElement>('.df-gl')
+    const cvPrev = cv?.style.transform ?? ''
+    if (cv) cv.style.transform = 'none'
+    const spot = () => scene.querySelector(`.df-hs[data-id="${id}"]`)?.getBoundingClientRect()
+    let r = spot()
+    if (r && r.width > 0 && scene.scrollHeight > scene.clientHeight + 4 && (r.top < 56 || r.bottom > vh - 56)) {
+      scene.scrollTop += r.top + r.height / 2 - vh * 0.42
+      r = spot()
+    }
+    let out: Origin = centre
+    if (r && r.width > 0) {
+      const x = r.left + r.width / 2
+      const y = r.top + r.height / 2
+      if (x >= 0 && x <= vw && y >= 0 && y <= vh) {
+        out = { x, y }
+        const cr = cv?.getBoundingClientRect()
+        if (cv && cr && cr.width > 0 && cv.offsetWidth > 0) {
+          const k = cr.width / cv.offsetWidth
+          // the stage's own origin on screen, and the whole viewport in stage px (what the widened canvas covers)
+          const ox = cr.left - cv.offsetLeft * k
+          const oy = cr.top - cv.offsetTop * k
+          const view = { L: Math.floor(-ox / k), T: Math.floor(-oy / k), W: Math.ceil(vw / k) + 2, H: Math.ceil(vh / k) + 2 }
+          out.st = { x: (x - ox) / k, y: (y - oy) / k, k, view }
+        }
+      }
+    }
+    if (cv) cv.style.transform = cvPrev
     scene.style.transform = prev
-    if (!r || r.width === 0) return centre
-    const x = r.left + r.width / 2
-    const y = r.top + r.height / 2
-    return x < 0 || x > window.innerWidth || y < 0 || y > window.innerHeight ? centre : { x, y }
+    return out
   }, [])
 
   useLayoutEffect(() => {
@@ -674,11 +869,11 @@ export default function DF({ view, params }: Props) {
   const vars = { '--u': `${g.u}px`, '--k': `${g.k}px` } as CSSProperties
 
   return (
-    <div ref={rootRef} className={cls} style={vars} data-ready={ready ? '1' : undefined} data-view={mod ? mod.id : 'home'} data-landed={landed ? '1' : undefined}>
+    <div ref={rootRef} className={cls} style={vars} data-ready={ready ? '1' : undefined} data-state={mod ? undefined : still ? 'result' : 'idle'} data-view={mod ? mod.id : 'home'} data-landed={landed ? '1' : undefined}>
       <Backdrop g={g} still={still} slowRef={pausedRef} farRef={farRef} />
       <div className="df-vignette" />
       {g.phone ? (
-        <div className="df-scroll" ref={sceneRef} aria-hidden={away || undefined}>
+        <div className="df-scroll" ref={sceneRef} inert={away || undefined}>
           <header className="df-phead">
             <h1 className="df-wordmark">SuperHumans</h1>
             <p className="df-tagline">Six AI health checks for astronauts, running in your browser.</p>
@@ -687,7 +882,7 @@ export default function DF({ view, params }: Props) {
           <div className="df-pwrap" style={{ height: g.H * g.s }}>
             <div className="df-pstage" style={{ transform: `scale(${g.s})` }}>
               <div className="df-photo" />
-              <Figure key="phone" g={g} still={still} intro={intro} pausedRef={pausedRef} hot={hot} setHot={setHot} onReady={onFigReady} />
+              <Figure key="phone" g={g} still={still} intro={intro} pausedRef={pausedRef} hot={hot} setHot={setHot} onReady={onFigReady} zoomRef={zoomRef} />
               <Callouts g={g} hot={hot} setHot={setHot} />
               <AiMark />
             </div>
@@ -716,10 +911,10 @@ export default function DF({ view, params }: Props) {
         </div>
       ) : (
         <>
-          <div className="df-scene" ref={sceneRef} aria-hidden={away || undefined}>
-            <Figure key="desk" g={g} still={still} intro={intro} pausedRef={pausedRef} hot={hot} setHot={setHot} onReady={onFigReady} />
+          <div className="df-scene" ref={sceneRef} inert={away || undefined}>
+            <Figure key="desk" g={g} still={still} intro={intro} pausedRef={pausedRef} hot={hot} setHot={setHot} onReady={onFigReady} zoomRef={zoomRef} />
           </div>
-          <main className="df-ui" ref={uiRef} aria-hidden={away || undefined}>
+          <main className="df-ui" ref={uiRef} inert={away || undefined}>
             <div className="df-col" style={{ width: g.colW }}>
               <h1 className="df-wordmark">SuperHumans</h1>
               <p className="df-tagline">Six AI health checks for astronauts, running in your browser.</p>

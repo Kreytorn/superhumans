@@ -328,6 +328,19 @@ export const VeinSqueezeMoment = forwardRef<VeinSqueezeMomentHandle, VeinSqueeze
   const outcomesRef = useRef<ClipOutcome[] | null>(null)
   const geom = useRef<{ dirty: boolean; version: number; rects: (Rect | null)[]; drawn: string[] }>({ dirty: true, version: 0, rects: [], drawn: [] })
   const clock = useRef({ t: 0, holding: false, auto: false, jump: false, last: 0, upAt: 0, hadResult: false, raf: 0, run: 0 })
+  // set on unmount: a model answer or a key release that lands after the stage is gone must not restart the clock
+  const gone = useRef(false)
+  useEffect(() => {
+    gone.current = false
+    return () => {
+      gone.current = true
+      const c = clock.current
+      c.run++
+      if (c.raf) cancelAnimationFrame(c.raf)
+      c.raf = 0
+      c.holding = c.auto = c.jump = false
+    }
+  }, [])
   const queue = useRef<Promise<void>>(Promise.resolve())
   const liveFailed = useRef(false)
   const live = useRef({ ready: false, pinned, phase: 'idle' as MomentState, mode, primary: `clip-${letter}`, cb: { onResult, onState, onReady, onMode } })
@@ -539,6 +552,7 @@ export const VeinSqueezeMoment = forwardRef<VeinSqueezeMomentHandle, VeinSqueeze
     (now: number) => {
       const c = clock.current
       c.raf = 0
+      if (gone.current) return
       const dt = clamp(now - c.last, 0, 64)
       c.last = now
       const has = !!outcomesRef.current
@@ -564,7 +578,7 @@ export const VeinSqueezeMoment = forwardRef<VeinSqueezeMomentHandle, VeinSqueeze
   )
   const kick = useCallback(() => {
     const c = clock.current
-    if (c.raf) return
+    if (c.raf || gone.current) return
     c.last = performance.now()
     c.raf = requestAnimationFrame(loop)
   }, [loop])

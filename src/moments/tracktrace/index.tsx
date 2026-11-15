@@ -495,6 +495,23 @@ const TrackTraceMoment = forwardRef<TrackTraceMomentHandle, TrackTraceMomentProp
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sampleId, mode, pinned])
 
+  // ---- unmount: free the offscreen pictures (each is a full-size canvas) and drop the cached sample sheet, so a stage
+  // opened and closed many times in one tab does not keep every nucleus it ever showed
+  useEffect(
+    () => () => {
+      S.gen++
+      clearTimeout(S.lensTimer)
+      S.lensWant = null
+      const sc = S.scene
+      for (const c of [sc.hero, sc.heroTok, sc.heat, sc.pickImg, S.atlas?.nuc, S.atlas?.dots, canvasRef.current] as unknown[]) {
+        if (c instanceof HTMLCanvasElement) c.width = c.height = 0
+      }
+      S.scene = { ...emptyScene(), W: sc.W, H: sc.H, annotate: sc.annotate, touch: sc.touch }
+      Object.assign(S, { atlas: null, atlasKey: '', x: null, imgs: null, resultP: null, warmP: null, wellP: null, heroP: null, summary: null })
+    },
+    [S],
+  )
+
   // ---- pinned frames: ?state= and ?t=
   const heroReady = !!S.scene.hero
   useEffect(() => {

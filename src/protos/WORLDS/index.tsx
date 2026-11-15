@@ -10,6 +10,7 @@ import type { ProtoProps } from '../../App'
 import { navigate } from '../../lib/route'
 import Scene, { hasWebGL } from './Scene'
 import Stage, { type Act, type StageHandle, type StageState } from './stages'
+import StorySection from './story'
 import { BASE, SITE_LINE, WORLDS, isModule, worldOf, type ModuleId, type World } from './data'
 
 const go = (view: string) => navigate(`proto/WORLDS/${view}`)
@@ -51,13 +52,18 @@ export default function Worlds({ view, params }: ProtoProps) {
   const onPick = useCallback((m: ModuleId) => go(m), [])
 
   return (
-    <div className="wd-root" data-view={id ? 'module' : 'home'} data-open={open ? 1 : 0} data-gl={webgl ? 1 : 0} data-settled={settled ? 1 : 0} data-ready={ready && (!id || open) ? 1 : 0}>
-      <div className="wd-scene" aria-hidden="true">
-        {webgl ? (
-          <Scene focus={id} hover={hover} frozen={open} labels={labels} onPick={onPick} onHover={setHover} onArrive={onArrive} onReady={onReady} />
-        ) : (
-          <Still focus={id} />
-        )}
+    <div
+      className="wd-root"
+      data-view={id ? 'module' : 'home'}
+      data-open={open ? 1 : 0}
+      data-gl={webgl ? 1 : 0}
+      data-settled={settled ? 1 : 0}
+      data-ready={ready && (!id || open) ? 1 : 0}
+      // home has nothing to run, so it shows the same view for ?state=idle and ?state=result (test hook only)
+      data-state={id ? undefined : params.get('state') === 'result' ? 'result' : 'idle'}
+    >
+      <div className="wd-scene" aria-hidden="true" data-qa={id ? undefined : 'hero'}>
+        {webgl ? <Scene focus={id} hover={hover} frozen={open} labels={labels} onPick={onPick} onHover={setHover} onArrive={onArrive} onReady={onReady} /> : <Still focus={id} />}
       </div>
       <div className="wd-shade" aria-hidden="true" />
 
@@ -78,6 +84,7 @@ export default function Worlds({ view, params }: ProtoProps) {
             }}
             className="wd-label"
             data-id={w.id}
+            data-qa={i === 0 && !id ? 'primary' : undefined}
             data-hot={hover === w.id ? 1 : 0}
             tabIndex={id ? -1 : 0}
             onClick={() => go(w.id)}
@@ -129,7 +136,7 @@ function ModulePage({ world, open }: { world: World; open: boolean }) {
     const t0 = performance.now()
     const iv = window.setInterval(() => {
       const el = box.current?.querySelector('[data-ready]')
-      if (world.id === 'spikecount' || el?.getAttribute('data-ready') === '1' || performance.now() - t0 > 10000) {
+      if (el?.getAttribute('data-ready') === '1' || performance.now() - t0 > 10000) {
         setLoaded(true)
         window.clearInterval(iv)
       }
@@ -141,7 +148,7 @@ function ModulePage({ world, open }: { world: World; open: boolean }) {
   const n = String(idx + 1).padStart(2, '0')
 
   return (
-    <div className="wd-page" data-open={open ? 1 : 0} data-id={world.id}>
+    <div className="wd-page" data-open={open ? 1 : 0} data-id={world.id} data-state={state}>
       <button className="wd-back" onClick={() => go('home')}>
         <svg viewBox="0 0 20 20" aria-hidden="true">
           <path d="M12.5 4.5 7 10l5.5 5.5" />
@@ -159,6 +166,7 @@ function ModulePage({ world, open }: { world: World; open: boolean }) {
         <div className="wd-actions">
           <button
             className="wd-run"
+            data-qa="primary"
             disabled={state === 'running' || !open || !loaded}
             onClick={() => {
               if (state === 'result' || state === 'error') stage.current?.reset()
@@ -175,10 +183,25 @@ function ModulePage({ world, open }: { world: World; open: boolean }) {
             </svg>
           </button>
         </div>
+        <button
+          className="wd-cue"
+          onClick={(e) => {
+            const page = e.currentTarget.closest('.wd-page')
+            const story = page?.querySelector('.wd-story') as HTMLElement | null
+            if (page && story) page.scrollTo({ top: story.offsetTop - 24, behavior: 'smooth' })
+          }}
+        >
+          <svg viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M4.5 7.5 10 13l5.5-5.5" />
+          </svg>
+          {world.id === 'tracktrace' ? 'The story, and how IonScan reads a nucleus' : 'The story, and how it works'}
+        </button>
       </aside>
 
       <main className="wd-main">
-        <div className="wd-stage" ref={box}>{open && <Stage id={world.id} ref={stage} onAct={onAct} onState={onState} />}</div>
+        <div className="wd-stage" ref={box} data-qa="hero">
+          {open && <Stage id={world.id} ref={stage} onAct={onAct} onState={onState} />}
+        </div>
         <div className="wd-act" data-show={act ? 1 : 0} aria-live="polite">
           {act ? (
             <>
@@ -190,17 +213,8 @@ function ModulePage({ world, open }: { world: World; open: boolean }) {
             <span className="wd-act-idle">{state === 'running' ? 'The model is reading the sample.' : 'Time is stopped. The world is waiting for its check.'}</span>
           )}
         </div>
-        {world.id === 'tracktrace' && (
-          <figure className="wd-arch">
-            <div className="wd-arch-frame">
-              <div className="wd-arch-card">
-                <img src={`${BASE}tracktrace/ionscan_architecture.svg`} alt="Diagram of the IonScan network, layer by layer" loading="lazy" />
-              </div>
-            </div>
-            <figcaption>IonScan, our own 3.2 M-parameter network</figcaption>
-          </figure>
-        )}
       </main>
+      {open && <StorySection world={world} next={next} onNext={() => go(next.id)} />}
     </div>
   )
 }
@@ -215,25 +229,46 @@ const STILL_POS: Record<ModuleId, [number, number, number]> = {
   garnmeter: [36, 20, 8],
 }
 
+const SUN: [number, number] = [56, 44]
+const SQUASH = 0.46
+
 function Still({ focus }: { focus: ModuleId | null }) {
   return (
     <div className="wd-still" data-focus={focus ?? ''}>
+      {/* each orbit is the tilted ellipse around the sun that passes through its world, so it holds at any aspect */}
+      <svg className="wd-still-orbits" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        {WORLDS.map((w) => {
+          const [x, y] = STILL_POS[w.id]
+          const rx = Math.hypot(x - SUN[0], (y - SUN[1]) / SQUASH)
+          return <ellipse key={w.id} cx={SUN[0]} cy={SUN[1]} rx={rx} ry={rx * SQUASH} vectorEffect="non-scaling-stroke" />
+        })}
+      </svg>
       <i className="wd-still-sun" />
-      {WORLDS.map((w) => {
+      {WORLDS.map((w, k) => {
         const [x, y, d] = STILL_POS[w.id]
         const [u0, v0, cw, ch] = w.crop
-        const style: CSSProperties = {
+        // unit vector from the world toward the sun: the lit side faces it, the night side looks away
+        const lx = SUN[0] - x
+        const ly = (SUN[1] - y) * 0.62
+        const n = Math.hypot(lx, ly) || 1
+        const style = {
           left: `${x}%`,
           top: `${y}%`,
           width: `${d}vmax`,
+          '--lx': (lx / n).toFixed(3),
+          '--ly': (ly / n).toFixed(3),
+          animationDelay: `${-k * 1.3}s`,
+        } as CSSProperties
+        const img: CSSProperties = {
           backgroundImage: `url(${BASE}${w.image})`,
           backgroundSize: `${100 / cw}% ${100 / ch}%`,
           backgroundPosition: `${cw < 1 ? (u0 / (1 - cw)) * 100 : 0}% ${ch < 1 ? ((1 - v0 - ch) / (1 - ch)) * 100 : 0}%`,
         }
         return (
-          <a key={w.id} className="wd-still-world" data-id={w.id} href={`#/proto/WORLDS/${w.id}`} style={{ left: style.left, top: style.top, width: style.width }}>
-            <i style={{ backgroundImage: style.backgroundImage, backgroundSize: style.backgroundSize, backgroundPosition: style.backgroundPosition }} />
+          <a key={w.id} className="wd-still-world" data-id={w.id} href={`#/proto/WORLDS/${w.id}`} style={style}>
+            <i style={img} />
             <b>{w.name}</b>
+            <em>{w.kind}</em>
           </a>
         )
       })}

@@ -7,9 +7,13 @@ import '@fontsource-variable/geist-mono'
 import '@fontsource/instrument-serif/400-italic.css'
 import './hole.css'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { BASE, CHECKS, SITE_LINE, type Check } from './data'
+import { CHECKS, SITE_LINE, type Check } from './data'
 import Scene, { hasWebGL, type HoleCtl } from './Scene'
 import Stage, { type Act, type StageHandle, type StageState } from './stages'
+import StorySection from './story'
+
+// With reduced motion the camera does not fly: each press cuts straight to the check, and Back cuts home.
+const REDUCED = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 const go = (v: string) => {
   window.location.hash = `#/proto/HOLE/${v}`
@@ -32,7 +36,9 @@ export default function Hole({ view, params }: { view: string; params: URLSearch
   const [pressed, setPressed] = useState<number | null>(null)
   const [arrived, setArrived] = useState(!webgl)
   const [moving, setMoving] = useState(true)
+  const [drawn, setDrawn] = useState(!webgl)
   const [ready, setReady] = useState(!webgl)
+  const [modState, setModState] = useState<StageState>('idle')
   const [hover, setHover] = useState<number | null>(null)
   const target = idx >= 0 ? idx : pressed
   const pressedRef = useRef(pressed)
@@ -46,16 +52,21 @@ export default function Hole({ view, params }: { view: string; params: URLSearch
       pointer: [0, 0],
       labels: [],
       clock: null,
-      snap: idx >= 0,
+      snap: idx >= 0 || REDUCED,
       frames: 0,
       pinQuality: params.get('q') === '1',
+      calmUntil: 0,
       onArrive: () => {},
       onFirstFrame: () => {},
+      onSettled: () => {},
       onLost: () => {},
     }
   }
   const c = ctl.current
   if (import.meta.env.DEV) (window as unknown as { __hole?: HoleCtl }).__hole = c
+  if (REDUCED && c.target !== target) c.snap = true
+  // leaving an open check: its model may still be busy on the GPU, so the scene comes back at a low scale first
+  if (c.target != null && target == null && idx < 0 && arrived) c.calmUntil = performance.now() + 2600
   c.target = target
   c.hover = target == null ? hover : null
   c.onArrive = (i) => {
@@ -63,10 +74,12 @@ export default function Hole({ view, params }: { view: string; params: URLSearch
     setMoving(false)
     if (pressedRef.current === i) go(CHECKS[i].id)
   }
-  c.onFirstFrame = () => setReady(true)
+  c.onFirstFrame = () => setDrawn(true)
+  c.onSettled = () => setReady(true)
   c.onLost = () => {
     setWebgl(false)
     setArrived(true)
+    setDrawn(true)
     setReady(true)
     if (pressedRef.current != null) go(CHECKS[pressedRef.current].id)
   }
@@ -110,12 +123,14 @@ export default function Hole({ view, params }: { view: string; params: URLSearch
       className="hole"
       data-phase={phase}
       data-ready={ready ? '1' : '0'}
+      data-drawn={drawn ? '1' : '0'}
+      data-state={phase === 'open' ? modState : params.get('state') === 'result' ? 'result' : 'idle'}
       data-webgl={webgl ? '1' : '0'}
       onPointerMove={(e) => {
         c.pointer = [(e.clientX / window.innerWidth) * 2 - 1, (e.clientY / window.innerHeight) * 2 - 1]
       }}
     >
-      <div className="hole-scene" aria-hidden="true">
+      <div className="hole-scene" aria-hidden="true" data-qa={phase === 'home' ? 'hero' : undefined}>
         {webgl ? <Scene ctl={c} active={phase !== 'open' || moving} /> : <div className="hole-still" />}
       </div>
       <div className="hole-scrim" aria-hidden="true" />
@@ -131,6 +146,7 @@ export default function Hole({ view, params }: { view: string; params: URLSearch
               key={k.id}
               type="button"
               className="hole-light"
+              data-qa={i === 0 && phase === 'home' ? 'primary' : undefined}
               data-side={webgl ? 'f' : STILL_SPOTS[i][2]}
               data-vis={webgl ? '0' : '1'}
               data-hot={hover === i ? '1' : '0'}
@@ -179,17 +195,24 @@ export default function Hole({ view, params }: { view: string; params: URLSearch
       </p>
       <p className="hole-mark">AI-generated imagery</p>
 
-      {phase === 'open' && <Module key={CHECKS[idx].id} check={CHECKS[idx]} index={idx} />}
+      {phase === 'open' && <Module key={CHECKS[idx].id} check={CHECKS[idx]} index={idx} onModState={setModState} />}
     </div>
   )
 }
 
-function Module({ check, index }: { check: Check; index: number }) {
+function Module({ check, index, onModState }: { check: Check; index: number; onModState(s: StageState): void }) {
   const stage = useRef<StageHandle>(null)
   const [state, setState] = useState<StageState>('idle')
   const [act, setAct] = useState<Act | null>(null)
   const onAct = useCallback((a: Act | null) => setAct(a), [])
-  const onState = useCallback((s: StageState) => setState(s), [])
+  const onState = useCallback(
+    (s: StageState) => {
+      setState(s)
+      onModState(s)
+    },
+    [onModState],
+  )
+  useEffect(() => () => onModState('idle'), [onModState])
   // A stage can ignore a press while its sample is still loading: keep the press and hand it over until it starts.
   // If a stage drops back to rest moments after the press (its sample finished loading), press once more for them.
   const [waiting, setWaiting] = useState(false)
@@ -220,11 +243,34 @@ function Module({ check, index }: { check: Check; index: number }) {
     setWaiting(true)
     stage.current?.run()
   }
+  // When the page closes, free what its stage held: media decoders and canvas memory (the stage's own models stay
+  // cached in their engines, shared by every visit).
+  const root = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = root.current
+    return () => {
+      if (!el) return
+      window.setTimeout(() => {
+        // only a page that has really left the document (React's dev double-mount keeps it attached)
+        if (el.isConnected) return
+        el.querySelectorAll('video, audio').forEach((m) => {
+          const media = m as HTMLMediaElement
+          media.pause()
+          media.removeAttribute('src')
+          media.load()
+        })
+        el.querySelectorAll('canvas').forEach((cv) => {
+          cv.width = 0
+          cv.height = 0
+        })
+      }, 0)
+    }
+  }, [])
   const prev = CHECKS[(index + CHECKS.length - 1) % CHECKS.length]
   const next = CHECKS[(index + 1) % CHECKS.length]
 
   return (
-    <div className="hole-mod" data-state={state} data-id={check.id}>
+    <div className="hole-mod" data-state={state} data-id={check.id} ref={root}>
       <div className="hole-mod-in">
         <header className="hole-head">
           <button type="button" className="hole-back" onClick={() => go('home')}>
@@ -247,6 +293,7 @@ function Module({ check, index }: { check: Check; index: number }) {
           <button
             type="button"
             className="hole-run"
+            data-qa="primary"
             disabled={state === 'running' || waiting}
             onClick={main}
           >
@@ -264,14 +311,18 @@ function Module({ check, index }: { check: Check; index: number }) {
           {act && <p className="hole-act-w">{act.whoActs}</p>}
         </div>
 
-        {check.id === 'tracktrace' && (
-          <figure className="hole-arch">
-            <div className="hole-arch-card">
-              <img src={`${BASE}tracktrace/ionscan_architecture.svg`} alt="Diagram of the IonScan network, from the microscope image to the damage spots and the ion path" />
-            </div>
-            <figcaption>IonScan, our own 3.2 M-parameter network</figcaption>
-          </figure>
-        )}
+        <button
+          type="button"
+          className="hole-cue"
+          onClick={() => document.getElementById('hole-story')?.scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth', block: 'start' })}
+        >
+          <span>{check.id === 'tracktrace' ? 'The story, and how IonScan reads a nucleus' : 'The story behind this check'}</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14M6 13l6 6 6-6" />
+          </svg>
+        </button>
+
+        <StorySection id={check.id} />
 
         <footer className="hole-foot">
           <button type="button" onClick={() => go(prev.id)}>

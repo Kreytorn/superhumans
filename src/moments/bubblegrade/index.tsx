@@ -1012,8 +1012,14 @@ export function BubbleGradeMoment(props: BubbleGradeMomentProps) {
     const dispose = () => {
       S.token++
       stopLoop()
-      S.audio?.pause()
+      const a = S.audio
       S.audio = null
+      if (a) {
+        // release the media element's decoder and buffer, not just pause it
+        a.pause()
+        a.removeAttribute('src')
+        a.load()
+      }
     }
 
     return { S, run, reset, seek, setSound, restyle, layout, draw, play, pause, pinAt, loadSample, dispose, stopLoop, playAudioAt }

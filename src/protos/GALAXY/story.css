@@ -1,0 +1,565 @@
+/* GALAXY: below the first screen of each check, the story, then how it works. Scoped to .gx. */
+.gx .gx-mod-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+}
+.gx .gx-more {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 10px;
+  padding: 0 !important;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-2) !important;
+  transition: color 180ms ease;
+}
+.gx .gx-more svg {
+  font-size: 16px;
+  color: var(--hue);
+  animation: gx-nudge 2.4s ease-in-out infinite;
+}
+.gx .gx-more:hover {
+  color: #fff !important;
+}
+@keyframes gx-nudge {
+  50% {
+    transform: translateY(4px);
+  }
+}
+.gx .gx-story {
+  position: relative;
+  padding: clamp(80px, 9vw, 140px) var(--pad) 72px;
+  background: linear-gradient(180deg, rgba(3, 4, 10, 0) 0, rgba(3, 4, 10, 0.86) 120px, rgba(3, 4, 10, 0.94) 100%);
+}
+.gx .gx-story > * {
+  max-width: 1280px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+.gx .gx-kicker {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.gx .gx-kicker b {
+  font-weight: 500;
+  color: var(--hue);
+}
+.gx .gx-kicker b::after {
+  content: "";
+  display: inline-block;
+  width: 28px;
+  height: 1px;
+  margin-left: 14px;
+  vertical-align: middle;
+  background: color-mix(in srgb, var(--hue) 60%, transparent);
+}
+.gx .gx-reset:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.gx .gx-story h2 {
+  margin-bottom: 0 !important;
+  margin-top: 22px !important;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(44px, 4.7vw, 76px);
+  line-height: 1.02;
+  letter-spacing: -0.012em;
+  color: #fff;
+  text-wrap: balance;
+}
+.gx .gx-tale {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(36px, 5vw, 84px);
+  align-items: center;
+}
+.gx .gx-tale-body {
+  margin-top: 26px !important;
+  max-width: 30em;
+  font-size: clamp(18px, 1.4vw, 21px);
+  line-height: 1.55;
+  color: #c3cad9;
+}
+.gx .gx-tale-body + .gx-tale-body {
+  margin-top: 16px !important;
+}
+.gx .gx-tale-pic {
+  margin: 0;
+}
+.gx .gx-tale-frame {
+  padding: 8px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--hue) 30%, rgba(200, 212, 255, 0.28));
+  background: rgba(8, 11, 22, 0.6);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55), 0 0 90px color-mix(in srgb, var(--hue) 12%, transparent);
+}
+.gx .gx-tale-frame > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 11px;
+}
+.gx .gx-tale-pic > figcaption,
+.gx .gx-scans-cap {
+  margin-top: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.gx .gx-cells {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+.gx .gx-cells figure,
+.gx .gx-clips figure {
+  margin: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0b0f1a;
+}
+.gx .gx-cells img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+.gx .gx-cells figcaption,
+.gx .gx-clips figcaption {
+  padding: 10px 4px 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink-2);
+}
+.gx .gx-clips {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.gx .gx-clips video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: #000;
+}
+.gx .gx-how {
+  margin-top: clamp(96px, 10vw, 150px) !important;
+}
+.gx .gx-steps,
+.gx .gx-scans ol {
+  list-style: none;
+  padding: 0 !important;
+}
+.gx .gx-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 48px !important;
+  border-top: 1px solid rgba(200, 212, 255, 0.16);
+}
+.gx .gx-steps.n4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.gx .gx-steps li {
+  padding: 30px 28px 6px 0;
+}
+.gx .gx-steps li + li {
+  padding-left: 28px;
+  border-left: 1px solid rgba(200, 212, 255, 0.1);
+}
+.gx .gx-step-n {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: var(--hue);
+}
+.gx .gx-steps h3 {
+  margin-top: 14px !important;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(28px, 2.3vw, 36px);
+  line-height: 1.08;
+  color: #fff;
+}
+.gx .gx-steps p {
+  margin-top: 12px !important;
+  font-size: 17px;
+  line-height: 1.55;
+  color: #b4bccd;
+}
+.gx .gx-scans {
+  margin-top: 64px !important;
+  padding: 34px 34px 26px;
+  border-radius: 18px;
+  border: 1px solid rgba(200, 212, 255, 0.14);
+  background: rgba(10, 13, 26, 0.6);
+  color: var(--hue);
+}
+.gx .gx-scans ol {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 18px;
+}
+.gx .gx-scans li {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.gx .gx-scans li > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.gx .gx-scans svg line {
+  stroke: rgba(200, 212, 255, 0.13);
+  stroke-width: 0.6;
+}
+.gx .gx-scan-beam {
+  fill: none;
+  stroke: var(--hue);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+/* one scan lights at a time, in the real order; the others stay dim */
+.gx .gx-scan-beams {
+  opacity: 0.28;
+  animation: gx-scan 6.4s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.8s);
+}
+@keyframes gx-scan {
+  0%,
+  100% {
+    opacity: 0.28;
+  }
+  4%,
+  13% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0.28;
+  }
+}
+.gx .gx-scans li span {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.gx .gx-scans li span b {
+  font-weight: 500;
+  color: var(--hue);
+}
+.gx .gx-scans-cap {
+  margin-top: 22px !important;
+}
+.gx .gx-how .gx-arch {
+  max-width: min(100%, 800px, calc((100svh - 230px) * 1.03));
+  margin: 72px auto 0 !important;
+  padding-bottom: 0 !important;
+}
+.gx .gx-how .gx-arch figcaption {
+  text-align: center;
+}
+.gx .gx-arch-card {
+  position: relative;
+}
+.gx .gx-arch-mark {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+.gx .gx-facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(28px, 4vw, 64px);
+  margin-top: 72px !important;
+}
+.gx .gx-facts p {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 22px;
+  border-top: 1px solid color-mix(in srgb, var(--hue) 45%, transparent);
+}
+.gx .gx-facts b {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(56px, 5.6vw, 88px);
+  line-height: 0.95;
+  color: #fff;
+}
+.gx .gx-facts span {
+  max-width: 28em;
+  font-size: 17px;
+  line-height: 1.5;
+  color: #b4bccd;
+}
+.gx .gx-honest {
+  margin-top: 40px !important;
+  max-width: 52em;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+.gx .gx-story-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-top: 110px !important;
+  padding-top: 34px;
+  border-top: 1px solid rgba(200, 212, 255, 0.14);
+}
+.gx .gx-story-back {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 10px;
+  height: 50px;
+  padding: 0 22px 0 18px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.26) !important;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background 180ms ease;
+}
+.gx .gx-story-back:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+.gx .gx-story-next {
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 0 !important;
+  text-align: right;
+}
+.gx .gx-story-next small {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.gx .gx-story-next span {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--serif);
+  font-size: clamp(40px, 4vw, 60px);
+  line-height: 1;
+  color: #fff;
+  transition: gap 200ms ease;
+}
+.gx .gx-story-next span svg {
+  font-size: 0.6em;
+  color: var(--hue);
+}
+.gx .gx-story-next:hover span {
+  gap: 22px;
+}
+
+@media (max-width: 760px), (max-aspect-ratio: 4/5) {
+  .gx .gx-mod-foot {
+    order: 3;
+    gap: 18px;
+  }
+  .gx .gx-story {
+    padding: 64px 16px 48px;
+  }
+  .gx .gx-story h2 {
+    font-size: 40px;
+    margin-top: 16px !important;
+  }
+  .gx .gx-kicker {
+    font-size: 11.5px;
+    gap: 10px;
+  }
+  .gx .gx-kicker b::after {
+    width: 18px;
+    margin-left: 10px;
+  }
+  .gx .gx-tale {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .gx .gx-tale-body {
+    font-size: 17px;
+    margin-top: 18px !important;
+  }
+  .gx .gx-tale-frame {
+    padding: 5px;
+    border-radius: 14px;
+  }
+  .gx .gx-cells {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .gx .gx-how {
+    margin-top: 80px !important;
+  }
+  .gx .gx-steps,
+  .gx .gx-steps.n4 {
+    grid-template-columns: 1fr;
+    margin-top: 28px !important;
+  }
+  .gx .gx-steps li,
+  .gx .gx-steps li + li {
+    padding: 22px 0;
+    border-left: 0;
+    border-bottom: 1px solid rgba(200, 212, 255, 0.1);
+  }
+  .gx .gx-steps h3 {
+    font-size: 30px;
+  }
+  .gx .gx-steps p {
+    font-size: 16px;
+  }
+  .gx .gx-scans {
+    margin-top: 40px !important;
+    padding: 20px 16px 16px;
+  }
+  .gx .gx-scans ol {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px 12px;
+  }
+  .gx .gx-scans li span {
+    font-size: 10.5px;
+    white-space: normal;
+  }
+  .gx .gx-how .gx-arch {
+    margin: 40px 0 0 !important;
+  }
+  .gx .gx-arch-frame {
+    overflow: visible;
+  }
+  .gx .gx-arch-card {
+    padding: 10px;
+  }
+  .gx .gx-arch-card img {
+    min-width: 0;
+  }
+  .gx .gx-facts {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-top: 48px !important;
+  }
+  .gx .gx-facts b {
+    font-size: 60px;
+  }
+  .gx .gx-facts span {
+    font-size: 16px;
+  }
+  .gx .gx-story-nav {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    margin-top: 72px !important;
+  }
+  .gx .gx-story-next {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .gx .gx-story-next span {
+    font-size: 42px;
+  }
+  .gx .gx-story-back {
+    align-self: flex-start;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gx .gx-more svg,
+  .gx .gx-scan-beams {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* Wide stages (SpikeCount's two squares, VeinSqueeze's two clips): the words go in a band above, the stage takes the full width. */
+@media (min-width: 761px) and (min-aspect-ratio: 4/5) {
+  .gx .gx-mod[data-wide] .gx-mod-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: clamp(18px, 2.4vh, 28px);
+    padding-top: clamp(20px, 3vh, 32px);
+    padding-bottom: clamp(24px, 3.4vh, 36px);
+  }
+  .gx .gx-mod[data-wide] .gx-mod-side {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'back . foot' 'head head head';
+    align-items: center;
+    row-gap: clamp(14px, 2vh, 22px);
+  }
+  .gx .gx-mod[data-wide] .gx-back {
+    grid-area: back;
+  }
+  .gx .gx-mod[data-wide] .gx-mod-foot {
+    grid-area: foot;
+    flex-direction: row;
+    align-items: center;
+    gap: 34px;
+  }
+  .gx .gx-mod[data-wide] .gx-next {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 14px;
+  }
+  .gx .gx-mod[data-wide] .gx-next span {
+    font-size: 28px;
+  }
+  .gx .gx-mod[data-wide] .gx-mod-head {
+    grid-area: head;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'kick . act' 'name sent act' 'name sent stat';
+    column-gap: clamp(28px, 3vw, 52px);
+    align-items: end;
+  }
+  .gx .gx-mod[data-wide] .gx-mod-kicker {
+    grid-area: kick;
+    margin-bottom: 6px;
+  }
+  .gx .gx-mod[data-wide] .gx-mod-name {
+    grid-area: name;
+    margin-top: 0 !important;
+    font-size: clamp(56px, 5.4vw, 80px);
+    line-height: 0.9;
+  }
+  .gx .gx-mod[data-wide] .gx-mod-sentence {
+    grid-area: sent;
+    margin: 0 !important;
+    max-width: 24em;
+    padding-bottom: 4px;
+  }
+  .gx .gx-mod[data-wide] .gx-mod-actions {
+    grid-area: act;
+    margin: 0;
+    justify-self: end;
+    align-self: end;
+  }
+  .gx .gx-mod[data-wide] .gx-status {
+    grid-area: stat;
+    margin: 8px 0 0 !important;
+    justify-self: end;
+  }
+}

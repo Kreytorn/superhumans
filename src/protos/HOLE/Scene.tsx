@@ -18,7 +18,11 @@ export interface HoleCtl {
   frames: number
   /** Pin the render scale (screenshots): no automatic lowering. */
   pinQuality: boolean
+  /** Until this time (performance.now) the scene draws at a low render scale: a check's model may still be busy on the GPU. */
+  calmUntil: number
   onArrive(i: number): void
+  /** The first move has come to rest (the page's data-ready). */
+  onSettled(): void
   onFirstFrame(): void
   /** The WebGL context was lost and could not be rebuilt: show the still drawing. */
   onLost(): void
@@ -357,6 +361,8 @@ function Rig({ ctl, steps }: { ctl: HoleCtl; steps: number }) {
     good: 0,
     raises: 0,
     dpr0: 0,
+    calm: false,
+    settled: false,
     dx: [0, 0, 0, 0, 0, 0],
   })
   const buf = useMemo(() => new THREE.Vector2(), [])
@@ -496,14 +502,30 @@ function Rig({ ctl, steps }: { ctl: HoleCtl; steps: number }) {
       s.first = false
       ctl.onFirstFrame()
     }
+    // settled: the opening move (or a snapped view) has come to rest, so the lights hold still and can be pressed
+    if (!s.settled && s.k >= 1) {
+      s.settled = true
+      ctl.onSettled()
+    }
     if (s.target != null && s.k >= 1 && !s.arrived) {
       s.arrived = true
       ctl.onArrive(s.target)
     }
 
-    // automatic render scale: only ever lowers, so a slow laptop settles on a smooth picture
+    // right after Back a check's model can still hold the GPU: draw at a low scale for a moment, then return smoothly
     if (!ctl.pinQuality) {
       if (s.dpr === 0) s.dpr = s.dpr0 = gl.getPixelRatio()
+      const calm = now < ctl.calmUntil
+      if (calm !== s.calm) {
+        s.calm = calm
+        setDpr(calm ? Math.min(s.dpr, 0.55) : s.dpr)
+        s.warm = 0
+        s.acc = 0
+        s.n = 0
+      }
+    }
+    // automatic render scale: only ever lowers, so a slow laptop settles on a smooth picture
+    if (!ctl.pinQuality && !s.calm) {
       if (s.warm < 12) s.warm++
       else {
         s.acc += delta

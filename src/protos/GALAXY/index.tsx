@@ -30,6 +30,9 @@ export default function Galaxy({ view, params }: { view: string; params: URLSear
   const [arrived, setArrived] = useState(idx)
   const [ready, setReady] = useState(false)
   const [still, setStill] = useState(false)
+  const [modState, setModState] = useState('idle')
+  const pinParam = params.get('state')
+  const pin = pinParam === 'idle' || pinParam === 'result' ? pinParam : undefined
 
   const measure = useCallback(() => {
     const a = anchors.current
@@ -123,6 +126,7 @@ export default function Galaxy({ view, params }: { view: string; params: URLSear
       return
     }
     setHover(-1)
+    setModState('idle')
     if (scene.current) {
       scene.current.setHover(-1)
       scene.current.setFocus(idx)
@@ -150,8 +154,8 @@ export default function Galaxy({ view, params }: { view: string; params: URLSear
   const hot = hover >= 0 ? CHECKS[hover] : null
 
   return (
-    <div ref={root} className={`gx${home ? ' is-home' : ' is-in'}${open ? ' is-open' : ''}${still ? ' is-still' : ''}`} data-proto="GALAXY" data-ready={ready && ((home && arrived === -1) || open) ? '1' : undefined} data-view={view}>
-      <canvas ref={canvas} className="gx-canvas" aria-hidden="true" />
+    <div ref={root} className={`gx${home ? ' is-home' : ' is-in'}${open ? ' is-open' : ''}${still ? ' is-still' : ''}`} data-proto="GALAXY" data-ready={ready && ((home && arrived === -1) || open) ? '1' : undefined} data-state={home ? (pin ?? 'idle') : (pin ?? modState)} data-view={view}>
+      <canvas ref={canvas} className="gx-canvas" aria-hidden="true" data-qa="hero" />
       <div className="gx-veil" aria-hidden="true" />
 
       <div className="gx-home" aria-hidden={!home} inert={!home}>
@@ -177,7 +181,9 @@ export default function Galaxy({ view, params }: { view: string; params: URLSear
             }}
             className={`gx-spot${hover === i ? ' is-hot' : ''}`}
             style={{ ['--hue' as string]: c.hue, ['--d' as string]: `${i * -0.5}s` }}
-            aria-label={`Open ${c.name}`}
+            // the rings repeat the names beside them, which are the keyboard and screen-reader controls
+            aria-hidden="true"
+            tabIndex={-1}
             onPointerEnter={() => setHover(i)}
             onPointerLeave={() => setHover(-1)}
             onFocus={() => setHover(i)}
@@ -196,6 +202,7 @@ export default function Galaxy({ view, params }: { view: string; params: URLSear
               labelEls.current[i] = el
             }}
             className={`gx-label gx-label-${c.side} gx-label-${c.id}${hover === i ? ' is-hot' : ''}${hover >= 0 && hover !== i ? ' is-dim' : ''}`}
+            data-qa={home && i === 0 ? 'primary' : undefined}
             style={{ ['--hue' as string]: c.hue }}
             onPointerEnter={() => setHover(i)}
             onPointerLeave={() => setHover(-1)}
@@ -235,7 +242,7 @@ export default function Galaxy({ view, params }: { view: string; params: URLSear
 
       {idx >= 0 && (
         <Suspense fallback={null}>
-          <Module key={CHECKS[idx].id} check={CHECKS[idx]} open={open} onBack={() => go('home')} onGo={go} />
+          <Module key={CHECKS[idx].id} check={CHECKS[idx]} open={open} onBack={() => go('home')} onGo={go} pin={pin} onStateChange={setModState} />
         </Suspense>
       )}
 

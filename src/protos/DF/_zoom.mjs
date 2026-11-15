@@ -12,6 +12,7 @@ page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`))
 await page.goto('http://localhost:5310/#/proto/DF/home', { waitUntil: 'domcontentloaded', timeout: 120000 })
 await page.waitForSelector('.df[data-ready="1"]', { timeout: 45000 })
 await page.waitForTimeout(400)
+if (process.argv.includes('--scrolled')) { await page.evaluate(() => document.querySelector('.df-scroll')?.scrollTo(0, 1e6)); await page.waitForTimeout(400) }
 const marks = [0.18, 0.38, 0.55, 0.7, 0.84, 0.94]
 for (let i = 0; i < marks.length; i++) {
   await page.evaluate(([m, v]) => window.__dfZoom(m, v), [id, marks[i]])

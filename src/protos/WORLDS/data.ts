@@ -17,7 +17,7 @@ export interface World {
   size: number
   /** radius used to frame the world when the camera flies in */
   focusR: number
-  /** each world swings slowly along its orbit around the angle a0, so the composed view never falls apart; speed is the swing rate */
+  /** a0: where the world sits on its orbit at the first frame (the composed opening view); it then orbits fully. speed is unused since r3 polish */
   speed: number
   a0: number
   /** height above the orbital plane */
@@ -149,7 +149,7 @@ export const WORLDS: World[] = [
     base: [0.03, 0.02, 0.09],
     rim: [0.6, 0.55, 1.0],
     glow: 0.9,
-    invert: true,
+    invert: false,
     pulse: 0.3,
     spins: true,
   },

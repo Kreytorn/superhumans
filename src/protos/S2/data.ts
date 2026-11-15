@@ -96,7 +96,6 @@ export const CHECKS: Check[] = [
     img: `${BASE}_posters/garnmeter.jpg`,
     aspect: 1.6,
     crop: [0.02, 0.02, 0.37],
-    invert: true,
     spot: [0.095, 0.84, 0.0],
     lens: [0.7, 1.04, 0.1],
   },
