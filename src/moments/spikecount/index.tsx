@@ -7,6 +7,7 @@ import './moment.css'
 import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent, type Ref } from 'react'
 import * as spike from '../../engine/spikecount'
 import type { ClassName, SpikeActDecision, SpikeCell, SpikeResult } from '../../engine/spikecount'
+import ReviewLine, { reviewOf } from '../../components/ReviewLine'
 
 export type MomentState = 'idle' | 'running' | 'result' | 'error'
 
@@ -827,11 +828,14 @@ export default function SpikeCountMoment(props: SpikeCountMomentProps) {
               <span className="scm-label">What to do next</span>
               <p className="scm-tier">{data?.decision.tierName ?? ''}</p>
               <p className="scm-headline">{data?.decision.headline ?? ''}</p>
+              {data && !lay.narrow && <ReviewLine review={reviewOf(data.decision.whoActs)} className="is-after scm-review" color="var(--mc, var(--m-c-cup, #b9a0ff))" />}
               <span className="scm-tag">
                 {srcTag}
                 {res?.source === 'precomputed' ? ` · ${spike.HONESTY.precomputed}` : ''}
               </span>
             </div>
+            {/* phone: the review line takes the full width under the number and the next step (the next-step column is narrow) */}
+            {data && lay.narrow && !pre && prog.phase >= 3 && <ReviewLine review={reviewOf(data.decision.whoActs)} className="is-after scm-review" color="var(--mc, var(--m-c-cup, #b9a0ff))" />}
           </div>
         )}
       </div>

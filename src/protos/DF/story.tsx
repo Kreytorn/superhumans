@@ -277,6 +277,9 @@ export function NextNav({ mod }: { mod: Mod }) {
       <a className="df-story-credits" href={href('credits')}>
         Credits
       </a>
+      <a className="df-story-credits" href={href('licences')}>
+        Data and licences
+      </a>
       <a className="df-story-go" href={href(next.id)} style={{ '--nc': next.color } as CSSProperties}>
         <span>Next check</span>
         <b>{next.name}</b>

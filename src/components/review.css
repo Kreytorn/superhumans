@@ -1,0 +1,24 @@
+/* "Human review needed / AI first reading" badge (ReviewLine.tsx). One look on every check: the check's colour on a
+   dark glass chip, small and quiet, never a siren. Fixed sizes so it reads the same inside every page and stage. */
+.ai-review.ai-review{--rv-c:var(--mc,#8FB8FF);
+  display:inline-flex;align-items:flex-start;gap:8px;align-self:flex-start;max-width:100%;box-sizing:border-box;
+  margin:0;padding:7px 12px 7px 9px;border:1px solid color-mix(in srgb,var(--rv-c) 42%,transparent);border-radius:9px;
+  background:color-mix(in srgb,var(--rv-c) 9%,rgba(7,10,20,.55));
+  font:500 14px/1.3 "Space Grotesk",system-ui,sans-serif;letter-spacing:0;text-transform:none;font-style:normal;
+  color:#F1F4FF;text-align:left;text-wrap:pretty;overflow-wrap:anywhere}
+.ai-review.ai-review svg{flex:none;width:16px;height:16px;margin-top:1px;color:var(--rv-c)}
+.ai-review.ai-review b{font-weight:650;color:var(--rv-c)}
+/* where it wraps, it breaks after the lead ("Human review needed:" / "crew medical officer"); a name too long for
+   one line then splits evenly */
+.ai-review.ai-review > span > *{display:inline-block;max-width:100%;text-wrap:balance}
+@media (max-width:520px){.ai-review.ai-review{font-size:13.5px;padding:6px 10px 6px 8px}}
+/* placed under an action sentence */
+.ai-review.ai-review.is-after{margin-top:12px;animation:aiReviewIn .5s .18s cubic-bezier(.23,1,.32,1) both}
+@keyframes aiReviewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.ai-review.ai-review.is-after{animation:none}}
+/* short laptop windows (1536x730, 1280x720): a tighter chip, so the stage beside or above it keeps its room */
+@media (min-width:821px) and (max-height:800px){
+  .ai-review.ai-review{font-size:13px;line-height:1.25;padding:5px 10px 5px 8px;gap:7px}
+  .ai-review.ai-review svg{width:15px;height:15px;margin-top:0}
+  .ai-review.ai-review.is-after{margin-top:8px}
+}

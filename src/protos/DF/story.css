@@ -76,6 +76,11 @@
 .df-check .df-story-arch figcaption b{font:700 40px/1.1 var(--sans);letter-spacing:-.03em;color:var(--text-1);text-wrap:balance}
 .df-check .df-story-arch figcaption span{max-width:24em;font:500 18px/1.45 var(--sans);color:var(--text-2)}
 
+/* wide screens: the two quiet links ("Credits", "Data and licences") sit together in the middle, not spread out */
+@media (min-width:821px) and (min-aspect-ratio:1001/1000){
+  .df-check .df-story-home + .df-story-credits{margin-left:auto}
+  .df-check .df-story-credits:has(+ .df-story-go){margin-right:auto}
+}
 @media (max-width:1180px){
   .df-check .df-story-h{font-size:44px}
   .df-check .df-story-problem{gap:40px}

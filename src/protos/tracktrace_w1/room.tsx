@@ -11,6 +11,7 @@ import type { NucleusResult, TrackTraceAct, WellResult } from '../../engine/trac
 import TrackTraceMoment, { type MomentBeat, type MomentState, type TrackTraceMomentHandle } from './stage'
 import { createScene, type Nucleus3D, type SceneHandle } from './scene'
 import { HERO, HERO_3D, LINE, XRAY, tierOf } from './ids'
+import ReviewLine, { reviewOf } from '../../components/ReviewLine'
 import './w1.css'
 
 const SENTENCE = 'IonScan circles every DNA-damage spot. When they line up, it draws a heavy ion’s path.'
@@ -562,6 +563,7 @@ export function W1Room({ pin, live = true, sample: first = HERO, top, after, onC
                     <em>{act.tierName}</em>
                     {well ? ` · ${well.nuclei.length} cells in this sample decide it` : ' · the whole sample decides it'} · {tt.HONESTY.precomputed}
                   </p>
+                  <ReviewLine review={reviewOf(act.whoActs)} className="is-after" color="var(--mc, var(--tier))" />
                 </>
               ) : (
                 <p className="w1-act-quiet">{running ? 'Reading the nucleus, then its whole sample.' : 'One press. The whole sample decides; the action lands here.'}</p>

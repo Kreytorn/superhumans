@@ -42,6 +42,16 @@
   .tt-tail .df-arch-cap{font-size:19px}
 }
 
+/* short laptop windows (1536x730, 1280x720): the result's "Human review needed" line makes the rail taller, so the
+   rail and the first screen give back a little of their air and the stage window keeps its height */
+@media (min-width:821px) and (max-height:800px){
+  .tt-page .w1-first{padding-bottom:44px}
+  .tt-page .w1 .w1-cue{bottom:8px}
+  .tt-page .w1-right{gap:10px}
+  .tt-page .w1-rail > div{padding-top:12px;padding-bottom:12px}
+  .tt-page .w1-act-line{font-size:21px}
+}
+
 @media (max-width:820px){
   .tt-page .w1-top{height:64px}
   .tt-page .w1-first{padding-top:76px}

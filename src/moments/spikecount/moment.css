@@ -316,6 +316,8 @@
 .scm[data-narrow='1'] .scm-read { order: -1; width: 100%; flex-direction: row; align-items: flex-start; justify-content: flex-start; gap: 16px; padding: 2px 2px 4px; min-height: 104px; }
 .scm[data-narrow='1'] .scm-num { flex: none; min-width: 136px; }
 .scm[data-narrow='1'] .scm-next { flex: 1; min-width: 0; }
+.scm[data-narrow='1'] .scm-read { flex-wrap: wrap; }
+.scm[data-narrow='1'] .scm-read > .ai-review.scm-review { flex: 1 1 100%; margin-top: 0; }
 .scm[data-narrow='1'] .scm-hero { font-size: 56px; margin-top: 2px; }
 .scm[data-narrow='1'] .scm-sub { font-size: 13.5px; margin-top: 4px; }
 .scm[data-narrow='1'] .scm-bar { height: 5px; margin-top: 8px; }

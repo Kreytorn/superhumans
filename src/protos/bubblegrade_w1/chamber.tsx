@@ -10,6 +10,7 @@ import '@fontsource/instrument-serif/400-italic.css'
 import * as bubble from '../../engine/bubblegrade'
 import type { BubbleResult, BubbleSample, CrewInputs, SymptomTypeI, SymptomTypeII } from '../../engine/bubblegrade'
 import { createChamber, type Chamber } from './scene'
+import ReviewLine, { reviewOf } from '../../components/ReviewLine'
 import './w1.css'
 
 const SENTENCE = 'After a spacewalk, it listens to the heart and grades the gas bubbles that cause the bends.'
@@ -534,6 +535,7 @@ export default function ListeningChamber({ clip, onClip, pin, live = true, back,
                 <span>{decision.tierName}</span>
                 <i>{bubble.HONESTY.card}</i>
               </p>
+              <ReviewLine review={reviewOf(decision.whoActs)} className="is-after" color="var(--mc, var(--cyan))" />
               <div className="bgw1-symptoms" role="group" aria-label="Symptom checklist: symptoms always win over bubbles">
                 <span>Any symptoms?</span>
                 {CHIPS_I.map((s) => (

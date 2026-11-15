@@ -12,6 +12,7 @@ import type { GarnMomentHandle } from '../../moments/garnmeter'
 import type { SpikeCountMomentHandle } from '../../moments/spikecount'
 import { HONESTY_BANDS, HONESTY_HELD_OUT, HONESTY_HERO_PAIR, HONESTY_SQUEEZE, HONESTY_STRIP } from '../../engine/veinsqueeze/honesty'
 import StorySection from './story'
+import ReviewLine, { reviewOf, type Review } from '../../components/ReviewLine'
 
 // Each stage is its own chunk, fetched only when its page has landed.
 const TrackTrace = lazy(() => import('../../moments/tracktrace'))
@@ -42,6 +43,8 @@ export interface Outcome {
   flag?: { tag: string; line: string }
   /** One fixed honesty line shown in the open with the action (BubbleGrade). */
   note?: string
+  /** r4: who reviews the AI's reading (from the engine's whoActs; Garn Meter: experimental). Shown under the result. */
+  review?: Review
 }
 
 type Tokens = CSSProperties & Record<`--${string}`, string>
@@ -106,7 +109,8 @@ const who = (s: string | undefined) => {
   const t = s === 'self' ? 'you' : s.startsWith('self,') ? `you${s.slice(4)}` : s
   return t.charAt(0).toUpperCase() + t.slice(1)
 }
-const acts = (a: { whoActs: string; headline: string } | null | undefined) => (a ? { who: who(a.whoActs), action: a.headline, fine: fineOf(a) } : { fine: [] })
+const acts = (a: { whoActs: string; headline: string } | null | undefined) =>
+  a ? { who: who(a.whoActs), action: a.headline, fine: fineOf(a), review: reviewOf(a.whoActs) } : { fine: [] }
 
 class StageBoundary extends Component<{ children: ReactNode; onFail?: () => void }, { failed: boolean }> {
   state = { failed: false }
@@ -431,6 +435,7 @@ function StandardCheck({ mod, live, pin, sample, onStatus }: CheckPageProps) {
               bigLabel: `Garn, the model’s reading for scene ${g.trial}. 0 is fine, 1 is totally sick.`,
               action: 'A reading only, not used for alerts.',
               fine: g.notes,
+              review: { kind: 'experimental' },
             })
           }
         />
@@ -510,6 +515,7 @@ function StandardCheck({ mod, live, pin, sample, onStatus }: CheckPageProps) {
                 )}
                 {outcome.action && <p className="df-check-action">{outcome.action}</p>}
                 {outcome.note && <p className="df-check-note">{outcome.note}</p>}
+                {outcome.review && <ReviewLine review={outcome.review} />}
                 {outcome.fine.length > 0 && (
                   <details className="df-check-fine">
                     <summary>How do we know?</summary>

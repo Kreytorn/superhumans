@@ -1,0 +1,130 @@
+/* DF's "Data and licences" page (#/proto/DF/licences): three plain facts, one card per check in the check's colour,
+   then the models and code we built on. The shared sky and bar (.df-xs) are in credits.css, loaded with the home. */
+.df-lc-wrap{position:relative;max-width:1240px;margin:0 auto;padding:28px clamp(16px,4.2vw,64px) max(48px,16vh)}
+.df-lc-bar-end{display:flex;align-items:center;gap:10px}
+
+/* ---------- title ---------- */
+.df-lc-hero{padding:clamp(52px,10vh,112px) 0 clamp(30px,5vh,52px)}
+.df-lc-kicker{display:flex;align-items:center;gap:12px;margin:0;font:600 15px/1 "JetBrains Mono",ui-monospace,Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.df-lc-kicker::before{content:"";width:28px;height:2px;background:currentColor;box-shadow:0 0 12px currentColor}
+.df-lc-h1{margin:20px 0 0;font:700 clamp(46px,6.2vw,92px)/.95 var(--sans);letter-spacing:-.045em;color:var(--text-1);text-wrap:balance}
+.df-lc-lead{margin:24px 0 0;max-width:30em;font:500 clamp(18px,1.6vw,23px)/1.42 var(--sans);color:var(--text-2);text-wrap:pretty}
+
+/* ---------- the three facts: one glass band, three cells ---------- */
+.df-lc-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0 0 clamp(40px,6vh,64px);padding:0;list-style:none;border:1px solid rgba(143,184,255,.3);border-radius:20px;
+  background:linear-gradient(180deg,rgba(28,40,86,.5),rgba(8,11,24,.82) 80%);box-shadow:0 24px 70px rgba(0,0,8,.4),0 0 70px rgba(143,184,255,.08)}
+.df-lc-facts li{display:grid;grid-template-columns:auto minmax(0,1fr);align-content:start;gap:8px 14px;padding:24px 26px}
+.df-lc-facts li+li{border-left:1px solid var(--line-hair)}
+.df-lc-facts svg{grid-row:1/3;width:30px;height:30px;color:#CFE0FF;filter:drop-shadow(0 0 8px rgba(143,184,255,.55))}
+.df-lc-facts b{font:600 20px/1.2 var(--sans);letter-spacing:-.015em;color:var(--text-1)}
+.df-lc-facts span{font:500 15px/1.5 var(--sans);color:var(--text-2);text-wrap:pretty}
+
+/* ---------- one card per check ---------- */
+.df-lc-cards{display:grid;gap:18px}
+.df-lc-card{position:relative;display:grid;grid-template-columns:minmax(0,250px) minmax(0,1fr);gap:24px clamp(24px,3vw,48px);padding:clamp(24px,2.4vw,34px);
+  border:1px solid var(--line-hair);border-left:2px solid color-mix(in srgb,var(--mc) 72%,transparent);border-radius:20px;
+  background:radial-gradient(70% 140% at 0% 0%,color-mix(in srgb,var(--mc) 9%,transparent),transparent 62%),rgba(8,11,24,.8);box-shadow:0 24px 60px rgba(0,0,8,.35)}
+.df-lc-card.is-nasa{border-top-color:rgba(143,184,255,.34);border-right-color:rgba(143,184,255,.34);border-bottom-color:rgba(143,184,255,.34)}
+.df-lc-who{position:sticky;top:24px;align-self:start;display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-width:0}
+.df-lc-who h2{display:flex;align-items:center;gap:12px;margin:0;font:700 clamp(26px,2.3vw,34px)/1.05 var(--sans);letter-spacing:-.03em;color:var(--mc)}
+.df-lc-who h2 svg{width:22px;height:22px;flex:none;filter:drop-shadow(0 0 8px var(--mc))}
+.df-lc-who p{margin:0;font:500 16px/1.4 var(--sans);color:var(--text-3)}
+.df-lc-nasa{margin-top:4px;padding:6px 10px;border:1px solid rgba(143,184,255,.4);border-radius:8px;background:rgba(143,184,255,.08);
+  font:600 12px/1.2 "JetBrains Mono",ui-monospace,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:#CFE0FF}
+.df-lc-body{display:flex;flex-direction:column;gap:18px;min-width:0}
+
+.df-lc-main{display:flex;flex-direction:column;gap:12px;min-width:0}
+.df-lc-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 20px}
+.df-lc-top h3{margin:0;font:600 clamp(22px,1.9vw,27px)/1.15 var(--sans);letter-spacing:-.02em;color:var(--text-1)}
+.df-lc-by{margin:0;font:500 15px/1.45 var(--sans);color:var(--text-3);text-wrap:pretty}
+.df-lc-ack{margin:-4px 0 0;font:500 13px/1.45 var(--sans);font-style:italic;color:var(--text-3);text-wrap:pretty}
+.df-lc-what{margin:0;max-width:46em;font:500 16px/1.5 var(--sans);color:var(--text-2);text-wrap:pretty}
+
+/* the licence: its exact name as a chip, then what it lets anyone do */
+.df-lc-lic{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:2px 0;padding:12px 14px;border-radius:12px;background:rgba(143,184,255,.05);border:1px solid rgba(143,184,255,.14)}
+.df-lc-lic b{flex:none;padding:6px 10px;border:1px solid rgba(143,184,255,.42);border-radius:8px;background:rgba(143,184,255,.1);
+  font:700 14px/1.2 "JetBrains Mono",ui-monospace,Consolas,monospace;color:#DCE8FF;white-space:nowrap}
+.df-lc-lic span{flex:1 1 18em;min-width:0;font:500 16px/1.45 var(--sans);color:var(--text-1);text-wrap:pretty}
+.df-lc-lic.is-terms{background:rgba(255,178,36,.05);border-color:rgba(255,178,36,.2)}
+.df-lc-lic.is-terms b{border-color:rgba(255,178,36,.5);background:rgba(255,178,36,.1);color:#FFD58A}
+
+/* what we did with it: three marks, lit when true */
+.df-lc-uses{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.df-lc-uses li{display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:0 11px;border:1px dashed rgba(150,170,255,.22);border-radius:999px;
+  font:600 13px/1 var(--sans);color:rgba(154,163,191,.62)}
+.df-lc-uses li.is-on{border-style:solid;border-color:color-mix(in srgb,var(--mc) 55%,transparent);background:color-mix(in srgb,var(--mc) 15%,transparent);color:var(--text-1)}
+.df-lc-uses svg{width:14px;height:14px;flex:none;color:var(--mc)}
+
+.df a.df-lc-link{display:inline-flex;align-self:flex-start;align-items:center;gap:6px;min-height:30px;font:600 15px/1.3 var(--sans);color:var(--accent);
+  text-decoration:underline;text-decoration-color:rgba(143,184,255,.35);text-underline-offset:4px;overflow-wrap:anywhere}
+.df a.df-lc-link:hover{color:#CFE0FF;text-decoration-color:var(--accent)}
+.df-lc-link svg{width:13px;height:13px;flex:none}
+.df-lc-where{margin:0;font:500 14px/1.45 var(--sans);color:var(--text-3)}
+
+/* the extra data a check uses: small panels under the main one */
+.df-lc-mores{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px}
+.df-lc-more{display:flex;flex-direction:column;gap:10px;min-width:0;padding:18px 18px 16px;border:1px solid var(--line-hair);border-radius:14px;background:rgba(255,255,255,.025)}
+.df-lc-role{margin:0;font:600 12px/1 "JetBrains Mono",ui-monospace,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--mc)}
+.df-lc-more h4{margin:0;font:600 19px/1.2 var(--sans);letter-spacing:-.01em;color:var(--text-1)}
+.df-lc-more .df-lc-by{font-size:14px}
+.df-lc-more .df-lc-what{font-size:15px}
+.df-lc-more .df-lc-lic{padding:10px 12px}
+.df-lc-more .df-lc-lic span{flex-basis:12em;font-size:15px}
+.df-lc-note{margin:0;padding-left:14px;border-left:2px solid color-mix(in srgb,var(--mc) 60%,transparent);font:500 15px/1.5 var(--sans);color:var(--text-2);text-wrap:pretty}
+
+/* ---------- models and code we built on ---------- */
+.df-lc-built{margin-top:clamp(56px,9vh,96px);padding-top:clamp(40px,6vh,64px);border-top:1px solid var(--line-hair)}
+.df-lc-h2{margin:0 0 26px;font:700 clamp(30px,3.2vw,46px)/1.05 var(--sans);letter-spacing:-.035em;color:var(--text-1);text-wrap:balance}
+.df-lc-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0;padding:0;list-style:none}
+.df-lc-tile{display:flex;flex-direction:column;gap:8px;min-width:0;padding:18px 18px 16px;border:1px solid var(--line-hair);border-radius:14px;background:rgba(8,11,24,.76)}
+.df-lc-tile b{font:600 19px/1.2 var(--sans);letter-spacing:-.01em;color:var(--text-1)}
+.df-lc-tile-by{font:500 13px/1.4 var(--sans);color:var(--text-3)}
+.df-lc-tile-lic{align-self:flex-start;max-width:100%;padding:5px 9px;border:1px solid rgba(143,184,255,.36);border-radius:8px;background:rgba(143,184,255,.08);
+  font:700 12px/1.25 "JetBrains Mono",ui-monospace,Consolas,monospace;color:#DCE8FF}
+.df-lc-tile-how{font:500 15px/1.4 var(--sans);color:var(--text-2);text-wrap:pretty}
+.df-lc-dots{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:auto;padding-top:4px}
+.df-lc-dots i{width:8px;height:8px;border-radius:50%;background:var(--mc);box-shadow:0 0 8px var(--mc)}
+.df-lc-dots small{margin-left:2px;font:500 12px/1.3 var(--sans);color:var(--text-3)}
+.df-lc-foot{margin:18px 0 0;max-width:52em;font:500 15px/1.55 var(--sans);color:var(--text-3);text-wrap:pretty}
+
+.df-lc-end{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;margin-top:clamp(48px,7vh,72px);padding-top:clamp(32px,5vh,52px);border-top:1px solid var(--line-hair)}
+.df-lc-end p{margin:0;font:500 16px/1.55 var(--sans);color:var(--text-2)}
+.df-lc-end-links{display:flex;flex-wrap:wrap;gap:10px}
+
+@media (max-width:1060px){
+  .df-lc-card{grid-template-columns:minmax(0,1fr);gap:20px}
+  .df-lc-who{position:static;flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+  .df-lc-who h2{align-self:center}
+  .df-lc-nasa{margin-top:0}
+  .df-lc-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:860px){
+  .df-lc-facts{grid-template-columns:minmax(0,1fr)}
+  .df-lc-facts li+li{border-left:0;border-top:1px solid var(--line-hair)}
+}
+@media (max-width:759px){
+  .df-lc-wrap{padding:16px 16px max(40px,12vh)}
+  .df-lc-hide-s{display:none !important}
+  .df-xs-bar .df-back{padding:0 18px 0 14px;font-size:16px}
+  .df-lc-hero{padding:44px 0 28px}
+  .df-lc-kicker{font-size:13px}
+  .df-lc-h1{font-size:44px}
+  .df-lc-lead{font-size:17px}
+  .df-lc-facts{border-radius:16px}
+  .df-lc-facts li{padding:18px 18px}
+  .df-lc-facts b{font-size:18px}
+  .df-lc-card{padding:22px 18px 20px;border-radius:16px}
+  .df-lc-who h2{font-size:26px}
+  .df-lc-who p{font-size:15px}
+  .df-lc-top h3{font-size:22px}
+  .df-lc-lic{padding:12px}
+  .df-lc-lic span,.df-lc-what{font-size:15px}
+  .df-lc-more{padding:16px 14px 14px}
+  .df-lc-h2{font-size:30px;margin-bottom:20px}
+  .df-lc-tiles{gap:10px}
+  .df-lc-tile{padding:14px 13px 13px;gap:7px}
+  .df-lc-tile b{font-size:17px}
+  .df-lc-tile-how{font-size:14px}
+  .df-lc-tile-lic{font-size:11.5px}
+  .df-lc-end{flex-direction:column;align-items:flex-start}
+}

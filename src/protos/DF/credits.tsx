@@ -1,113 +1,377 @@
-// DF's credits and AI-use page (r4): #/proto/DF/credits, in DF's look (the sky of the home behind dark cards).
-// NASA first, then every dataset by check, the models we started from, code, type and tools, and how AI was used.
-// Every entry comes from src/data/credits.json (written by scripts/gen-credits.mjs from the manifests and the
-// installed packages; the same data as THIRD_PARTY.md). The few lines typed here (the ISS photo, the two
-// self-hosted fonts, the QR tool) are marked where they are used. Styles: credits.css (loaded with the home).
-import { Fragment, useEffect, useState, type CSSProperties, type ReactNode } from 'react'
+// DF's credits page (r4): #/proto/DF/credits. Plain bullet lists under the names of things: one section per check
+// (its data, licence and links, the models it builds on), then NASA, the Canadian Space Agency, the website,
+// training, fonts, images, the use of AI and the team. Short, official wording; no slogans.
+// Every fact is copied from the verified sources: public/<module>/manifest.json, THIRD_PARTY.md, src/data/credits.json,
+// work/Web/SUBMISSION.md sections 6 and 8, work/Web/models/*.md and work/Web/CHEATSHEET_who_did_what.md.
+// Styles: credits.css (loaded with the home; it also holds the sky and bar shared with the QR and licences pages).
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import credits from '../../data/credits.json'
 import { MODS, href } from './data'
-import issPhoto from './earth_sunrise_iss074e0409626.jpg'
 import { BackIcon, REPO_URL, SpaceBackdrop, useEscapeHome, useReducedMotion } from './qr'
 
-interface Dataset {
-  id: string
-  nasa: boolean
-  module: string
-  name: string
-  cite: string
-  urls: string[]
-  licence: string
-  use: string
+interface Item {
+  /** A short label before the text: "Data", "Model", ... */
+  k?: string
+  text: ReactNode
+  /** A short licence on the same line, after the text. */
+  inl?: string
+  /** A second line: licence and links. */
+  meta?: ReactNode
 }
-interface Pretrained {
-  name: string
-  by: string
-  licence: string
-  usedBy: string[]
-  how: string
-}
-interface Ref {
-  text: string
-  url: string
-  nasa: boolean
-  resourcesTab?: boolean
-}
-interface Lib {
-  name: string
-  version: string
-  licence: string
-  kind: string
-  importedInSrc: boolean
-}
-interface Font {
-  family: string
-  licence: string
-  importedInSrc: boolean
-}
-interface Tool {
-  name: string
-  use: string
-  licence: string
+interface Block {
+  title: string
+  items: Item[]
 }
 
-const DATASETS = credits.datasets as Dataset[]
-const PRETRAINED = credits.pretrained as Pretrained[]
-const REFS = credits.references as Ref[]
-const LIBS = credits.libraries as Lib[]
-const FONTS = credits.fonts as Font[]
-const TOOLS = credits.tools as Tool[]
-const NASA_DATA = DATASETS.find((d) => d.nasa)
-const MOD = new Map(MODS.map((m) => [m.id, m]))
 const THIRD_PARTY_URL = `${REPO_URL}/blob/main/THIRD_PARTY.md`
-/** The section buttons under the title (buttons, not links: the address bar's hash belongs to the router). */
-const JUMPS: [string, string][] = [
-  ['nasa', 'NASA'],
-  ['data', 'Data'],
-  ['models', 'Models'],
-  ['code', 'Code and type'],
-  ['ai', 'AI use'],
+const COLOR = new Map(MODS.map((m) => [m.name, m.color]))
+const FONTS = (credits.fonts as { family: string; importedInSrc: boolean }[]).filter((f) => f.importedInSrc).map((f) => f.family)
+
+function A({ url, children }: { url: string; children: ReactNode }) {
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  )
+}
+/** The second line of a bullet: "Licence: X", a note, then the links, separated by dots. */
+function Meta({ lic, note, links = [] }: { lic?: string; note?: string; links?: [string, string][] }) {
+  const parts: ReactNode[] = []
+  if (lic) parts.push(`Licence: ${lic}`)
+  if (note) parts.push(note)
+  for (const [label, url] of links)
+    parts.push(
+      <A key={url} url={url}>
+        {label}
+      </A>,
+    )
+  return (
+    <>
+      {parts.map((p, i) => (
+        <span key={i} className="df-cr-part">
+          {p}
+        </span>
+      ))}
+    </>
+  )
+}
+
+const CHECKS: Block[] = [
+  {
+    title: 'TrackTrace',
+    items: [
+      {
+        k: 'Data',
+        text: 'NASA BPS Microscopy benchmark, from NASA OSDR study OSD-366 (Penninckx et al. 2019): 77,177 microscope images of mouse skin-cell nuclei after iron-ion, X-ray or no irradiation.',
+        meta: (
+          <Meta
+            lic="no restrictions on use (AWS Open Data registry); OSD-366: NASA science data, no licence field"
+            links={[
+              ['AWS registry', 'https://registry.opendata.aws/bps_microscopy/'],
+              ['NASA OSDR', 'https://osdr.nasa.gov/bio/repo/data/studies/OSD-366'],
+              ['DOI', 'https://doi.org/10.26030/v8w4-rg83'],
+            ]}
+          />
+        ),
+      },
+      {
+        k: 'Model',
+        text: 'IonScan, built by the team. Whole-sample model: gated-attention MIL (Ilse et al. 2018).',
+        inl: 'Licence: MIT',
+      },
+      {
+        k: 'Methods',
+        text: 'Mamba-style state-space scans (Gu & Dao 2023), SUGAR-ReGLU feed-forward (Horuz et al. 2025; Shazeer 2020), U-Net-style decoder (Ronneberger et al. 2015).',
+      },
+    ],
+  },
+  {
+    title: 'BubbleGrade',
+    items: [
+      {
+        k: 'Data',
+        text: '“An Echo from the past” (Blogg et al. 2026): Doppler audio recordings of venous gas emboli in divers; 6,826 recordings from 310 divers used.',
+        meta: <Meta lic="GPL-3.0-or-later" note="six clips shown, resampled to 16 kHz" links={[['Zenodo', 'https://zenodo.org/records/16877955']]} />,
+      },
+      {
+        k: 'Test data',
+        text: 'Pierleoni, Mercuri et al. 2019 (Data in Brief): 30 modern-probe Doppler recordings, for one test only; not used for training, not on the site.',
+        meta: <Meta lic="CC BY-NC-ND 4.0" links={[['PMC', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC6864345/']]} />,
+      },
+      {
+        k: 'Model',
+        text: 'MobileNetV4-Conv-Medium (Qin et al. 2024; ImageNet weights from timm), fine-tuned by the team with a CORAL ordinal head (Cao et al. 2020).',
+        inl: 'Licence: Apache-2.0 (weights)',
+      },
+    ],
+  },
+  {
+    title: 'SpikeCount',
+    items: [
+      {
+        k: 'Data',
+        text: 'RedTell DSE set (Sadafi et al. 2023; Helmholtz Munich / University of Zurich): about 5,700 expert-graded red blood cells in 152 microscope fields.',
+        meta: <Meta lic="CC BY 4.0" links={[['Zenodo', 'https://zenodo.org/records/7801430']]} />,
+      },
+      {
+        k: 'Models',
+        text: 'U-Net cell outliner (Ronneberger et al. 2015) on MobileNetV4-Conv-Small; MobileNetV4-Conv-Medium shape grader. Fine-tuned by the team from timm weights.',
+        meta: <Meta lic="Apache-2.0 (timm weights); MIT (segmentation_models_pytorch)" />,
+      },
+    ],
+  },
+  {
+    title: 'VeinSqueeze',
+    items: [
+      {
+        k: 'Data',
+        text: 'ThrombUS+ Ultrasound Dataset #1: 2,341 compression-ultrasound clips of leg veins from 594 patients in 5 European hospitals.',
+        meta: (
+          <Meta
+            lic="CC BY 4.0"
+            links={[
+              ['Zenodo', 'https://zenodo.org/records/17659415'],
+              ['Paper', 'https://zenodo.org/records/18894312'],
+            ]}
+          />
+        ),
+      },
+      {
+        k: 'Context',
+        text: 'Neck-vein compression clip, Gillman et al., Scand J Trauma Resusc Emerg Med 2010;18:39, additional file S3. Cropped; not a model input.',
+        meta: <Meta lic="CC BY 2.0" note="Wikimedia Commons" />,
+      },
+      {
+        k: 'Context',
+        text: 'SegThy (Kronke et al., PLOS ONE 2022): one neck ultrasound sweep with the expert outline. Not a model input.',
+        meta: <Meta lic="CC BY 4.0" links={[['Hugging Face', 'https://huggingface.co/datasets/MedOtter/SegThy']]} />,
+      },
+      {
+        k: 'Model',
+        text: 'MobileNetV4-Conv-Medium frame encoder and a 2-block transformer over 32 frames, trained by the team. Squeeze curve: SAM 2.1 (Meta), zero-shot.',
+        meta: <Meta lic="Apache-2.0 (timm weights, SAM 2.1)" links={[['SAM 2.1', 'https://huggingface.co/facebook/sam2.1-hiera-large']]} />,
+      },
+    ],
+  },
+  {
+    title: 'BrainDrift',
+    items: [
+      {
+        k: 'Data',
+        text: 'OASIS-1 brain MRI (Marcus et al. 2007), via neurite-oasis (Hoopes et al. 2021): 332 brains for training, 40 for testing.',
+        meta: (
+          <Meta
+            lic="OASIS Data Use Terms (cite; no re-identification)"
+            note="skull-stripped crops only"
+            links={[
+              ['OASIS', 'https://sites.wustl.edu/oasisbrains/'],
+              ['neurite-oasis', 'https://github.com/adalca/medical-datasets/blob/master/neurite-oasis.md'],
+            ]}
+          />
+        ),
+      },
+      {
+        k: 'Data',
+        text: 'OpenNeuro ds005595 (Chai et al.): HCP-Aging perivascular-space masks; 159 people for training, 20 for testing.',
+        meta: (
+          <Meta
+            lic="CC0"
+            note="Supported by the National Institute on Aging of the NIH under Award Number U01AG052564"
+            links={[['OpenNeuro', 'https://openneuro.org/datasets/ds005595/versions/1.0.0']]}
+          />
+        ),
+      },
+      {
+        k: 'Data',
+        text: 'OpenNeuro ds000239 (Maclaren et al. 2014): 120 repeat scans of 3 healthy adults, for day-to-day variation.',
+        meta: <Meta lic="CC0" links={[['OpenNeuro', 'https://openneuro.org/datasets/ds000239']]} />,
+      },
+      {
+        k: 'Models',
+        text: 'Brain map: 2.5D U-Net on MobileNetV4-Conv-Small, trained by the team. Perivascular spaces: nnU-Net ResEnc-L (Isensee et al.) with the OpenMind encoder (Wald et al. 2025). Skull removal: HD-BET (Isensee et al. 2019).',
+        meta: <Meta lic="Apache-2.0 (timm weights, nnU-Net, HD-BET); CC BY 4.0 (OpenMind encoder)" />,
+      },
+      {
+        k: 'Simulation',
+        text: 'Ventricles +10.7% (Roberts et al., AJNR 2019); brain shift up 2.52 mm (Wang et al., PNAS 2026).',
+        meta: (
+          <Meta
+            links={[
+              ['Roberts 2019', 'https://doi.org/10.3174/ajnr.A6249'],
+              ['Wang 2026', 'https://doi.org/10.1073/pnas.2505682122'],
+            ]}
+          />
+        ),
+      },
+    ],
+  },
+  {
+    title: 'Garn Meter',
+    items: [
+      {
+        k: 'Data',
+        text: 'Hacettepe University VR-sickness EEG (Ozkan, Uyan & Celikcan 2023; Uyan & Celikcan 2024): 14-channel EEG of 33 people with 1-7 discomfort ratings.',
+        meta: (
+          <Meta
+            lic="none stated; cited as the authors request"
+            note="one anonymised 224-second excerpt shown"
+            links={[
+              ['Paper 2023', 'https://doi.org/10.1016/j.displa.2023.102415'],
+              ['Paper 2024', 'https://doi.org/10.1016/j.displa.2024.102704'],
+            ]}
+          />
+        ),
+      },
+      {
+        k: 'Model',
+        text: 'CorrFuse-EEG: a team member’s earlier code (June 2026, not made for Space Apps), adapted to EEG.',
+        inl: 'Licence: MIT',
+      },
+      {
+        k: 'Methods',
+        text: 'S4D (Gu et al. 2022), GSS (Mehta et al. 2023), GeM (Radenović et al. 2019), CORAL (Cao et al. 2020); baseline EEGNet (Lawhern et al. 2018).',
+      },
+    ],
+  },
 ]
 
-/** Short names for the dataset cards (the full title is in the citation line under each). */
-const LABEL: Record<string, string> = {
-  'blogg-doppler': 'An Echo from the past: Doppler recordings of gas bubbles',
-  'pierleoni-doppler': 'Pierleoni, Mercuri et al. Doppler recordings',
-  redtell: 'RedTell red blood cell shapes',
-  'thrombus-plus': 'ThrombUS+ leg-vein ultrasound',
-  'gillman-2010': 'Neck-vein squeeze clip',
-  segthy: 'SegThy neck ultrasound',
-  'oasis-1': 'OASIS-1 brain MRI',
-  'openneuro-ds005595': 'OpenNeuro ds005595: HCP-Aging brain masks',
-  'openneuro-ds000239': 'OpenNeuro ds000239: repeat brain scans',
-  'hacettepe-vr-eeg': 'Hacettepe University VR-sickness EEG',
+const GENERAL: Block[] = [
+  {
+    title: 'NASA Human Research Program',
+    items: [
+      { text: <A url="https://www.nasa.gov/hrp/hazards/">5 Hazards of Human Spaceflight</A>, inl: 'Resources tab' },
+      { text: <A url="https://www.nasa.gov/hrp/risks/">Risks of Human Spaceflight</A>, inl: 'Resources tab' },
+      { text: <A url="https://www.nasa.gov/hrp/ongoing-hrp-research/">Ongoing HRP Research in Space</A>, inl: 'Resources tab' },
+    ],
+  },
+  {
+    title: 'Canadian Space Agency',
+    items: [
+      {
+        text: <A url="https://www.asc-csa.gc.ca/eng/news/articles/2026/2026-02-26-monitoring-radiation-astronaut-health.asp">Monitoring Radiation for Astronaut Health</A>,
+        inl: 'Resources tab',
+      },
+      {
+        text: <A url="https://www.asc-csa.gc.ca/eng/iss/science/why-do-we-conduct-science-experiments-in-space.asp">Why Do We Conduct Science Experiments in Space?</A>,
+        inl: 'Resources tab',
+      },
+      {
+        text: (
+          <>
+            <A url="https://www.asc-csa.gc.ca/eng/sciences/marrow.asp">MARROW study of space anemia</A> (Trudel et al. 2022, Nature Medicine)
+          </>
+        ),
+        meta: 'Background for SpikeCount',
+      },
+    ],
+  },
+  {
+    title: 'Website',
+    items: [
+      { text: 'React, Vite, TypeScript, Tailwind CSS', inl: 'MIT; TypeScript: Apache-2.0' },
+      { text: 'three.js, react-three-fiber, drei, postprocessing', inl: 'MIT; Zlib' },
+      { text: 'ONNX Runtime Web (Microsoft), runs the models', inl: 'MIT' },
+      { text: 'Motion, D3, Base UI, NumberFlow, Phosphor Icons, Lucide', inl: 'MIT or ISC' },
+      { text: 'Electron (desktop app); coi-serviceworker (Guido Zuidhof)', inl: 'MIT' },
+      {
+        text: 'Our code, text, figures and model weights',
+        inl: 'MIT, Team SuperHumans',
+        meta: (
+          <Meta
+            links={[
+              ['Code repository', REPO_URL],
+              [`THIRD_PARTY.md (all ${credits.totals.libraries} packages)`, THIRD_PARTY_URL],
+            ]}
+          />
+        ),
+      },
+    ],
+  },
+  {
+    title: 'Training',
+    items: [
+      { text: 'PyTorch (BSD-3-Clause); timm, MONAI, nnU-Net, Hugging Face transformers (Apache-2.0); segmentation_models_pytorch (MIT)' },
+      { text: 'ONNX and ONNX Runtime (model export)', inl: 'Apache-2.0; MIT' },
+      { text: 'NumPy, SciPy, scikit-learn, scikit-image, pandas, Matplotlib, OpenCV, Pillow, SimpleITK, nibabel, pydicom, soundfile, trimesh', inl: 'open-source licences' },
+      { text: 'Architecture diagrams: LaTeX and TikZ', inl: 'LPPL' },
+      { text: 'ffmpeg (video encoding), Blender 4.5 (Station renders)', meta: <Meta lic="LGPL-2.1+ / GPL (ffmpeg); GPL-2.0+ (Blender); tools only, not shipped" /> },
+      { text: 'GPUs: Google Colab' },
+    ],
+  },
+  {
+    title: 'Fonts',
+    items: [
+      { text: 'Space Grotesk, JetBrains Mono', inl: 'SIL Open Font License 1.1' },
+      { text: `Also bundled: ${FONTS.join(', ')}`, inl: 'OFL-1.1' },
+      { text: 'Self-hosted files built by Fontsource' },
+    ],
+  },
+  {
+    title: 'Images',
+    items: [
+      {
+        text: '“Star trails and an orbital sunrise above the southern Indian Ocean”, NASA / Chris Williams, ISS image iss074e0409626 (23 March 2026).',
+        meta: <Meta lic="NASA imagery, public domain" links={[['images.nasa.gov', 'https://images.nasa.gov/details/iss074e0409626']]} />,
+      },
+      { text: 'Illustrations drawn by AI-written code, such as the glowing body on the home page, are marked “AI-generated illustration”.' },
+      { text: 'Architecture diagrams are marked “AI-generated diagram”; the small images inside are held-out dataset samples.' },
+      {
+        text: 'Station version of the home page: star map from NASA/Goddard SVS Deep Star Maps 2020 (Gaia DR2: ESA/Gaia/DPAC); Saturn maps by Solar System Scope. Marked “AI-generated imagery”.',
+        meta: (
+          <Meta
+            lic="public domain (NASA); CC BY 4.0 (Solar System Scope)"
+            links={[
+              ['NASA SVS', 'https://svs.gsfc.nasa.gov/4851'],
+              ['Solar System Scope', 'https://www.solarsystemscope.com/textures/'],
+            ]}
+          />
+        ),
+      },
+      { text: 'QR code made with segno 1.6.6', inl: 'BSD-3-Clause' },
+      { text: 'No NASA logos or insignia are used.' },
+    ],
+  },
+  {
+    title: 'Use of AI',
+    items: [
+      { text: 'Claude by Anthropic, through Claude Code, wrote the code: the website, the desktop app, the in-browser model code and the training scripts. The team decided what to build, ran the training and read the results.' },
+      { text: 'Claude drew the six architecture diagrams as LaTeX/TikZ code; each is marked “AI-generated diagram”.' },
+      { text: 'Claude helped with research and with the wording of the project page, and listed candidate health problems with their sources. The team chose the idea and the six checks.' },
+      { text: 'AI generated no health data and no results. Every sample is openly published research data; every number comes from our trained models on data they had not seen.' },
+    ],
+  },
+  {
+    title: 'Team',
+    items: [
+      { text: 'Team SuperHumans' },
+      { text: 'NASA Space Apps Challenge 2026, Istanbul local event' },
+      { text: 'Challenge: “Create Health Monitoring Software for Astronauts on Space Missions”' },
+    ],
+  },
+]
+
+function Section({ b, order }: { b: Block; order?: number }) {
+  const color = COLOR.get(b.title)
+  const style = { ...(color ? { '--mc': color } : {}), ...(order !== undefined ? { order } : {}) } as CSSProperties
+  return (
+    <section className="df-cr-sec" aria-label={b.title} style={style}>
+      <h2 className={color ? 'df-cr-h2 has-dot' : 'df-cr-h2'}>
+        {b.title}
+      </h2>
+      <ul className="df-cr-list">
+        {b.items.map((it, i) => (
+          <li key={i}>
+            {it.k && <b>{it.k}: </b>}
+            {it.text}
+            {it.inl && <span className="df-cr-inl">{it.inl}</span>}
+            {it.meta && <span className="df-cr-meta">{it.meta}</span>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
 }
 
-const STAR = 'M0 -8C.9 -2.2 2.2 -.9 8 0C2.2 .9 .9 2.2 0 8C-.9 2.2 -2.2 .9 -8 0C-2.2 -.9 -.9 -2.2 0 -8Z'
-const mc = (color: string) => ({ '--mc': color }) as CSSProperties
-
-function Star() {
-  return (
-    <svg viewBox="-10 -10 20 20" aria-hidden="true">
-      <path d={STAR} fill="currentColor" />
-      <circle r="1.6" fill="#fff" />
-    </svg>
-  )
-}
-function Sparkle() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 2.5c.6 4.6 2.9 6.9 7.5 7.5-4.6.6-6.9 2.9-7.5 7.5-.6-4.6-2.9-6.9-7.5-7.5 4.6-.6 6.9-2.9 7.5-7.5Z" fill="currentColor" />
-      <path d="M19 15.5c.25 1.9 1.1 2.75 3 3-1.9.25-2.75 1.1-3 3-.25-1.9-1.1-2.75-3-3 1.9-.25 2.75-1.1 3-3Z" fill="currentColor" />
-    </svg>
-  )
-}
-function Out() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
 function QrIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -116,394 +380,16 @@ function QrIcon() {
     </svg>
   )
 }
-function Ext({ url, children }: { url: string; children: ReactNode }) {
-  return (
-    <a href={url} target="_blank" rel="noopener noreferrer">
-      {children}
-      <Out />
-    </a>
-  )
-}
-/** A readable name for a source link. */
-function linkName(url: string) {
-  try {
-    const u = new URL(url)
-    if (u.hostname === 'doi.org') return `DOI ${u.pathname.slice(1)}`
-    return u.hostname.replace(/^www\./, '')
-  } catch {
-    return url
-  }
-}
-const isUrl = (s: string) => /^https?:\/\//.test(s)
-/** A long model id ("timm/mobilenetv4_conv_medium.e500_r256_in1k") may wrap after a dot or a slash, not mid-word. */
-const breakable = (s: string) =>
-  s.split(/(?<=[./])/).map((part, i) => (
-    <Fragment key={i}>
-      {i > 0 && <wbr />}
-      {part}
-    </Fragment>
-  ))
-/** A licence line that names two sources ("A: ... . B: ...") reads better as two chips. */
-const licenceParts = (s: string) => s.split(/\.\s+(?=[A-Z])/).filter(Boolean)
 
-function Section({ id, n, title, sub, children }: { id: string; n: string; title: string; sub?: ReactNode; children: ReactNode }) {
+function Links() {
   return (
-    <section className="df-cr-sec" id={`credits-${id}`} aria-labelledby={`credits-${id}-h`}>
-      <header className="df-cr-sec-head">
-        <p className="df-cr-num">{n}</p>
-        <h2 className="df-cr-h2" id={`credits-${id}-h`}>
-          {title}
-        </h2>
-        {sub && <p className="df-cr-sub">{sub}</p>}
-      </header>
-      {children}
-    </section>
-  )
-}
-
-function UseChip({ id }: { id: string }) {
-  const m = MOD.get(id)
-  if (!m) return null
-  return (
-    <span className="df-cr-use" style={mc(m.color)}>
-      <i />
-      {m.name}
-    </span>
-  )
-}
-
-function DatasetCard({ d }: { d: Dataset }) {
-  const links = d.urls.filter(isUrl)
-  const plain = d.urls.filter((u) => !isUrl(u))
-  return (
-    <article className="df-cr-card">
-      <h4>{LABEL[d.id] ?? d.name}</h4>
-      <div className="df-cr-tags">
-        <span className="df-cr-lic">{d.licence}</span>
-      </div>
-      <p>{d.use}</p>
-      <p className="df-cr-cite">
-        {d.cite}
-        {plain.length > 0 && ` · ${plain.join(' · ')}`}
-      </p>
-      {links.length > 0 && (
-        <div className="df-cr-links">
-          {links.map((u) => (
-            <Ext key={u} url={u}>
-              {linkName(u)}
-            </Ext>
-          ))}
-        </div>
-      )}
-    </article>
-  )
-}
-
-function Nasa() {
-  const hrp = REFS.filter((r) => r.nasa && r.resourcesTab)
-  const partner = REFS.filter((r) => !r.nasa && r.resourcesTab)
-  return (
-    <Section
-      id="nasa"
-      n="01"
-      title="NASA first"
-      sub="The challenge’s Resources tab pointed us to NASA’s Human Research Program. NASA’s own open science data trained our radiation model."
-    >
-      <div className="df-cr-grid">
-        <article className="df-cr-card is-nasa df-cr-span">
-          <h3>NASA Human Research Program</h3>
-          <div className="df-cr-tags">
-            <span className="df-cr-lic is-plain">From the Resources tab</span>
-          </div>
-          <p>Its hazards and risks pages set what SuperHumans checks: five of the six checks answer a hazard or risk that NASA names there.</p>
-          <ul className="df-cr-hrp df-cr-links">
-            {hrp.map((r) => (
-              <li key={r.url}>
-                <Ext url={r.url}>{r.text.replace(/^NASA Human Research Program:\s*/, '')}</Ext>
-              </li>
-            ))}
-          </ul>
-        </article>
-        {NASA_DATA && (
-          <article className="df-cr-card is-nasa">
-            <h3>NASA BPS Microscopy benchmark</h3>
-            <div className="df-cr-tags">
-              <UseChip id={NASA_DATA.module} />
-              {licenceParts(NASA_DATA.licence).map((l) => (
-                <span key={l} className="df-cr-lic">
-                  {l}
-                </span>
-              ))}
-            </div>
-            <p>{NASA_DATA.use}</p>
-            <p className="df-cr-cite">{NASA_DATA.cite}</p>
-            <div className="df-cr-links">
-              {NASA_DATA.urls.map((u) => (
-                <Ext key={u} url={u}>
-                  {u.includes('osdr.nasa.gov') ? 'NASA OSDR, OSD-366' : u.includes('opendata.aws') ? 'AWS Open Data registry' : linkName(u)}
-                </Ext>
-              ))}
-            </div>
-          </article>
-        )}
-        {/* typed here, from deck/CREDITS.md: the photo is not in a module manifest */}
-        <article className="df-cr-card is-nasa">
-          <img className="df-cr-photo" src={issPhoto} alt="Orbital sunrise over the Earth's limb, seen from the International Space Station" loading="lazy" decoding="async" />
-          <h3>NASA ISS photo</h3>
-          <div className="df-cr-tags">
-            <span className="df-cr-lic">NASA imagery, public domain</span>
-          </div>
-          <p>“Star trails and an orbital sunrise above the southern Indian Ocean”, from the International Space Station. The planet under the body on the home page.</p>
-          <p className="df-cr-cite">NASA / Chris Williams, ISS image iss074e0409626 (23 March 2026)</p>
-          <div className="df-cr-links">
-            <Ext url="https://images.nasa.gov/details/iss074e0409626">images.nasa.gov</Ext>
-          </div>
-        </article>
-        {partner.length > 0 && (
-          <article className="df-cr-card df-cr-span">
-            <h3>Canadian Space Agency</h3>
-            <div className="df-cr-tags">
-              <span className="df-cr-lic is-plain">From the Resources tab</span>
-            </div>
-            <p>Two partner-agency pages from the same Resources tab.</p>
-            <ul className="df-cr-hrp df-cr-links">
-              {partner.map((r) => (
-                <li key={r.url}>
-                  <Ext url={r.url}>{r.text.replace(/^Canadian Space Agency:\s*/, '')}</Ext>
-                </li>
-              ))}
-            </ul>
-          </article>
-        )}
-      </div>
-    </Section>
-  )
-}
-
-/** A rough height of one check's block of dataset cards: its heading, then each card, longer texts weighing more. */
-const blockWeight = (list: Dataset[]) => 0.5 + list.reduce((n, d) => n + 1 + (d.use.length + d.cite.length) / 260, 0)
-
-function Data() {
-  const groups = MODS.map((m, i) => ({ m, i, list: DATASETS.filter((d) => !d.nasa && d.module === m.id) })).filter((g) => g.list.length > 0)
-  const count = groups.reduce((n, g) => n + g.list.length, 0)
-  // Two columns on a wide screen, each block going to the shorter one, so neither column ends in an empty stretch.
-  // On a narrow screen the columns dissolve (display: contents) and `order` puts the blocks back in pitch order.
-  const cols: (typeof groups)[] = [[], []]
-  const high = [0, 0]
-  for (const g of groups) {
-    const k = high[0] <= high[1] ? 0 : 1
-    cols[k].push(g)
-    high[k] += blockWeight(g.list)
-  }
-  return (
-    <Section
-      id="data"
-      n="02"
-      title="The data behind each check"
-      sub={`${count} more openly published datasets from research teams around the world. No astronaut data and no personal data: people appear only under neutral ids.`}
-    >
-      <div className="df-cr-checks">
-        {cols.map((col, k) => (
-          <div key={k} className="df-cr-col">
-            {col.map(({ m, i, list }) => (
-              <div key={m.id} className="df-cr-check" style={{ ...mc(m.color), order: i }}>
-                <h3 className="df-cr-check-head">
-                  <Star />
-                  {m.name}
-                  <span>{m.hook}</span>
-                </h3>
-                {list.map((d) => (
-                  <DatasetCard key={d.id} d={d} />
-                ))}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-    </Section>
-  )
-}
-
-function Models() {
-  const corr = TOOLS.find((t) => t.name === 'CorrFuse')
-  return (
-    <Section
-      id="models"
-      n="03"
-      title="Models we started from"
-      sub="Open pretrained networks we fine-tuned, or used to prepare data. None of their files ship; the six checks run our own trained models."
-    >
-      <div className="df-cr-rows">
-        {PRETRAINED.map((p) => {
-          const [head, ...rest] = p.name.split(', ')
-          return (
-            <article key={p.name} className="df-cr-row">
-              <h3>
-                {head}
-                {rest.length > 0 && <small>{breakable(rest.join(', '))}</small>}
-              </h3>
-              <p>
-                {p.by}. {p.how[0].toUpperCase() + p.how.slice(1)}.
-              </p>
-              <div className="df-cr-uses">
-                <span className="df-cr-lic">{p.licence}</span>
-                {p.usedBy.map((u) => (
-                  <UseChip key={u} id={u} />
-                ))}
-              </div>
-            </article>
-          )
-        })}
-        {corr && (
-          <article className="df-cr-row">
-            <h3>
-              CorrFuse
-              <small>Team SuperHumans</small>
-            </h3>
-            <p>{corr.use[0].toUpperCase() + corr.use.slice(1)}.</p>
-            <div className="df-cr-uses">
-              <span className="df-cr-lic">{corr.licence}</span>
-              <UseChip id="garnmeter" />
-            </div>
-          </article>
-        )}
-      </div>
-    </Section>
-  )
-}
-
-function Code() {
-  const run = LIBS.filter((l) => l.importedInSrc && l.kind === 'runtime')
-  const desk = LIBS.filter((l) => l.importedInSrc && l.kind === 'desktop')
-  const fonts = FONTS.filter((f) => f.importedInSrc)
-  const tools = TOOLS.filter((t) => t.name !== 'CorrFuse')
-  return (
-    <Section id="code" n="04" title="Code, type and tools" sub="All open source. Nothing on this site is loaded from another server.">
-      <div className="df-cr-cols">
-        <article className="df-cr-card">
-          <h3>In your browser</h3>
-          <ul className="df-cr-chips">
-            {run.map((l) => (
-              <li key={l.name} className="df-cr-chip">
-                {l.name} <small>{l.version} · {l.licence}</small>
-              </li>
-            ))}
-            <li className="df-cr-chip">
-              coi-serviceworker <small>0.1.7 · MIT</small>
-            </li>
-            {desk.map((l) => (
-              <li key={l.name} className="df-cr-chip">
-                {l.name} <small>{l.version} · {l.licence} · desktop app</small>
-              </li>
-            ))}
-          </ul>
-        </article>
-        <article className="df-cr-card">
-          <h3>Type</h3>
-          <ul className="df-cr-chips">
-            {/* typed here: the two DF faces are self-hosted files in src/assets/fonts (Fontsource builds) */}
-            <li className="df-cr-chip">
-              Space Grotesk <small>OFL-1.1</small>
-            </li>
-            <li className="df-cr-chip">
-              JetBrains Mono <small>OFL-1.1</small>
-            </li>
-            {fonts.map((f) => (
-              <li key={f.family} className="df-cr-chip">
-                {f.family} <small>{f.licence}</small>
-              </li>
-            ))}
-          </ul>
-          <p className="df-cr-note">SIL Open Font License 1.1, served with the site (Fontsource files).</p>
-        </article>
-        <article className="df-cr-card df-cr-wide">
-          <h3>Training, figures and this page</h3>
-          <ul className="df-cr-chips">
-            {tools.map((t) => (
-              <li key={t.name} className="df-cr-chip" title={t.use}>
-                {t.name} <small>{t.licence}</small>
-              </li>
-            ))}
-            {/* typed here: used once to draw public/qr/superhumans_qr.svg; none of its code ships */}
-            <li className="df-cr-chip" title="drew the QR code once as a picture; none of its code ships">
-              segno 1.6.6 <small>BSD-3-Clause</small>
-            </li>
-          </ul>
-          <p className="df-cr-note">
-            {credits.totals.libraries} npm packages in all, each with its version and licence, are listed in{' '}
-            <a className="df-cr-a" href={THIRD_PARTY_URL} target="_blank" rel="noopener noreferrer">
-              THIRD_PARTY.md
-            </a>
-            .
-          </p>
-        </article>
-      </div>
-    </Section>
-  )
-}
-
-function AiUse() {
-  return (
-    <Section id="ai" n="05" title="How we used AI" sub="The rules call it Super Intelligence. Here is exactly what it did, and what it did not do.">
-      <div className="df-cr-ai">
-        <p className="df-cr-ai-who">
-          <Sparkle />
-          Our AI tool: Claude by Anthropic, through Claude Code.
-        </p>
-        <div className="df-cr-ai-cols">
-          <div>
-            <h3>What AI did</h3>
-            <ul>
-              <li>
-                <b>Wrote the code:</b> this website, the desktop app, the engines that run the six models in your browser, and the scripts that trained, tested and exported the models.
-              </li>
-              <li>
-                <b>Suggested idea options</b> and helped with research: NASA and partner sources, published space-medicine findings and open datasets.
-              </li>
-              <li>
-                <b>Drew the six architecture diagrams</b> as LaTeX/TikZ code, and wrote the shaders that draw the glowing body and the aurora.
-              </li>
-              <li>
-                <b>Helped word</b> the texts on this site and our project page.
-              </li>
-            </ul>
-          </div>
-          <div style={{ '--ac': '#2EE6A6' } as CSSProperties}>
-            <h3>What people did</h3>
-            <ul>
-              <li>
-                <b>Picked the idea</b> and the six checks from the options.
-              </li>
-              <li>
-                Decided what to build, <b>ran the training,</b> read the results and directed every change.
-              </li>
-              <li>
-                <b>Checked</b> every statement and number against our own result files.
-              </li>
-            </ul>
-          </div>
-          <div style={{ '--ac': '#FFB224' } as CSSProperties}>
-            <h3>What AI did not do</h3>
-            <ul>
-              <li>
-                <b>It made no health data.</b> The health data shown is real, openly published research data.
-              </li>
-              <li>
-                <b>It did not produce the results.</b> Every number comes from running our trained models on data they had never seen.
-              </li>
-              <li>
-                Pictures made with AI say so on screen, like the{' '}
-                <span className="df-cr-mark">
-                  <Sparkle />
-                  AI-generated illustration
-                </span>{' '}
-                mark on the glowing body and “AI-generated diagram” on every architecture diagram.
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </Section>
+    <div className="df-cr-links">
+      <a href={href('licences')}>Data and licences</a>
+      <a href={href('qr')}>
+        <QrIcon />
+        QR code
+      </a>
+    </div>
   )
 }
 
@@ -519,60 +405,35 @@ export default function Credits({ params }: { params: URLSearchParams }) {
       <SpaceBackdrop still={reduce || pinned} slow />
       <div className="df-xs-scroll">
         <div className="df-cr-wrap">
-          <nav className="df-xs-bar" aria-label="Site">
-            <a className="df-back" href={href('home')} data-qa="primary">
+          <nav className="df-cr-bar" aria-label="Site">
+            <a className="df-cr-back" href={href('home')} data-qa="primary">
               <BackIcon />
-              Back to the body
+              Back
             </a>
-            <a className="df-xs-link" href={href('qr')}>
-              <QrIcon />
-              QR code
-            </a>
+            <Links />
           </nav>
-          <header className="df-cr-hero" data-qa="hero">
-            <p className="df-cr-kicker">Credits and AI use</p>
-            <h1 className="df-cr-h1">Built on open science.</h1>
-            <p className="df-cr-lead">
-              <b>Team SuperHumans</b> made this for the NASA Space Apps Challenge 2026 in Istanbul, for the challenge “Create Health Monitoring Software for Astronauts on Space Missions”. It runs on openly
-              published research data, and every source keeps its own licence.
-            </p>
-            <ul className="df-cr-jump" aria-label="On this page">
-              {JUMPS.map(([id, label]) => (
-                <li key={id}>
-                  <button type="button" onClick={() => document.getElementById(`credits-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>
-                    {label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </header>
-          <Nasa />
-          <Data />
-          <Models />
-          <Code />
-          <AiUse />
+          <h1 className="df-cr-h1" data-qa="hero">
+            Credits
+          </h1>
+          {/* two columns that end at about the same height, read across in pitch order; one column, in pitch order, on a phone */}
+          <div className="df-cr-checks">
+            {[0, 1].map((col) => (
+              <div key={col} className="df-cr-col">
+                {CHECKS.map((b, i) => (i % 2 === col ? <Section key={b.title} b={b} order={i} /> : null))}
+              </div>
+            ))}
+          </div>
+          <div className="df-cr-cols is-general">
+            {GENERAL.map((b) => (
+              <Section key={b.title} b={b} />
+            ))}
+          </div>
           <footer className="df-cr-end">
-            <p>
-              Our code, text, figures and trained model weights are under the <b>MIT licence</b> (Team SuperHumans). Everything else keeps its own licence; the full list, file by file, is in{' '}
-              <a className="df-cr-a" href={THIRD_PARTY_URL} target="_blank" rel="noopener noreferrer">
-                THIRD_PARTY.md
-              </a>{' '}
-              in our{' '}
-              <a className="df-cr-a" href={REPO_URL} target="_blank" rel="noopener noreferrer">
-                code repository
-              </a>
-              .
-            </p>
-            <div className="df-cr-end-links">
-              <a className="df-xs-link" href={href('qr')}>
-                <QrIcon />
-                QR code
-              </a>
-              <a className="df-back" href={href('home')}>
-                <BackIcon />
-                Back to the body
-              </a>
-            </div>
+            <a className="df-cr-back" href={href('home')}>
+              <BackIcon />
+              Back
+            </a>
+            <Links />
           </footer>
         </div>
       </div>

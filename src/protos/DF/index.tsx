@@ -36,9 +36,12 @@ interface CheckProps {
 // The real check page lives in ./check.tsx; until that file exists a plain page stands in for it.
 const checkLoader = import.meta.glob<{ default: ComponentType<CheckProps> }>('./check.tsx')['./check.tsx']
 const RealCheck = checkLoader ? lazy(checkLoader) : null
-// Two quiet screens beside the home (r4): #/proto/DF/credits (credits and AI use) and #/proto/DF/qr (the QR end screen).
+// Quiet screens beside the home (r4): #/proto/DF/credits (credits and AI use), #/proto/DF/qr (the QR end screen)
+// and #/proto/DF/licences (the data of each check and its licence, in plain words).
 const Credits = lazy(() => import('./credits'))
 const QrEnd = lazy(() => import('./qr'))
+const Licences = lazy(() => import('./licences'))
+const SCREENS: Record<string, typeof Credits> = { credits: Credits, qr: QrEnd, licences: Licences }
 /** Set once the home has played its reveal: coming back from the credits or the QR screen skips it. */
 let homeSeen = false
 
@@ -542,19 +545,44 @@ function Callouts({ g, hot, setHot }: HotProps & { g: Geom }) {
   )
 }
 
-/** The instrument window: a large real sample of one check, with its name and sentence, and a strip of all six. */
-function SampleWindow({ shown, hot, setHot, primary }: HotProps & { shown: number; primary: boolean }) {
+/** The site's QR (made once with segno, decoded back to https://kreytorn.github.io/superhumans/; white quiet zone inside). */
+const SITE_QR = `${BASE}qr/superhumans_qr.svg`
+
+/** The instrument window: a large real sample of one check, with its name and sentence, and a strip of all six.
+ *  At rest (qr) the same frame holds the site's QR instead, and opens the full-screen QR when clicked. */
+function SampleWindow({ shown, hot, setHot, primary, qr }: HotProps & { shown: number; primary: boolean; qr: boolean }) {
   const m = MODS[shown]
   return (
-    <section className="df-win" style={mc(m.color)} aria-label="Real samples of the six checks">
-      <a className="df-win-frame" data-qa={primary ? 'primary' : undefined} href={href(m.id)} {...hotHandlers(shown, setHot)}>
-        <span className="df-win-head">
+    <section className="df-win" style={mc(qr ? '#8FB8FF' : m.color)} aria-label="Real samples of the six checks">
+      <a
+        className={`df-win-frame${qr ? ' is-qr' : ''}`}
+        data-qa={primary ? 'primary' : undefined}
+        href={href(qr ? 'qr' : m.id)}
+        {...(qr ? {} : hotHandlers(shown, setHot))}
+      >
+        {/* the link's name comes from what is on screen (no aria-label), so it always contains the visible words */}
+        <span className="df-wq" aria-hidden={qr ? undefined : true}>
+          <span className="df-wq-box">
+            <span className="df-wq-tile">
+              <img src={SITE_QR} alt="QR code to this site" draggable={false} decoding="async" />
+              <i className="df-tick tl" />
+              <i className="df-tick tr" />
+              <i className="df-tick bl" />
+              <i className="df-tick br" />
+            </span>
+          </span>
+          <span className="df-wq-line">Scan to open it on your phone</span>
+          <span className="df-wq-url">
+            kreytorn.github.io<b>/superhumans</b>
+          </span>
+        </span>
+        <span className="df-win-head" aria-hidden={qr || undefined}>
           <StarIcon />
           <span className="df-win-name">{m.name}</span>
           <State ask={m.ask} />
           <span className="df-win-tag">Real sample</span>
         </span>
-        <span className="df-win-view">
+        <span className="df-win-view" aria-hidden={qr || undefined}>
           {MODS.map((x, i) => (
             <img key={x.id} src={stillOf(x)} alt="" className={`${stillClass(x)}${i === shown ? ' on' : ''}`} draggable={false} decoding="async" />
           ))}
@@ -569,7 +597,9 @@ function SampleWindow({ shown, hot, setHot, primary }: HotProps & { shown: numbe
             </svg>
           </span>
         </span>
-        <span className="df-win-sent">{m.sentence}</span>
+        <span className="df-win-sent" aria-hidden={qr || undefined}>
+          {m.sentence}
+        </span>
       </a>
       <div className="df-strip">
         <p className="df-strip-head">
@@ -578,7 +608,7 @@ function SampleWindow({ shown, hot, setHot, primary }: HotProps & { shown: numbe
         </p>
         <div className="df-thumbs">
           {MODS.map((x, i) => (
-            <a key={x.id} href={href(x.id)} className={`df-thumb${i === shown ? ' on' : ''}${hot === i ? ' is-hot' : ''}`} style={mc(x.color)} aria-label={`Open ${x.name}`} title={x.name} {...hotHandlers(i, setHot)}>
+            <a key={x.id} href={href(x.id)} className={`df-thumb${!qr && i === shown ? ' on' : ''}${hot === i ? ' is-hot' : ''}`} style={mc(x.color)} aria-label={`Open ${x.name}`} title={x.name} {...hotHandlers(i, setHot)}>
               <img src={stillOf(x)} alt="" className={stillClass(x)} draggable={false} decoding="async" />
               <i className={`df-lamp${x.ask ? ' ask' : ''}`} />
             </a>
@@ -634,10 +664,11 @@ function QrGlyph() {
   )
 }
 
-/** The home's links to the credits and to the QR end screen (which the Q key on the home also opens). */
+/** The home's links to the data and licences, the credits and the QR end screen (which the Q key on the home also opens). */
 function SiteLinks({ className }: { className: string }) {
   return (
     <nav className={className} aria-label="About this site">
+      <a href={href('licences')}>Data and licences</a>
       <a href={href('credits')}>Credits and AI use</a>
       <a href={href('qr')} aria-keyshortcuts="Q" title="QR code to this site (key Q)">
         <QrGlyph />
@@ -648,8 +679,8 @@ function SiteLinks({ className }: { className: string }) {
 }
 
 export default function DF(props: Props) {
-  if (props.view === 'credits' || props.view === 'qr') {
-    const Screen = props.view === 'qr' ? QrEnd : Credits
+  const Screen = Object.hasOwn(SCREENS, props.view) ? SCREENS[props.view] : null
+  if (Screen) {
     return (
       <Suspense fallback={<div className="df" />}>
         <Screen params={props.params} />
@@ -687,7 +718,10 @@ function DFHome({ view, params }: Props) {
   const [landed, setLanded] = useState(!!mod)
   const [away, setAway] = useState(!!mod)
   const [hot, setHotRaw] = useState(-1)
+  /** The last check that was hot: the window keeps its sample while the QR fades back in. */
   const [rest, setRest] = useState(ASK_INDEX)
+  /** True while the window shows the site's QR (its resting state on a wide screen). */
+  const [qr, setQr] = useState(true)
   const [figReady, setFigReady] = useState(false)
   const onFigReady = useCallback(() => setFigReady(true), [])
   /** The open check's own status: the root reports ready (and its phase) only once that page's stage is on screen. */
@@ -697,15 +731,20 @@ function DFHome({ view, params }: Props) {
   const setHot = useCallback((i: number) => {
     if (pausedRef.current) return
     setHotRaw(i)
-    if (i >= 0) setRest(i)
+    if (i >= 0) {
+      setRest(i)
+      setQr(false)
+    }
   }, [])
 
-  // at rest the window goes slowly round the six samples
+  // at rest the window shows the site's QR, so the room can scan it while the talk starts. A hot check swaps its
+  // sample in; when nothing is hot the QR comes back after a short grace, so the pointer can cross from a callout
+  // into the window (which then keeps that check hot) without the sample vanishing on the way.
   useEffect(() => {
-    if (away || hot >= 0 || still || g.phone) return
-    const id = window.setInterval(() => setRest((r) => (r + 1) % MODS.length), 5200)
-    return () => window.clearInterval(id)
-  }, [away, hot, still, g.phone])
+    if (hot >= 0 || qr) return
+    const id = window.setTimeout(() => setQr(true), 500)
+    return () => window.clearTimeout(id)
+  }, [hot, qr])
 
   /** Paints the zoom at position v: every layer is a pure function of it, so it can stop and turn round anywhere. */
   const apply = useCallback((v: number) => {
@@ -996,7 +1035,7 @@ function DFHome({ view, params }: Props) {
               <h1 className="df-wordmark">SuperHumans</h1>
               <p className="df-tagline">Six AI health checks for astronauts, running in your browser.</p>
               <Summary />
-              <SampleWindow shown={shown} hot={hot} setHot={setHot} primary={!mod} />
+              <SampleWindow shown={shown} hot={hot} setHot={setHot} primary={!mod} qr={qr && hot < 0} />
             </div>
             <Callouts g={g} hot={hot} setHot={setHot} />
             <AiMark />
