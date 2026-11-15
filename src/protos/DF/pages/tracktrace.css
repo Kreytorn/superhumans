@@ -24,13 +24,21 @@
 .tt-tail .df-arch-card{width:min(100%,calc((100svh - 112px) * 500.918 / 484.213 + 22px))}
 .tt-tail .df-arch-card img{width:100%;height:auto;aspect-ratio:500.918 / 484.213;max-height:none;min-height:0}
 
-/* wide screens: the words on the left, the figure as tall as the screen on the right */
+/* wide screens (the owner, r4: "make it bigger and mirror the page, architecture on left"): the figure on the left,
+   as tall as the screen less 24 px above and below, the words in a narrow column on the right (about 28% of the
+   width). --tt-card is the card's width at that height (img height = 100svh - 48 - 22, 22 px = padding + frame).
+   The figure's column takes --tt-card when there is room, else whatever is left after the words' 320 px; the pair is
+   centred. The DOM keeps the words first (screen readers read the title before the figure); only the grid swaps them. */
 @media (min-width:1100px) and (min-aspect-ratio:5/4){
-  /* big screens (1920x1080 and up): the column widens until the figure, in its 67% share, is as tall as the screen */
-  .tt-tail{max-width:max(1392px,calc(((100svh - 112px) * 500.918 / 484.213 + 22px) / 0.67 + 152px))}
-  .tt-tail .df-arch{display:grid;grid-template-columns:minmax(320px,.66fr) minmax(0,1.34fr);align-items:center;gap:0 56px;min-height:100svh;padding:44px 0}
-  .tt-tail .df-arch-head{gap:16px}
-  .tt-tail .df-arch-h{font-size:clamp(30px,2.5vw,38px);line-height:1.12;max-width:none}
+  .tt-tail{--tt-card:calc((100svh - 70px) * 500.918 / 484.213 + 22px);--tt-words:clamp(320px,28vw,600px);--tt-gap:56px;
+    max-width:calc(var(--tt-card) + var(--tt-gap) + var(--tt-words) + 96px)}
+  .tt-tail .df-arch{display:grid;grid-template-columns:minmax(0,var(--tt-card)) minmax(320px,1fr);align-items:center;gap:0 var(--tt-gap);min-height:100svh;padding:24px 0}
+  .tt-tail .df-arch-fig{grid-column:1;grid-row:1}
+  .tt-tail .df-arch-card{width:min(100%,var(--tt-card))}
+  .tt-tail .df-arch-head{grid-column:2;grid-row:1;gap:16px;min-width:0;container-type:inline-size}
+  /* 9.3cqi: where the words column sits at its 320 px floor (a 1280x1024 screen), the title shrinks so "IonScan, our own"
+     stays on one line instead of leaving "own" alone on a line */
+  .tt-tail .df-arch-h{font-size:clamp(30px,min(2.5vw,9.3cqi),38px);line-height:1.12;max-width:none}
   .tt-tail .df-arch-cap{font-size:19px}
 }
 

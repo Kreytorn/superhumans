@@ -246,7 +246,7 @@ function RepairChart() {
           </g>
         ))}
       </svg>
-      <figcaption>Mean damage spots per nucleus after exposure. NASA’s own counts from the lab study: data, not model output.</figcaption>
+      <figcaption>Mean damage spots per nucleus after exposure. The study’s own counts, from NASA’s open data: data, not model output.</figcaption>
     </figure>
   )
 }
@@ -549,7 +549,7 @@ export function W1Room({ pin, live = true, sample: first = HERO, top, after, onC
                 </div>
                 <div className="nasa">
                   <b>{done && result && result.nfoci2016 !== null ? Math.round(result.nfoci2016) : '–'}</b>
-                  <i>NASA’s own count</i>
+                  <i>Count in NASA’s dataset</i>
                 </div>
               </div>
             </div>
