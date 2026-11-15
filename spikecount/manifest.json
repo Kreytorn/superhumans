@@ -2704,6 +2704,26 @@
    "licence": "CC BY 4.0",
    "credit": "Team SuperHumans, derived from RedTell (CC BY 4.0)",
    "what": "compact derived evidence: OOF scatter rows, headline numbers, comparison table"
+  },
+  {
+   "path": "architecture.svg",
+   "bytes": 964081,
+   "sha256": "c46562466b379f097dc3a54d5c3d01111cca7c9bde7660907ca3e0d551971b21",
+   "role": "media",
+   "source": "work/Web/figures/spikecount/spikecount_arch.svg (built by work/Web/figures/spikecount/build.sh from spikecount_arch.tex)",
+   "licence": "MIT (diagram, project licence); embedded RedTell images CC BY 4.0; Latin Modern glyphs GUST Font License",
+   "credit": "Architecture diagram by team SuperHumans, drawn with an AI assistant (Claude); AI-generated diagram. Microscope field 96 and the cell crops: RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430, CC BY 4.0, run through the shipped SpikeCount models; Latin Modern fonts (GUST Font License), drawn as outlines",
+   "what": "architecture figure (outliner + grader, IonScan figure style, white background, visible 'AI-generated diagram' mark), SVG; shown by src/protos/DF/arch.tsx via architecture.json"
+  },
+  {
+   "path": "architecture.png",
+   "bytes": 613607,
+   "sha256": "9017aac754dd8475632b476cb9328b007217f8921a76f040b30669221102ebfd",
+   "role": "media",
+   "source": "work/Web/figures/spikecount/spikecount_arch.png (built by work/Web/figures/spikecount/build.sh from spikecount_arch.tex)",
+   "licence": "MIT (diagram, project licence); embedded RedTell images CC BY 4.0; Latin Modern glyphs GUST Font License",
+   "credit": "Architecture diagram by team SuperHumans, drawn with an AI assistant (Claude); AI-generated diagram. Microscope field 96 and the cell crops: RedTell DSE set, Sadafi et al. 2023, Front Physiol 14:1058720, Zenodo 7801430, CC BY 4.0, run through the shipped SpikeCount models; Latin Modern fonts (GUST Font License), drawn as outlines",
+   "what": "architecture figure (outliner + grader, IonScan figure style, white background, visible 'AI-generated diagram' mark), 300-dpi PNG; shown by src/protos/DF/arch.tsx via architecture.json"
   }
  ]
 }

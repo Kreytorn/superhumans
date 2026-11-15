@@ -1,0 +1,1 @@
+var e=`field-96`,t=`./spikecount/fields/96.png`,n=!1;function r(){if(n||typeof Image>`u`)return;n=!0;let e=new Image;e.decoding=`async`,e.src=t}export{t as n,r,e as t};

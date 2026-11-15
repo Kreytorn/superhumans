@@ -1,0 +1,6 @@
+{
+  "src": "architecture.svg",
+  "title": "BrainDrift, a brain map that runs in your browser",
+  "caption": "It colours every pixel of each brain-scan slice as one of six classes, then adds up the fluid spaces, the ventricles, before and after a simulated flight.",
+  "alt": "Diagram of the BrainDrift brain-map network. Three neighbouring slices of a real brain MRI (OASIS-1) are padded to 192 by 192 pixels and enter an ImageNet-pretrained MobileNetV4 encoder, which halves the image five times, down to 6 by 6 pixels with 960 channels. A U-Net decoder doubles the size back in five steps (192, 128, 64, 32 and 24 channels), each step joining the encoder map of the same size; the last step also joins the input slices. A 1 by 1 convolution scores 6 classes for every pixel (background and five brain regions); after the crop back to 176 by 176, the top class of each pixel gives the brain map, with the ventricles, the fluid spaces, in green. Counting ventricle pixels on every slice gives the ventricle volume: 17.5 mL before and 19.1 mL after a simulated flight, a change of plus 9.2 percent, where the simulation put in plus 10.7 percent. The network has 4.0 million parameters and runs in the browser. Marked: AI-generated diagram."
+}

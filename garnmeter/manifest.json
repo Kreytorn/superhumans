@@ -62,7 +62,40 @@
    "source": "derived from work/GarnMeter/out/garn_metrics.json + garn_oof.csv (no person ids)",
    "licence": "MIT (project licence)",
    "credit": "CorrFuse-EEG by team SuperHumans: CorrFuse (a team member's own prior code, first written June 2026 for TEKNOFEST 2026 Healthcare-AI ECG, not built for Space Apps), adapted to 14-channel EEG; trained on the Hacettepe data above. Methods: S4D (Gu et al. 2022), GSS (Mehta et al. 2023), GeM (Radenovic et al. 2019), CORAL (Cao et al. 2020)."
+  },
+  {
+   "path": "architecture.svg",
+   "bytes": 746091,
+   "sha256": "0edf280431fa14245d7e3a14f1aef5cc45bb61f9f57674004b98c2e88457ec49",
+   "role": "media",
+   "what": "CorrFuse-EEG architecture figure (no caption; white background; 'AI-generated diagram' mark), SVG",
+   "source": "work/Web/figures/garnmeter/garnmeter_arch_nocap.svg (built by build.sh from garnmeter_arch.tex; width/height scaled for the page, same viewBox)",
+   "licence": "MIT (diagram, project licence); embedded EEG traces from the Hacettepe VR-sickness study: no licence stated by the dataset authors; cited; Latin Modern glyphs GUST Font License",
+   "credit": "Architecture diagram by team SuperHumans, drawn with an AI assistant (Claude); AI-generated diagram",
+   "note": "Figure drawn with LaTeX/TikZ, Latin Modern fonts (GUST Font License). The EEG traces and the output values come from this module's own files: demo/session_eeg.bin (Hacettepe VR-sickness EEG, Ozkan, Uyan & Celikcan 2023, DOI 10.1016/j.displa.2023.102415; Uyan & Celikcan 2024, DOI 10.1016/j.displa.2024.102704; cited as the authors request) and models/garn.onnx."
+  },
+  {
+   "path": "architecture.png",
+   "bytes": 549841,
+   "sha256": "3ded9ec771ddf5dd47df8944b684cbac6d0164a6138d5c1c1b9106aed1d01785",
+   "role": "media",
+   "what": "the same figure, 300-dpi PNG",
+   "source": "work/Web/figures/garnmeter/garnmeter_arch_nocap.png (built by build.sh from garnmeter_arch.tex)",
+   "licence": "MIT (diagram, project licence); embedded EEG traces from the Hacettepe VR-sickness study: no licence stated by the dataset authors; cited; Latin Modern glyphs GUST Font License",
+   "credit": "Architecture diagram by team SuperHumans, drawn with an AI assistant (Claude); AI-generated diagram",
+   "note": "Figure drawn with LaTeX/TikZ, Latin Modern fonts (GUST Font License). The EEG traces and the output values come from this module's own files: demo/session_eeg.bin (Hacettepe VR-sickness EEG, Ozkan, Uyan & Celikcan 2023, DOI 10.1016/j.displa.2023.102415; Uyan & Celikcan 2024, DOI 10.1016/j.displa.2024.102704; cited as the authors request) and models/garn.onnx."
+  },
+  {
+   "path": "architecture.json",
+   "bytes": 1482,
+   "sha256": "59d756386a66d0665df47bde59cb997522920b52a22212bd57453881a5c04679",
+   "role": "meta",
+   "what": "title, caption and alt text of the architecture figure, read by the page",
+   "source": "work/Web/figures/garnmeter/publish_site.py",
+   "licence": "MIT (project licence)",
+   "credit": "Architecture diagram by team SuperHumans, drawn with an AI assistant (Claude); AI-generated diagram",
+   "note": "Figure drawn with LaTeX/TikZ, Latin Modern fonts (GUST Font License). The EEG traces and the output values come from this module's own files: demo/session_eeg.bin (Hacettepe VR-sickness EEG, Ozkan, Uyan & Celikcan 2023, DOI 10.1016/j.displa.2023.102415; Uyan & Celikcan 2024, DOI 10.1016/j.displa.2024.102704; cited as the authors request) and models/garn.onnx."
   }
  ],
- "total_bytes": 2303717
+ "total_bytes": 3601131
 }

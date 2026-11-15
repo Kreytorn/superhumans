@@ -11,7 +11,7 @@
    "bubblegrade/models/bubblegrade_mnv4m_r4.onnx.part01"
   ]
  },
- "totalBytes": 33133607,
+ "totalBytes": 33839447,
  "files": [
   {
    "path": "bubblegrade/clips/dcs-dive.wav",
@@ -282,6 +282,26 @@
    "licence": "GPL-3.0-or-later (derived data)",
    "credit": "Team SuperHumans model output (code written with AI assistance); derived from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo",
    "note": "uint8 display spectrogram [64][cols], gzip"
+  },
+  {
+   "path": "bubblegrade/architecture.svg",
+   "bytes": 339686,
+   "sha256": "5d726fc9ef28cea7fe06cb44325f9eeabdf217d8663ee234d5f99e82f00f05f3",
+   "role": "media",
+   "source": "work/Web/figures/bubblegrade/bubblegrade_arch.svg (built by work/Web/figures/bubblegrade/build.sh from bubblegrade_arch.tex, make_thumbs.py, svg_size.py)",
+   "licence": "MIT (project licence) for the diagram; the three thumbnails are derived from a GPL-3.0-or-later clip and stay GPL-3.0-or-later",
+   "credit": "Architecture diagram by team SuperHumans, drawn with an AI assistant (Claude); AI-generated diagram; drawn with LaTeX/TikZ, Latin Modern fonts (GUST Font License); its three thumbnails show one held-out clip from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo, and the model's output on it",
+   "note": "BubbleGrade architecture figure (IonScan figure style, simpler; white background, visible 'AI-generated diagram' mark); same figure as SVG and 300-dpi PNG; shown by src/protos/DF/arch.tsx via architecture.json"
+  },
+  {
+   "path": "bubblegrade/architecture.png",
+   "bytes": 366154,
+   "sha256": "3cd2b2ee81994ff4d0910564a38b534fd8951bbc98f130fd88853b58a54d48e1",
+   "role": "media",
+   "source": "work/Web/figures/bubblegrade/bubblegrade_arch.png (built by work/Web/figures/bubblegrade/build.sh from bubblegrade_arch.tex, make_thumbs.py, svg_size.py)",
+   "licence": "MIT (project licence) for the diagram; the three thumbnails are derived from a GPL-3.0-or-later clip and stay GPL-3.0-or-later",
+   "credit": "Architecture diagram by team SuperHumans, drawn with an AI assistant (Claude); AI-generated diagram; drawn with LaTeX/TikZ, Latin Modern fonts (GUST Font License); its three thumbnails show one held-out clip from Blogg et al. 2026, An Echo from the past, Zenodo 16877955 (DOI 10.5281/zenodo.16877955), GPL-3.0-or-later per Zenodo, and the model's output on it",
+   "note": "BubbleGrade architecture figure (IonScan figure style, simpler; white background, visible 'AI-generated diagram' mark); same figure as SVG and 300-dpi PNG; shown by src/protos/DF/arch.tsx via architecture.json"
   }
  ]
 }
