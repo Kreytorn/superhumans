@@ -1,4 +1,4 @@
-// The other five checks: the specimen, the check's one sentence and a plain line that the full check
+// The other three checks (veins, brain, nausea): the specimen, the check's one sentence and a plain line that the full check
 // arrives in the complete build. Each cuts its own window (a band for sound and brainwaves, a tall window for
 // the ultrasound and the brain), always at least half the viewport.
 import { useEffect, useState } from 'react'

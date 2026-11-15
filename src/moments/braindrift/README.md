@@ -1,0 +1,49 @@
+# BrainDrift moment: fly a real brain, the model re-reads it
+
+`import { BrainDriftMoment } from './moments/braindrift'`. Stage only: a cut-away 3D brain (real MRI slice on the cut face, Model B's ventricle surface in front of it, the rest of the brain as a matte half and a glass half) with one control, the flight slider. Harness: `#/moment/braindrift`.
+
+**Props.** `sampleId` flight frame, default `flight-f100` (also f025 / f050 / f075; other ids fall back to f100). `mode` `auto | live | replay` (auto: `analyze()` on a laptop, `replay()` on a coarse pointer, a screen under 700 px, or any model failure). `state` `idle | result` and `t` (ms) pin the stage; a pinned stage uses `replay()` unless `mode="live"`. `onResult(result, act)` fires when the measured change lands (start of the compare beat), `onState(state)` on idle / running / result / error. `labels` (default true) numbers on the specimen, `tags` (default true) SIMULATION and LIVE / REPLAY, `controls` (default true) the slider. `className`, `style`. Ref: `run()` plays the whole moment to `sampleId`, `reset()`.
+
+**Hooks.** Root `.bdm`: `data-intro` while the entrance plays (below); `data-ready="1"`, `data-state`, `data-beat`, `data-frame` (0-4), `data-live`, `data-measured`, `data-t`. `data-qa="hero"` is the specimen, `data-qa="primary"` the slider (drag, click, arrows, Home / End; Enter or Space runs from rest, lets go of a pending step, and measures again at a result). "Before flight" and "After flight" are buttons; "Before flight" is switched off (`disabled`, `data-here`) while the stage already rests at before flight, and hands the focus to the slider when it resets. `data-pre-read` is set while the stage shows the pre-flight read (below). At rest one line over the track says what the drag does ("Drag to after flight: the AI measures what changed.", `.bdm-cue`, shown with `controls`) and the stage names the grey shape ("fluid spaces", with `labels`; on an upright stage its leader ends with a dot in the body of the large left chamber). While the model reads, "the AI is mapping slice n of 174" stands one line under that name (with `labels={false}` it stays in the top-left corner).
+
+**Look (k2, Sun 15 Nov 04:30).** Nothing in the props, ref methods or tokens changed; everything below is drawn from the same shipped meshes and model outputs.
+- *Entrance* (natural open only: no `state`, no `t`, no reduced motion; 2.6 s): the camera glides in from a side view of the whole brain while the cut opens from the back of the head to its resting slice; the "fluid spaces" name waits for it (`data-intro`). Any drag, key or `run()` ends it at once.
+- *Reading frame*: while the model reads, a thin instrument frame of light (millimetre ticks every 10 mm, lit corners) stands round the reading plane and travels with it.
+- *Fluid through the tissue*: the part of the ventricle surface behind the slice is added as a soft outline of light, faint before the model has measured it, brighter once measured and while it reads.
+- *Swell flare*: each time a new stored frame swaps in (drag or fly), the glow round the fluid flares and settles, so the swell is seen, not only measured.
+- *Read trace*: after the read, the glass half keeps its slice contours a little brighter (every slice was read).
+- Class-map defaults are now cool (`--m-class-white` `#d3e0ea`, `-cortex` `#7f93b4`, `-deep` `#4e6688`, `-hind` `#9fb0c6`); the "fluid here now, not before" swatch is a small rim (light edge on blue), not a box; the backdrop has two faint far washes of `--m-glow`.
+
+**Tokens** (on the root; the 3D materials read them too, re-read when `className` or `style` changes):
+
+| Token | Default | Paints |
+|---|---|---|
+| `--m-stage` | `#0e1114` | stage background (dark because the specimen is an MRI) |
+| `--m-ink`, `--m-ink-2` | `#eef0f1`, `#929ca4` | text; quiet text, leader lines, the before-flight outline |
+| `--m-mark` | `#5cc4f0` | what the model drew: measured ventricles (surface, cut-face fill, the number) |
+| `--m-mark-2` | `#f4fbff` | "fluid here now, not before" (ventricle after flight where the pre-flight map had none), drawn only as a rim where the surface meets the cut slice, and the after-flight top outline |
+| `--m-accent` | `#eef0f1` | slider handle, fill and focus ring (keyboard focus: a line round the whole track and a 3 px ring 4 px clear of the thumb) |
+| `--m-specimen`, `--m-glass` | `#d9d2c6`, `#cdd5db` | matte brain half; glass half |
+| `--m-fluid` | `#77828b` | ventricles of a frame the model has not measured in this run |
+| `--m-scan` | `#f3f1ec` | tint of the MRI slice |
+| `--m-class-white`, `-cortex`, `-deep`, `-hind` | cool blue-greys | flat tones of the other four classes while the model reads |
+| `--m-font`, `--m-font-mono` | Instrument Sans, Geist Mono | labels; tags |
+
+`?theme=paper` on the harness overrides every token from outside (light stage, serif) as proof.
+
+**Beats** (`timeline.ts`, `frameAt(t)` is pure; `?t=` shows the exact frame; reduced motion jumps to the end):
+
+| Beat | ms | Shows |
+|---|---|---|
+| fly | 0-1500 | the slider travels to the frame; the five stored frames swap in (ventricle surface of each, shell lifted by the injected shift); "we put in +x %" follows the thumb. Under the user's hand this beat is the drag itself. |
+| seal | 1500-2100 | the cut closes: the brain is whole before the model looks |
+| read | 2100-5700 | Model B's slices, back to front in the order it runs them: each slice shows its 6-class map, and the ventricles it found stay behind the plane. Live: the plane never passes the last finished `onProgress` slice. If a first live release arrives before the model has read the pre-flight scan, that read is shown first, the same way on the pre-flight brain ("pre-flight scan first: slice n of 174"), then the plane starts again on the flown brain. |
+| compare | 5700-7000 | the plane returns to slice 100 (through the brain's highest point); fluid that is here now and was not before shows as a light rim where the ventricle surface meets the slice, the before and after top outlines draw, the measured change and rise appear, each with its put-in figure |
+
+**Downloads.** Idle 4.0 MB (shell 1.67, f000 ventricles 0.72, f000 crop 1.43, f000 map 0.18). First touch or run: +2.2 MB per frame used (crop 1.45 + surface 0.72); a laptop then fetches the three in-between frames in the background (+6.5 MB), a phone only the frame under the thumb. Replay +0.36 MB of stored maps. Live: +16.2 MB model (warmed 0.9 s after idle, laptops only). The PVS web is never loaded here.
+
+**Tags a page must keep next to it** (the stage shows them unless `tags={false}`): `SIMULATION` by "After flight", and `LIVE` or `REPLAY` (beside the reading line during the run, then inline after "fluid spaces, as the AI measured"; with `labels={false}` in the top-left corner throughout). Middle frames say "illustration" above the thumb while dragged and ", for illustration" in the put-in line at their result (with `labels={false}` the note above the thumb stays instead), so no frame shows more than two tags. With `labels={false}` the page must explain the light colour ("fluid here now, not before") and show measured next to put-in (`result.measured` / `result.injected`, both the change and the rise), never one without the other. With labels on, the stage alone shows 4 numbers at its result (the budget's limit), so the page adds none. Full honesty strings: `HONESTY.flightFrame`, `.middleFrames`, `.offlineReplay` (already in the tags' `title`s).
+
+**Gaps.** Flight frames only: the compare brains and the PVS web (Model A) are not staged. Phones use `replay()`; `analyzeSlice` is not used. A first live run released before the warm-up ends takes about twice as long (14-23 s measured here against 7 s warm): it shows the pre-flight read, after up to about 1 s of a closed brain under "loading the model". No orbit or zoom under the user's hand: the camera rests at a fixed pose per aspect ratio and moves only in the entrance and while the model reads. Layout: a wide stage with labels keeps 290 px on the left for them; an upright stage (a phone) runs the brain 20 px past each side and, with labels on, starts it 110 px from the top (room for the rise label) instead of centring it. The rise is ~8 px on screen; it is true to scale, not exaggerated. The slice outline is cleaned for display only (near-black rim voxels peeled up to 3 mm, pieces under 40 voxels dropped, soft alpha edge; `softenEdge` in `scene.ts`), and the glass half steps back to 8 % where it lies in front of the slice. Not checked on a real phone or in Firefox / Safari.
+
+**The light colour is a rule, and it is audited.** `growth.ts`: a vertex of the after-flight ventricle surface is light only if the point 0.6 mm inside it was not ventricle in the pre-flight map (8-voxel blend, then 5 relaxations along the surface). It is "fluid here now, not before", not net growth: at f100 the model's maps gain 3,115 voxels and lose 1,508 (net 1,607 = +9.2 %), because the ventricles also move up with the brain, so about a third of the surface carries the flag. Painting all of it read as far more growth than +9.2 %, so the surface stays the measured blue and the flag is shown only in the 3 mm band where the surface meets the cut slice (`uRim` in `scene.ts`), with the gained voxels of that slice itself. `node work/Web/shots/moment-braindrift/fixed/growth_check.mjs` prints the audit (f000 against itself: 0.0 % light; no piece that is light but was mostly ventricle before).

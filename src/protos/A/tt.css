@@ -1,0 +1,256 @@
+/* Prototype A "Viewbox": the TrackTrace check. Everything is scoped under .vb.
+   The moment is restyled only through its --m-* custom properties (set on .vb-tt-stage). */
+
+/* A check whose page goes on below the first viewport: the film row is one screen, the print lies under it. */
+.vb[data-scroll] {
+  height: auto;
+  min-height: 100svh;
+  grid-template-rows: minmax(560px, 100svh) auto;
+}
+
+/* the film: the moment's stage in this direction's materials (film base, film print, the one model colour) */
+.vb .vb-tt-stage {
+  grid-row: 1;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  --m-stage: #0b0d0e;
+  --m-specimen: #e9eeee;
+  --m-ink: #e9eeee;
+  --m-ink-2: #8d989e;
+  --m-mark: #2fd2f4;
+  --m-accent: #ffffff;
+  --m-font: var(--sans);
+  --m-font-mono: var(--sans);
+  --m-size: 15px;
+}
+.vb .vb-tt-fill {
+  position: absolute;
+  inset: 0;
+}
+
+/* edge print: one tag, then what the film shows now (one line of print); the arrow leads to the IonScan print below */
+.vb .vb-tt-edge {
+  min-width: 0;
+  overflow: visible;
+}
+.vb .vb-tt-edge-text {
+  display: inline-block;
+  max-width: calc(100% - 112px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: top;
+}
+.vb .vb-tt-key {
+  margin-right: 18px;
+  white-space: nowrap;
+}
+.vb .vb-tt-edge-text .vb-tag--film {
+  margin: 0 0 0 -8px;
+}
+.vb .vb-tt-dim {
+  color: #8d989e;
+}
+.vb .vb-tt-line {
+  display: inline-block;
+  width: 18px;
+  height: 2px;
+  margin-right: 7px;
+  background: var(--cyan);
+  vertical-align: 4px;
+}
+.vb .vb-tt-ring {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 7px;
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+  vertical-align: -1px;
+}
+.vb .vb-tt-down {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  translate: 0 -50%;
+  color: var(--print);
+  transition: transform 120ms var(--out);
+}
+/* at rest the caption itself is the way down to the print */
+.vb .vb-tt-down[data-cap] {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  translate: none;
+  vertical-align: middle;
+  margin-top: -3px;
+  font: inherit;
+  line-height: 20px;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.vb .vb-tt-down:active {
+  transform: scale(0.97);
+}
+.vb .vb-tt-down:focus-visible {
+  outline-color: var(--print);
+  outline-offset: -4px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .vb .vb-tt-down:hover {
+    color: #fff;
+  }
+  .vb .vb-tt-down[data-cap]:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+/* the poster of this check (Home film, spines) was printed in the moment's default mark colour; turn it to ours */
+.vb img.vb-still[data-id='tracktrace'] {
+  filter: hue-rotate(222deg);
+}
+
+/* the answer: the count climbs with the circles; the call lands when the whole sample has been read */
+.vb .vb-tt-result .vb-hero {
+  min-width: 0.6em;
+}
+.vb .vb-tt-result .vb-act {
+  transition: opacity 240ms ease;
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------ the IonScan print, one scroll step below */
+.vb .vb-tt-below {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 820px) minmax(240px, 360px);
+  gap: 36px;
+  align-items: start;
+  padding: 48px 32px 80px;
+}
+.vb .vb-tt-sheet {
+  display: block;
+  width: 100%;
+  padding: 28px 28px 22px;
+  background: #fff;
+  border: 1px solid rgb(18 23 26 / 0.3);
+  cursor: zoom-in;
+}
+/* pressed: the print takes the whole width of the light box, and its caption drops under it */
+.vb .vb-tt-below[data-zoom] {
+  grid-template-columns: minmax(0, 1fr);
+}
+.vb .vb-tt-below[data-zoom] .vb-tt-sheet {
+  cursor: zoom-out;
+}
+.vb .vb-tt-sheet img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.vb .vb-tt-figcap {
+  padding-top: 4px;
+  font: 450 24px/31px var(--serif);
+  letter-spacing: -0.005em;
+  text-wrap: pretty;
+}
+
+/* ------------------------------------------------------------ phones */
+@media (max-width: 760px) {
+  /* the stage keeps just over half of the first screen; the answer fills the rest of it */
+  .vb[data-scroll] .vb-open {
+    height: calc(51.5svh + 36px);
+    grid-template-rows: minmax(0, 1fr) 36px;
+  }
+  .vb[data-scroll] .vb-open .vb-edge {
+    height: 36px;
+    line-height: 36px;
+  }
+  .vb[data-scroll] .vb-answer {
+    flex: none;
+    min-height: calc(48.5svh - 36px - 71px);
+  }
+  .vb .vb-tt-edge-text {
+    max-width: calc(100% - 66px);
+  }
+  .vb .vb-tt-key {
+    margin-right: 12px;
+  }
+  .vb .vb-tt-line {
+    width: 14px;
+  }
+  .vb .vb-tt-wide,
+  .vb .vb-tt-down:not([data-cap]) {
+    display: none;
+  }
+  .vb .vb-tt-sentence {
+    margin: 2px 0 10px;
+    font-size: 19px;
+    line-height: 24px;
+  }
+  .vb .vb-tt-result {
+    margin-top: 8px;
+  }
+  .vb .vb-tt-result .vb-hero {
+    font-size: 40px;
+    line-height: 42px;
+  }
+  .vb .vb-tt-result .vb-hero-unit {
+    font-size: 20px;
+    line-height: 26px;
+  }
+  .vb .vb-tt-result .vb-number {
+    line-height: 22px;
+  }
+  .vb .vb-tt-result .vb-act {
+    margin-top: 8px;
+  }
+  .vb .vb-tt-result .vb-act-text {
+    margin-top: 2px;
+    font-size: 18px;
+    line-height: 23px;
+  }
+  .vb .vb-foot .vb-btn {
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 15px;
+  }
+  .vb .vb-tt-below {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 16px;
+    padding: 28px 16px calc(40px + env(safe-area-inset-bottom, 0px));
+  }
+  .vb .vb-tt-sheet {
+    padding: 12px 10px 10px;
+  }
+  /* pressed on a phone: the print is shown at reading size and pans sideways inside its own frame */
+  .vb .vb-tt-below[data-zoom] .vb-tt-sheet {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+  .vb .vb-tt-below[data-zoom] .vb-tt-sheet img {
+    width: 240%;
+    max-width: none;
+  }
+  .vb .vb-tt-figcap {
+    font-size: 19px;
+    line-height: 25px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vb .vb-tt-down,
+  .vb .vb-tt-result .vb-act {
+    transition: none;
+  }
+}

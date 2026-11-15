@@ -1,0 +1,203 @@
+/* TrackTrace moment. Everything is scoped under .ttm. Colours and fonts come from the --m-* custom properties,
+   read from the root or any ancestor; the fallbacks below are the defaults (see README.md).
+   data-narrow="1" is set by the component when the stage itself is under 600 px wide. */
+.ttm {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  overflow: hidden;
+  background: var(--m-stage, #0b0f12);
+  color: var(--m-ink, #f4f2ec);
+  font-family: var(--m-font, inherit);
+  font-size: var(--m-size, 15px);
+  line-height: 1.3;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+}
+.ttm[data-narrow='1'] { font-size: var(--m-size, 14px); }
+.ttm[data-state='idle'][data-tappable='1'] { cursor: pointer; }
+.ttm[data-state='result'][data-tappable='1'] { cursor: crosshair; }
+.ttm:focus-visible { outline: 2px solid var(--m-accent, #fff); outline-offset: -3px; }
+.ttm .ttm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; transition: opacity 320ms cubic-bezier(0.23, 1, 0.32, 1); }
+/* another nucleus comes on stage: the old picture and its words fade out, the new picture fades in */
+.ttm[data-swap='1'] .ttm-canvas { opacity: 0; transition-duration: 180ms; }
+.ttm[data-swap='1'] .ttm-note,
+.ttm[data-swap='1'] .ttm-sample { opacity: 0 !important; transition: opacity 160ms linear; }
+
+/* the one line on the idle stage: what pressing will find */
+.ttm .ttm-promise {
+  position: absolute;
+  left: 24px;
+  top: 22px;
+  margin: 0;
+  max-width: min(17em, calc(100% - 48px));
+  font-size: 2.1em;
+  font-weight: 600;
+  line-height: 1.14;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1);
+  /* keeps the words readable where the nucleus runs under them; a flat dark edge, not a glow */
+  text-shadow: 0 1px 2px var(--m-stage, #0b0f12), 0 0 14px var(--m-stage, #0b0f12);
+}
+.ttm .ttm-promise[data-on='1'] { opacity: 1; }
+.ttm[data-narrow='1'] .ttm-promise { left: 14px; top: 14px; max-width: calc(100% - 28px); font-size: 1.5em; }
+
+/* the words that follow the nucleus: under it while it fills the stage, beside the lens once it has docked */
+.ttm .ttm-note {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75em;
+  white-space: nowrap;
+  pointer-events: none;
+  font-size: 1.45em;
+}
+.ttm .ttm-note-main { font-weight: 600; }
+.ttm .ttm-note-num { font-size: 1.3em; font-variant-numeric: lining-nums; }
+.ttm .ttm-note-sub { color: var(--m-ink, #f4f2ec); }
+.ttm .ttm-note[data-kind='caption'] .ttm-note-sub,
+.ttm .ttm-note-fine { color: var(--m-ink-2, #8a9299); }
+.ttm .ttm-note-fine { font-size: 0.8em; }
+/* one row under the nucleus on a wide stage: the second line follows on the same row */
+.ttm[data-narrow='0'] .ttm-note[data-dock=''] .ttm-note-sub br { display: none; }
+.ttm[data-narrow='0'] .ttm-note[data-dock=''] .ttm-note-fine { margin-left: 0.75em; }
+.ttm[data-narrow='1'] .ttm-note-sub { text-align: center; }
+.ttm .ttm-note[data-dock='col'] .ttm-note-sub,
+.ttm .ttm-note[data-dock='band'] .ttm-note-sub { text-align: left; line-height: 1.35; }
+.ttm .ttm-note .ttm-tag { font-size: 0.6em; align-self: center; }
+.ttm[data-narrow='1'] .ttm-note { flex-direction: column; align-items: center; gap: 2px; font-size: 1.15em; }
+.ttm[data-narrow='1'] .ttm-note .ttm-tag { margin-top: 4px; font-size: 0.68em; }
+
+/* docked: the count is the one large number beside the lens */
+.ttm .ttm-note[data-dock='col'],
+.ttm .ttm-note[data-dock='band'] {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2em;
+  white-space: normal;
+  font-size: 1.25em;
+}
+.ttm .ttm-note[data-dock='col'] .ttm-note-main,
+.ttm .ttm-note[data-dock='band'] .ttm-note-main {
+  font-size: 1.25em;
+  line-height: 1.05;
+  margin-bottom: 0.15em;
+}
+.ttm .ttm-note[data-dock='col'] .ttm-note-num { margin-right: 0.05em; font-size: 4.6em; font-weight: 650; line-height: 0.82; letter-spacing: -0.03em; }
+.ttm .ttm-note[data-dock='band'] .ttm-note-num { margin-right: 0.05em; font-size: 3.4em; font-weight: 650; line-height: 0.85; letter-spacing: -0.03em; }
+.ttm .ttm-note[data-dock='col'] .ttm-tag,
+.ttm .ttm-note[data-dock='band'] .ttm-tag { align-self: flex-start; margin-top: 0.7em; font-size: 0.62em; }
+.ttm[data-narrow='1'] .ttm-note[data-dock='band'] { font-size: 1.08em; }
+.ttm[data-narrow='1'] .ttm-note[data-dock='band'] .ttm-note-main { font-size: 1.1em; }
+.ttm[data-narrow='1'] .ttm-note[data-dock='band'] .ttm-tag { font-size: 0.72em; }
+
+/* the whole-sample sentence, in the strip under the mosaic */
+.ttm .ttm-sample {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  box-sizing: border-box;
+  text-align: center;
+  text-wrap: balance;
+  line-height: 1.45;
+  pointer-events: none;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+.ttm .ttm-sample .ttm-tag { display: inline-block; margin-left: 0.8em; font-size: 0.68em; line-height: 1.3; vertical-align: 0.12em; }
+.ttm .ttm-legend { font-weight: 450; }
+.ttm .ttm-ring {
+  display: inline-block;
+  width: 0.78em;
+  height: 0.78em;
+  margin-right: 0.45em;
+  border: 1.5px solid var(--m-accent, #fff);
+  border-radius: 50%;
+  vertical-align: -0.08em;
+}
+.ttm[data-narrow='1'] .ttm-sample { bottom: 10px; font-size: 1.02em; }
+
+.ttm .ttm-tag {
+  font-family: var(--m-font-mono, ui-monospace, 'Cascadia Mono', Consolas, monospace);
+  font-size: 0.74em;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--m-ink-2, #8a9299);
+  border: 1px solid color-mix(in srgb, var(--m-ink-2, #8a9299) 55%, transparent);
+  border-radius: 3px;
+  padding: 0.12em 0.5em;
+  white-space: nowrap;
+}
+.ttm .ttm-error {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--m-ink-2, #8a9299);
+  background: var(--m-stage, #0b0f12);
+  border-radius: 4px;
+}
+.ttm .ttm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* the tag and the step control share one row beside the words */
+.ttm .ttm-note-row { display: inline-flex; align-items: center; align-self: center; gap: 0.75em; }
+.ttm .ttm-note .ttm-note-row .ttm-tag { margin-top: 0; align-self: center; }
+.ttm[data-narrow='1'] .ttm-note-row { margin-top: 6px; gap: 10px; }
+.ttm .ttm-note[data-dock='col'] .ttm-note-row,
+.ttm .ttm-note[data-dock='band'] .ttm-note-row { align-self: flex-start; flex-wrap: wrap; margin-top: 0.5em; gap: 10px 12px; }
+.ttm .ttm-note[data-dock='col'] .ttm-note-row { flex-direction: column; align-items: flex-start; gap: 20px; }
+.ttm .ttm-note[data-dock='col'] .ttm-note-row .ttm-tag { align-self: flex-start; }
+
+/* step to the next nucleus of the pool */
+.ttm .ttm-next {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  box-sizing: border-box;
+  height: 38px;
+  margin: 0;
+  padding: 0 15px 0 17px;
+  font: inherit;
+  font-size: calc(var(--m-size, 15px) * 0.94);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  color: var(--m-ink, #f4f2ec);
+  background: color-mix(in srgb, var(--m-stage, #0b0f12) 74%, transparent);
+  border: 1px solid color-mix(in srgb, var(--m-ink, #f4f2ec) 36%, transparent);
+  border-radius: 999px;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  transition: border-color 160ms ease, background-color 160ms ease, transform 120ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+/* a 48 px target whatever the pill's height */
+.ttm .ttm-next::after { content: ''; position: absolute; inset: -6px; }
+.ttm .ttm-next svg { flex: none; width: 1.08em; height: 1.08em; transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1); }
+@media (hover: hover) {
+  .ttm .ttm-next:hover { border-color: var(--m-ink, #f4f2ec); background: color-mix(in srgb, var(--m-ink, #f4f2ec) 12%, var(--m-stage, #0b0f12)); }
+  .ttm .ttm-next:hover svg { transform: translateX(3px); }
+}
+.ttm .ttm-next:active { transform: scale(0.97); }
+.ttm .ttm-next:focus-visible { outline: 2px solid var(--m-accent, #fff); outline-offset: 2px; }
+.ttm .ttm-next[data-at='corner'] { position: absolute; left: 24px; bottom: 22px; animation: ttm-next-in 320ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+.ttm[data-narrow='1'] .ttm-next { height: 34px; padding: 0 12px 0 14px; font-size: calc(var(--m-size, 14px) * 0.93); }
+.ttm[data-narrow='1'] .ttm-next[data-at='corner'] { left: 14px; bottom: 14px; }
+@keyframes ttm-next-in { from { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ttm .ttm-promise, .ttm .ttm-canvas, .ttm .ttm-next, .ttm .ttm-next svg { transition: none; }
+  .ttm .ttm-next[data-at='corner'] { animation: none; }
+}

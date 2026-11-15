@@ -1,0 +1,11 @@
+# VeinSqueeze, free version w1: "inside the vein" (k2, Sun 15 Nov)
+- Idea: the judge floats inside a blood vessel (live WebGL shader, cells streaming past); holding the probe flattens the vessel, tilts the glass slab and lights its edge; an alarm result warms the light. The name itself is pressed flat ("Vein" + squashed "squeeze").
+- Route: `#/proto/veinsqueeze_w1/home` (`?state=result|idle`, `?sample=clip-a..clip-f`, `?mode=live|replay`). Port 5604.
+- First screen: the real stage (`moments/veinsqueeze`, restyled through its tokens) full width with wide pictures and tall squeeze curves (23vh, about 200 px at 900); at rest a faint chart ghost says where the curve will draw; ACT headline, tier, who acts and the "Best case" tag come from `act()` at run time.
+- Scroll: 2019 story (the first clot in space, found in a neck vein), 01 SegThy jugular sweep, 02 animated press drawing (healthy flattens, clot stays round), 03 the Gillman neck clip with its SAM 2 curve and a live % readout, then the six held-out clips with stored outputs, training facts, "Did it cheat?" bars from meta/metrics.json and "How do we know?" (engine strings verbatim).
+- Extra material, all local in app/public/veinsqueeze/: ThrombUS+ clips A-F (Zenodo 17659415, CC BY 4.0); Gillman et al. 2010 neck clip (Scand J Trauma Resusc Emerg Med 18:39, CC BY 2.0); SegThy sweep (Kronke et al., PLOS ONE 2022, CC BY 4.0). No network at run time.
+- Drawn by us and marked "AI-generated illustration": the vessel shader background (fixed corner mark) and the press drawing.
+- Screenshots: work/Web/shots/k2/veinsqueeze_w1/ (screen_1440, screen_390, scroll_1440; plus idle/hold/pressed_result and scroll_b-f).
+- Checked: real press with the mouse reaches the LIVE result and the ORANGE flight-surgeon ACT; tsc clean for this folder.
+- Unfinished: under tonight's load the live model answers 35-50 s after release in headless Edge (warm it before the pitch); phone uses REPLAY by design; at 390 x 844 the hold button sits just below the fold; scroll_*_390 extras were shot before the phone mark moved to the top.
+- Dev-only helpers (not imported): _shot.mjs, _q.mjs, _press.mjs, _dbg.mjs.

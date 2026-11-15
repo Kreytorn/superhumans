@@ -1,0 +1,881 @@
+/* MARS "Mission to Mars". Everything is scoped under .mars */
+.mars {
+  --ink: #f3efe6;
+  --ink-2: rgba(243, 239, 230, 0.66);
+  --ink-3: rgba(243, 239, 230, 0.42);
+  --sun: #ffcb8e;
+  --rust: #e8763f;
+  --line: rgba(243, 239, 230, 0.16);
+  --f-display: 'Instrument Serif', 'Times New Roman', serif;
+  --f-ui: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --f-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #010205;
+  color: var(--ink);
+  font-family: var(--f-ui);
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+.mars *,
+.mars *::before,
+.mars *::after {
+  box-sizing: border-box;
+}
+.mars p,
+.mars h1,
+.mars h2,
+.mars figure {
+  margin: 0;
+}
+.mars button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.mars-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.mars[data-ready='1'] .mars-canvas {
+  opacity: 1;
+}
+.mars[data-gl='fail'] .mars-canvas {
+  display: none;
+}
+
+/* film finish: soft vignette and a little grain */
+.mars-grade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.5) 100%);
+}
+.mars-grade::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.055;
+}
+.mars-grade::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #010205;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+/* letterbox bars close in while the camera flies */
+.mars-bars::before,
+.mars-bars::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 7.5vh;
+  background: #000;
+  transform: scaleY(0);
+  transition: transform 0.7s var(--ease);
+  pointer-events: none;
+  z-index: 3;
+}
+.mars-bars::before {
+  top: 0;
+  transform-origin: top;
+}
+.mars-bars::after {
+  bottom: 0;
+  transform-origin: bottom;
+}
+.mars[data-fly='1'][data-ready='1'] .mars-bars::before,
+.mars[data-fly='1'][data-ready='1'] .mars-bars::after {
+  transform: scaleY(1);
+}
+
+/* ------------------------------------------------------------------------------------------------ home */
+.mars-hud {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.9s ease 0.5s;
+}
+.mars[data-view='check'] .mars-hud {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.mars-word {
+  position: absolute;
+  left: clamp(20px, 2.8vw, 44px);
+  top: clamp(18px, 2.6vw, 38px);
+  font-weight: 600;
+  font-size: clamp(13px, 1.05vw, 16px);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+}
+.mars-lede {
+  position: absolute;
+  left: 34vw;
+  top: clamp(64px, 11.5vh, 120px);
+  width: min(46vw, 700px);
+  animation: mars-rise 1.4s var(--ease) 0.5s both;
+}
+.mars-lede h1 {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(38px, 4.5vw, 70px);
+  line-height: 1.02;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.7);
+}
+.mars-lede h1 em {
+  font-style: italic;
+  color: var(--sun);
+}
+.mars-lede p {
+  margin-top: clamp(14px, 1.5vw, 22px);
+  font-size: clamp(15px, 1.2vw, 18px);
+  color: var(--ink-2);
+  letter-spacing: 0.01em;
+}
+.mars-body {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.mars-spot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  outline: none;
+  animation: mars-fade 1s ease calc(0.9s + var(--i) * 0.12s) both;
+}
+.mars-spot::before {
+  content: '';
+  position: absolute;
+  inset: -24px;
+  border-radius: 50%;
+}
+.mars-spot-dot {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff6e6;
+  box-shadow:
+    0 0 0 1px rgba(1, 2, 5, 0.6),
+    0 0 14px 2px rgba(255, 203, 142, 0.75);
+  transition: transform 0.35s var(--ease);
+}
+.mars-spot-dot::before,
+.mars-spot-dot::after {
+  content: '';
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 240, 220, 0.62);
+  transition:
+    transform 0.35s var(--ease),
+    border-color 0.3s;
+}
+.mars-spot-dot::after {
+  border-color: rgba(255, 240, 220, 0.5);
+  animation: mars-ping 3.6s ease-out calc(var(--i) * 0.6s) infinite;
+}
+.mars-spot-text {
+  position: absolute;
+  display: grid;
+  gap: 3px;
+  width: max-content;
+  text-align: left;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.9),
+    0 0 22px rgba(0, 0, 0, 0.95);
+  transition: transform 0.35s var(--ease);
+}
+.mars-spot[data-side='down'] .mars-spot-text {
+  left: 20px;
+  top: 16px;
+}
+.mars-spot[data-side='up'] .mars-spot-text {
+  right: 22px;
+  bottom: 14px;
+  text-align: right;
+}
+.mars-spot small {
+  font-family: var(--f-mono);
+  font-size: clamp(10.5px, 0.8vw, 12px);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  transition: color 0.3s;
+}
+.mars-spot b {
+  font-weight: 560;
+  font-size: clamp(19px, 1.7vw, 26px);
+  letter-spacing: -0.012em;
+  line-height: 1.08;
+  transition: color 0.3s;
+}
+.mars-spot:hover .mars-spot-dot,
+.mars-spot:focus-visible .mars-spot-dot {
+  transform: scale(1.35);
+}
+.mars-spot:hover .mars-spot-dot::before,
+.mars-spot:focus-visible .mars-spot-dot::before {
+  transform: scale(1.5);
+  border-color: var(--sun);
+}
+.mars-spot:hover b,
+.mars-spot:focus-visible b {
+  color: var(--sun);
+}
+.mars-spot:hover small,
+.mars-spot:focus-visible small {
+  color: var(--ink);
+}
+.mars-spot[data-side='down']:hover .mars-spot-text,
+.mars-spot[data-side='down']:focus-visible .mars-spot-text {
+  transform: translate(4px, 2px);
+}
+.mars-spot[data-side='up']:hover .mars-spot-text,
+.mars-spot[data-side='up']:focus-visible .mars-spot-text {
+  transform: translate(-4px, -2px);
+}
+.mars-spot:active .mars-spot-dot {
+  transform: scale(0.9);
+}
+
+.mars-ai {
+  position: absolute;
+  right: clamp(12px, 1.6vw, 24px);
+  bottom: clamp(10px, 1.4vw, 18px);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  pointer-events: none;
+  z-index: 4;
+}
+.mars[data-view='check'] .mars-ai {
+  right: auto;
+  left: clamp(20px, 2.8vw, 44px);
+  bottom: 9px;
+}
+
+/* ------------------------------------------------------------------------------------------------ check page */
+.mars-mod {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(320px, 27.5vw) minmax(0, 1fr);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  background: linear-gradient(90deg, rgba(1, 2, 5, 0.1), rgba(1, 2, 5, 0.42) 34%, rgba(1, 2, 5, 0.7));
+  animation: mars-fade 0.6s ease both;
+}
+.mars-side {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  padding: clamp(18px, 2.2vw, 32px) clamp(10px, 1.2vw, 20px) 36px clamp(20px, 2.8vw, 44px);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.mars-side-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.mars-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 18px 0 14px !important;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(243, 239, 230, 0.34);
+  background: rgba(1, 2, 5, 0.45) !important;
+  font-weight: 520;
+  font-size: 15px;
+  transition:
+    background 0.25s,
+    box-shadow 0.25s,
+    transform 0.2s;
+}
+.mars-back:hover,
+.mars-back:focus-visible {
+  background: rgba(243, 239, 230, 0.12) !important;
+  box-shadow: inset 0 0 0 1px rgba(243, 239, 230, 0.7);
+  outline: none;
+}
+.mars-back:active {
+  transform: scale(0.97);
+}
+.mars-paused {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.mars-title {
+  margin-top: auto;
+  padding-top: min(220px, 20vh);
+  animation: mars-rise 0.9s var(--ease) 0.1s both;
+}
+.mars-phase {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--f-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sun);
+}
+.mars-phase span {
+  color: var(--ink-3);
+}
+.mars-title h2 {
+  margin-top: 10px;
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(52px, 5.5vw, 86px);
+  line-height: 0.95;
+  letter-spacing: -0.015em;
+}
+.mars-sentence {
+  margin-top: 18px !important;
+  max-width: 21em;
+  font-size: clamp(17px, 1.32vw, 20px);
+  line-height: 1.42;
+  color: rgba(243, 239, 230, 0.86);
+  text-wrap: pretty;
+}
+.mars-run {
+  margin-top: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  height: 52px;
+  padding: 0 26px 0 22px !important;
+  border-radius: 999px;
+  background: var(--ink) !important;
+  color: #07080c !important;
+  font-weight: 620;
+  font-size: 16.5px;
+  letter-spacing: -0.005em;
+  box-shadow: 0 0 0 0 rgba(255, 203, 142, 0);
+  transition:
+    transform 0.2s var(--ease),
+    box-shadow 0.3s,
+    background 0.25s,
+    opacity 0.25s;
+}
+.mars-run:hover,
+.mars-run:focus-visible {
+  background: #fff !important;
+  box-shadow: 0 0 0 5px rgba(255, 203, 142, 0.28);
+  outline: none;
+}
+.mars-run:active {
+  transform: scale(0.97);
+}
+.mars-run:disabled {
+  opacity: 0.55;
+  cursor: default;
+  box-shadow: none;
+}
+.mars-act {
+  margin-top: 22px;
+  padding-left: 16px;
+  border-left: 2px solid var(--sun);
+  display: grid;
+  gap: 4px;
+  animation: mars-rise 0.7s var(--ease) both;
+}
+.mars-act small {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sun);
+}
+.mars-act p {
+  font-weight: 580;
+  font-size: 18px;
+  line-height: 1.3;
+  text-wrap: pretty;
+}
+.mars-act span {
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+.mars-hop {
+  margin-top: clamp(20px, 3.4vh, 36px);
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.mars-hop button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-weight: 540;
+  font-size: 15px;
+  text-align: left;
+  color: var(--ink);
+  transition: color 0.25s;
+}
+.mars-hop button.is-next {
+  text-align: right;
+  margin-left: auto;
+}
+.mars-hop button span {
+  display: grid;
+}
+.mars-hop small {
+  font-family: var(--f-mono);
+  font-weight: 400;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.mars-hop button:hover,
+.mars-hop button:focus-visible {
+  color: var(--sun);
+  outline: none;
+}
+
+.mars-main {
+  min-width: 0;
+  padding: clamp(14px, 1.9vw, 28px) clamp(14px, 1.9vw, 28px) clamp(14px, 1.9vw, 28px) clamp(6px, 0.8vw, 12px);
+}
+.mars-stage {
+  position: relative;
+  height: calc(100svh - 2 * clamp(14px, 1.9vw, 28px));
+  min-height: 460px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #05070c;
+  box-shadow:
+    0 0 0 1px rgba(243, 239, 230, 0.16),
+    0 40px 120px rgba(0, 0, 0, 0.7);
+  animation: mars-open 0.9s var(--ease) both;
+}
+.mars-mod[data-id='tracktrace'] .mars-stage {
+  height: calc(100svh - 2 * clamp(14px, 1.9vw, 28px) - 74px);
+}
+.mars-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--f-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.mars-arch {
+  position: relative;
+  z-index: 1;
+  margin-top: 22px !important;
+}
+.mars-arch-frame {
+  padding: 7px;
+  border: 1px solid rgba(243, 239, 230, 0.42);
+  border-radius: 12px;
+}
+.mars-arch-card {
+  background: #fff;
+  border-radius: 6px;
+  padding: clamp(14px, 2vw, 30px);
+}
+.mars-arch-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.mars-arch figcaption {
+  margin: 14px 2px 26px;
+  font-size: 15px;
+  color: var(--ink-2);
+}
+
+/* SpikeCount stage */
+.mars-spike {
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.75fr) minmax(250px, 1fr);
+  gap: clamp(20px, 3vw, 48px);
+  align-items: center;
+  padding: clamp(14px, 1.8vw, 26px);
+}
+.mars-spike-field {
+  position: relative;
+  width: 100%;
+  max-height: 100%;
+  justify-self: center;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0d0f12;
+  box-shadow: 0 0 0 1px var(--line);
+}
+.mars-spike-field img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(1.14) brightness(0.8);
+  transition: filter 0.6s;
+}
+.mars-spike[data-phase='idle'] .mars-spike-field img {
+  filter: contrast(1.1) brightness(0.95);
+}
+.mars-spike-field svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.mars-cell {
+  fill: rgba(127, 212, 255, 0.1);
+  stroke: #7fd4ff;
+  stroke-width: 1.7;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  animation: mars-draw 0.55s ease-out forwards;
+}
+.mars-cell.is-spiky {
+  fill: rgba(255, 106, 43, 0.26);
+  stroke: #ff7a3a;
+}
+.mars-spike-sweep {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: #fff3e6;
+  box-shadow: 0 0 26px 5px rgba(255, 122, 58, 0.75);
+  animation: mars-sweep 3.6s linear forwards;
+}
+.mars-spike-hint {
+  font-family: var(--f-display);
+  font-size: clamp(26px, 2.5vw, 38px);
+  line-height: 1.12;
+  max-width: 13em;
+  text-wrap: balance;
+}
+.mars-spike-big {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 20px !important;
+  transition:
+    opacity 0.5s,
+    translate 0.6s var(--ease);
+}
+.mars-spike-big b {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(64px, 7.4vw, 116px);
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+.mars-spike-big span {
+  font-size: 18px;
+  color: var(--ink-2);
+}
+.mars-spike-big.is-hot b {
+  color: #ff7a3a;
+}
+.mars-spike-big[data-show='0'] {
+  opacity: 0;
+  translate: 0 14px;
+}
+.mars-spike-key {
+  display: flex;
+  gap: 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.mars-spike-key i {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 9px;
+  border-radius: 50%;
+  border: 2px solid #7fd4ff;
+  vertical-align: -1px;
+}
+.mars-spike-key i.k-hot {
+  border-color: #ff7a3a;
+  background: rgba(255, 106, 43, 0.4);
+}
+.mars-spike-tag {
+  display: inline-block;
+  margin-top: 22px;
+  padding: 6px 9px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ------------------------------------------------------------------------------------------------ still (no WebGL) */
+.mars-still {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60vmax 60vmax at 22% 27%, rgba(255, 196, 130, 0.26), transparent 60%),
+    radial-gradient(90vmax 30vmax at 60% 30%, rgba(40, 52, 90, 0.2), transparent 70%), #010205;
+}
+.mars-still i {
+  position: absolute;
+  border-radius: 50%;
+  translate: -50% -50%;
+}
+.mars-still-sun {
+  left: 22%;
+  top: 27%;
+  width: 26px;
+  height: 26px;
+  background: #fff6e4;
+  box-shadow:
+    0 0 60px 30px rgba(255, 214, 160, 0.7),
+    0 0 240px 120px rgba(255, 180, 110, 0.25);
+}
+.mars-still-earth {
+  left: 12%;
+  top: 83%;
+  width: 40vh;
+  height: 40vh;
+  background: radial-gradient(circle at 34% 14%, #9cc4ff 0, #2b5fb8 9%, #0a1c40 24%, #02040a 46%);
+  box-shadow: -6px -10px 40px -6px rgba(90, 150, 255, 0.55);
+}
+.mars-still-mars {
+  left: 87%;
+  top: 19%;
+  width: 6vh;
+  height: 6vh;
+  background: radial-gradient(circle at 30% 40%, #e79a63, #b4532a 45%, #2a0f08 85%);
+}
+.mars-still svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.mars-still path {
+  fill: none;
+  stroke: rgba(255, 220, 180, 0.6);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 3 5;
+}
+
+/* ------------------------------------------------------------------------------------------------ motion */
+@keyframes mars-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes mars-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+@keyframes mars-open {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.985);
+  }
+}
+@keyframes mars-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  70%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+@keyframes mars-draw {
+  to {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+@keyframes mars-sweep {
+  to {
+    left: 100%;
+  }
+}
+
+/* ------------------------------------------------------------------------------------------------ phones */
+@media (max-width: 860px) {
+  .mars-lede {
+    left: 20px;
+    right: 20px;
+    top: 64px;
+    bottom: auto;
+    width: auto;
+  }
+  .mars-lede h1 {
+    font-size: clamp(34px, 9.6vw, 44px);
+  }
+  .mars-lede p {
+    font-size: 15px;
+  }
+  .mars-spot small {
+    display: none;
+  }
+  .mars-spot b {
+    font-size: 16px;
+  }
+  .mars-spot .mars-spot-text,
+  .mars-spot[data-side='down'] .mars-spot-text,
+  .mars-spot[data-side='up'] .mars-spot-text {
+    left: 18px;
+    right: auto;
+    top: -10px;
+    bottom: auto;
+    text-align: left;
+  }
+  .mars-spot .mars-spot-text,
+  .mars-spot[data-side='down'] .mars-spot-text,
+  .mars-spot[data-side='up'] .mars-spot-text {
+    left: auto;
+    right: 20px;
+    text-align: right;
+  }
+  .mars-body {
+    display: none;
+  }
+  .mars-body {
+    font-size: 9.5px;
+  }
+  .mars-mod {
+    display: block;
+    background: linear-gradient(180deg, rgba(1, 2, 5, 0.15) 0, rgba(1, 2, 5, 0.25) 150px, rgba(1, 2, 5, 0.9) 330px);
+  }
+  .mars-side {
+    position: static;
+    height: auto;
+    padding: 14px 16px 6px;
+  }
+  .mars-paused {
+    font-size: 10px;
+  }
+  .mars-title {
+    margin-top: 0;
+    padding-top: 128px;
+  }
+  .mars-title h2 {
+    font-size: clamp(46px, 13.5vw, 60px);
+  }
+  .mars-sentence {
+    font-size: 17px;
+  }
+  .mars-run {
+    width: 100%;
+    justify-content: center;
+  }
+  .mars-hop {
+    margin-top: 20px;
+  }
+  .mars-main {
+    padding: 10px 10px 40px;
+  }
+  .mars-stage,
+  .mars-mod[data-id='tracktrace'] .mars-stage {
+    height: 76svh;
+    min-height: 420px;
+    border-radius: 10px;
+  }
+  .mars-spike {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 18px;
+    padding: 12px;
+  }
+  .mars-spike-field {
+    height: auto;
+    width: 100%;
+    max-width: none;
+  }
+  .mars-ai {
+    font-size: 8.5px;
+  }
+  .mars[data-view='check'] .mars-ai {
+    left: auto;
+    right: 16px;
+    top: 62px;
+    bottom: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mars *,
+  .mars *::before,
+  .mars *::after {
+    animation-duration: 0.01s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01s !important;
+  }
+}

@@ -1,0 +1,741 @@
+// DF: the old "Deep Field" mockup (work/App/mockups/A/home.html) made real.
+//   #/proto/DF/home          the glass crew figure with six callouts, a window of real samples, and the sky
+//   #/proto/DF/<module id>   the check's page; opening one flies into that place on the body, Back flies out again
+// One tree stays mounted for both views, so the zoom has no hard cut: the scene scales toward the chosen body spot,
+// the words dim and blur away, a glow in the check's colour fills the view, and the check's page resolves out of it.
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, type ComponentType, type CSSProperties, type RefObject } from 'react'
+import './df.css'
+import { ASK, MODS, QUIET, href, type Mod } from './data'
+import { END, eout, fitCam, initFigure, initSky, project, settled, stateAt, type FigState } from './figure'
+import { initAurora } from './sky'
+
+interface Props {
+  view: string
+  params: URLSearchParams
+}
+interface CheckProps {
+  mod: Mod
+  /** True once the zoom has landed: only then may the heavy stage mount and load models. */
+  live: boolean
+}
+
+// The real check page lives in ./check.tsx; until that file exists a plain page stands in for it.
+const checkLoader = import.meta.glob<{ default: ComponentType<CheckProps> }>('./check.tsx')['./check.tsx']
+const RealCheck = checkLoader ? lazy(checkLoader) : null
+
+/** Where the figure and its callout columns sit. Desktop: viewport px. Phone: a 780x1064 stage scaled by s. */
+interface Geom {
+  phone: boolean
+  vw: number
+  vh: number
+  s: number
+  W: number
+  H: number
+  cx: number
+  top: number
+  bottom: number
+  glX: number
+  glW: number
+  LX: number
+  RX: number
+  hit: number
+  /** Callout scale: 1 = the mockup's sizes (figure 856 px tall). */
+  k: number
+  /** Type scale of the left column: 1 = the mockup's 1920x1080 stage. */
+  u: number
+  colW: number
+}
+function calcGeom(): Geom {
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  const phone = vw < 760 || vw / vh < 1.1
+  if (phone) {
+    const s = Math.min(vw, 560) / 780
+    return { phone, vw, vh, s, W: 780, H: 1064, cx: 390, top: 64, bottom: 952, glX: 0, glW: 780, LX: 236, RX: 544, hit: 46, k: 1, u: 1, colW: 0 }
+  }
+  const u = Math.min(vw / 1920, vh / 1080)
+  const top = Math.round(vh * 0.07)
+  const bottom = Math.round(vh * 0.925)
+  const fh = bottom - top
+  const k = fh / 856
+  const cx = Math.round(Math.min(vw * 0.7, vw - 40 * u - 450 * k))
+  const LX = cx - 202 * k
+  const RX = cx + 168 * k
+  const colW = Math.max(300, Math.min(720 * u, LX - 290 * k - 116 * u))
+  return { phone, vw, vh, s: 1, W: vw, H: vh, cx, top, bottom, glX: Math.round(cx - 0.4 * fh), glW: Math.round(0.8 * fh), LX, RX, hit: 30 * k, k, u, colW }
+}
+/** Callout row (stage px) of a check. */
+const rowY = (g: Geom, m: Mod) => (g.phone ? m.ayP : g.top + (m.ay - 112) * g.k)
+
+const STAR = 'M0 -8C.9 -2.2 2.2 -.9 8 0C2.2 .9 .9 2.2 0 8C-.9 2.2 -2.2 .9 -8 0C-2.2 -.9 -.9 -2.2 0 -8Z'
+/** The callouts finish fading in a little after the figure's own reveal. */
+const READY_MS = END + 500
+const BASE = import.meta.env.BASE_URL
+/** A real sample still of each check: its result poster, or for SpikeCount a real microscope field. */
+const stillOf = (m: Mod) => (m.id === 'spikecount' ? `${BASE}spikecount/fields/96.png` : `${BASE}_posters/${m.id}.jpg`)
+/** The Garn Meter poster is drawn on a light ground; it is shown inverted so it sits in the dark window. */
+const stillClass = (m: Mod) => (m.id === 'garnmeter' ? 'inv' : '')
+/** The window starts on the check that asks for attention, then goes round in pitch order. */
+const ASK_INDEX = Math.max(0, MODS.findIndex((m) => m.ask))
+
+const mc = (color: string, extra?: CSSProperties) => ({ '--mc': color, ...extra }) as CSSProperties
+const ss = (a: number, b: number, x: number) => {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)))
+  return t * t * (3 - 2 * t)
+}
+
+function useGeom() {
+  const [g, setG] = useState(calcGeom)
+  useEffect(() => {
+    const on = () => setG(calcGeom())
+    window.addEventListener('resize', on)
+    return () => window.removeEventListener('resize', on)
+  }, [])
+  return g
+}
+
+function useReducedMotion() {
+  const [reduce] = useState(() => {
+    try {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    } catch {
+      return false
+    }
+  })
+  return reduce
+}
+
+/** Sparse stars, the orbital sunrise (a real NASA photo) and the aurora shader over it. */
+function Backdrop({ g, still, slowRef, farRef }: { g: Geom; still: boolean; slowRef: RefObject<boolean>; farRef: RefObject<HTMLDivElement | null> }) {
+  const starRef = useRef<HTMLCanvasElement>(null)
+  const aurRef = useRef<HTMLCanvasElement>(null)
+  // the photo is as wide as the viewport; its limb (64 % down the picture) sits just under the figure's feet
+  const ph = (g.vw * 9) / 16
+  const pTop = 0.93 * g.vh - 0.64 * ph
+  const limbX = 0.42
+  const limbY = g.phone ? 0.03 : 1 - (pTop + 0.61 * ph) / g.vh
+  const limbC = g.phone ? 0.05 : (0.1 * (ph / g.vh)) / 0.1764
+
+  useEffect(() => {
+    const sky = starRef.current ? initSky(starRef.current, 17000) : null
+    if (!sky) return
+    sky.size()
+    sky.draw(0, true)
+  }, [g.vw, g.vh])
+
+  useEffect(() => {
+    const aur = aurRef.current ? initAurora(aurRef.current) : null
+    if (!aur) return
+    aur.size(g.vw, g.vh)
+    const limb: [number, number, number] = [limbX, limbY, limbC]
+    aur.draw(40, limb)
+    if (still) return
+    let raf = 0
+    let last = 0
+    const loop = (now: number) => {
+      raf = requestAnimationFrame(loop)
+      if (now - last < (slowRef.current ? 120 : 40)) return
+      last = now
+      aur.draw(40 + now / 1000, limb)
+    }
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
+  }, [g.vw, g.vh, limbY, limbC, still, slowRef])
+
+  return (
+    <>
+      <canvas ref={starRef} className="df-sky" aria-hidden="true" />
+      {!g.phone && (
+        <div className="df-far" ref={farRef} aria-hidden="true">
+          <div className="df-photo" style={{ top: pTop, height: ph }} />
+        </div>
+      )}
+      <canvas ref={aurRef} className="df-aur" aria-hidden="true" />
+    </>
+  )
+}
+
+function StarIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="-10 -10 20 20" aria-hidden="true">
+      <path d={STAR} fill="currentColor" />
+      <circle r="1.6" fill="#fff" />
+    </svg>
+  )
+}
+
+function AiMark() {
+  return (
+    <div className="df-ai">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2.5c.6 4.6 2.9 6.9 7.5 7.5-4.6.6-6.9 2.9-7.5 7.5-.6-4.6-2.9-6.9-7.5-7.5 4.6-.6 6.9-2.9 7.5-7.5Z" fill="currentColor" />
+        <path d="M19 15.5c.25 1.9 1.1 2.75 3 3-1.9.25-2.75 1.1-3 3-.25-1.9-1.1-2.75-3-3 1.9-.25 2.75-1.1 3-3Z" fill="currentColor" />
+      </svg>
+      AI-generated illustration
+    </div>
+  )
+}
+
+function State({ ask }: { ask?: boolean }) {
+  return ask ? (
+    <span className="df-st ask">{ASK}</span>
+  ) : (
+    <span className="df-st">
+      <i className="df-lamp" />
+      {QUIET}
+    </span>
+  )
+}
+
+function Summary() {
+  return (
+    <p className="df-sum">
+      <span>
+        <i className="df-lamp" />
+        Five are quiet.
+      </span>
+      <span>
+        <i className="df-lamp ask" />
+        One asks for the crew medic.
+      </span>
+    </p>
+  )
+}
+
+interface HotProps {
+  hot: number
+  setHot: (i: number) => void
+}
+const hotHandlers = (i: number, setHot: (i: number) => void) => ({
+  onPointerEnter: () => setHot(i),
+  onPointerLeave: () => setHot(-1),
+  onFocus: () => setHot(i),
+  onBlur: () => setHot(-1),
+})
+
+/** The WebGL glass figure plus the SVG layer of body spots and leader lines. Each body spot is a link to its check. */
+function Figure({
+  g,
+  still,
+  intro,
+  pausedRef,
+  hot,
+  setHot,
+  onReady,
+}: HotProps & { g: Geom; still: boolean; intro: boolean; pausedRef: RefObject<boolean>; onReady: () => void }) {
+  const cvRef = useRef<HTMLCanvasElement>(null)
+  const gRefs = useRef<(SVGGElement | null)[]>([])
+  const readyRef = useRef(onReady)
+  const startRef = useRef<number | null>(null)
+  const [nogl, setNogl] = useState(false)
+
+  useEffect(() => {
+    readyRef.current = onReady
+  }, [onReady])
+
+  useEffect(() => {
+    const cv = cvRef.current
+    if (!cv) return
+    const fig = initFigure(cv)
+    setNogl(!fig)
+    const cam = fitCam(g.cx, g.top, g.bottom)
+    const els = MODS.map((_, i) => {
+      const el = gRefs.current[i]
+      return {
+        lead: el?.querySelector<SVGPathElement>('.df-lead') ?? null,
+        end: el?.querySelector<SVGCircleElement>('.df-end') ?? null,
+        hs: el?.querySelector<SVGAElement>('.df-hs') ?? null,
+      }
+    })
+    const place = (st: FigState) => {
+      MODS.forEach((m, i) => {
+        const { lead, end, hs } = els[i]
+        if (!lead || !end || !hs) return
+        const ay = rowY(g, m)
+        const [sx, sy] = project(cam, m.org, st.rot)
+        const dy = Math.abs(ay - sy)
+        const ex = m.side === 'l' ? g.LX + 16 * g.k : g.RX - 16 * g.k
+        const bx = m.side === 'l' ? Math.max(sx - dy, ex + 12 * g.k) : Math.min(sx + dy, ex - 12 * g.k)
+        lead.setAttribute('d', `M${sx.toFixed(1)} ${sy.toFixed(1)}L${bx.toFixed(1)} ${ay.toFixed(1)}L${ex.toFixed(1)} ${ay.toFixed(1)}`)
+        lead.setAttribute('stroke-dashoffset', (1 - eout(st.ld[i])).toFixed(3))
+        end.setAttribute('cx', ex.toFixed(1))
+        end.setAttribute('cy', ay.toFixed(1))
+        end.style.opacity = st.ld[i] >= 1 ? '1' : '0'
+        const u = st.hs[i]
+        hs.setAttribute('transform', `translate(${sx.toFixed(1)} ${sy.toFixed(1)}) scale(${((0.4 + 0.6 * eout(u)) * g.k).toFixed(3)})`)
+        hs.style.opacity = Math.min(1, u * 2).toFixed(3)
+      })
+    }
+    const render = (st: FigState) => {
+      fig?.draw(st, cam)
+      place(st)
+    }
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
+    fig?.resize(g.glW * g.s * dpr, g.H * g.s * dpr, g.glW, g.glX, dpr)
+    let ready = false
+    const markReady = () => {
+      if (ready) return
+      ready = true
+      readyRef.current()
+    }
+    if (still) {
+      render(stateAt(1e6, false))
+      markReady()
+      return
+    }
+    if (startRef.current === null) startRef.current = intro ? performance.now() : -1e7
+    const start = startRef.current
+    let raf = 0
+    let lastDraw = 0
+    let drawn = false
+    const loop = (now: number) => {
+      raf = requestAnimationFrame(loop)
+      const paused = pausedRef.current
+      if (paused && drawn) return
+      const ms = paused ? 1e7 : now - start
+      if (ms < END) {
+        render(stateAt(ms, false))
+      } else if (now - lastDraw > 33 || !drawn) {
+        render(settled(ms - END, !paused))
+        if (ms > READY_MS) markReady()
+      } else return
+      lastDraw = now
+      drawn = true
+    }
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
+  }, [g, still, intro, pausedRef])
+
+  return (
+    <>
+      <canvas ref={cvRef} className="df-gl" style={{ left: g.glX, width: g.glW, height: g.H }} aria-hidden="true" />
+      <svg className={`df-fig${nogl ? ' nogl' : ''}`} viewBox={`0 0 ${g.W} ${g.H}`} width={g.W} height={g.H} aria-label="Crew body map: six checks">
+        {MODS.map((m, i) => (
+          <g
+            key={m.id}
+            ref={(el) => {
+              gRefs.current[i] = el
+            }}
+            className={hot === i ? 'is-hot' : undefined}
+            style={mc(m.color)}
+          >
+            <path className="df-lead" fill="none" strokeWidth={2 * g.k} strokeLinecap="round" pathLength={1} strokeDasharray={1} />
+            <circle className="df-end" r={3 * g.k} />
+            <a className="df-hs" data-id={m.id} href={href(m.id)} aria-label={`Open ${m.name}`} {...hotHandlers(i, setHot)}>
+              <circle className="df-hit" r={g.hit / g.k} />
+              <g className="df-hl">
+                <circle className="f" r={34} fillOpacity={0.16} />
+                <circle className="s" r={24} fill="none" strokeWidth={2} />
+              </g>
+              <circle className="f" r={16} fillOpacity={0.14} />
+              <circle className="df-ring s" r={18} fill="none" strokeWidth={1.5} strokeOpacity={0.6} />
+              <path className="f" d={STAR} transform="scale(.875)" />
+              <circle r={1.8} fill="#FFFFFF" />
+            </a>
+          </g>
+        ))}
+      </svg>
+    </>
+  )
+}
+
+function Callouts({ g, hot, setHot }: HotProps & { g: Geom }) {
+  return (
+    <>
+      {MODS.map((m, i) => {
+        const pos: CSSProperties = m.side === 'l' ? { right: g.W - g.LX } : { left: g.RX }
+        return (
+          <a
+            key={m.id}
+            href={href(m.id)}
+            className={`df-lab ${m.side}${hot === i ? ' is-hot' : ''}`}
+            style={{ ...mc(m.color), ...pos, top: rowY(g, m) - (g.phone ? 16 : 17 * g.k), '--d': `${2050 + i * 170}ms` } as CSSProperties}
+            aria-label={`Open ${m.name}: ${m.hook}. ${m.ask ? ASK : QUIET}.`}
+            {...hotHandlers(i, setHot)}
+          >
+            {g.phone ? (
+              <span className="df-lab-name">
+                {m.ask && m.side === 'r' && <i className="df-lamp ask" />}
+                {m.name}
+                {m.ask && m.side === 'l' && <i className="df-lamp ask" />}
+              </span>
+            ) : (
+              <>
+                <span className="df-lab-name">{m.name}</span>
+                <span className="df-lab-hook">{m.hook}</span>
+                <State ask={m.ask} />
+              </>
+            )}
+          </a>
+        )
+      })}
+    </>
+  )
+}
+
+/** The instrument window: a large real sample of one check, with its name and sentence, and a strip of all six. */
+function SampleWindow({ shown, hot, setHot }: HotProps & { shown: number }) {
+  const m = MODS[shown]
+  return (
+    <section className="df-win" style={mc(m.color)} aria-label="Real samples of the six checks">
+      <a className="df-win-frame" href={href(m.id)} aria-label={`Open ${m.name}`} {...hotHandlers(shown, setHot)}>
+        <span className="df-win-head">
+          <StarIcon />
+          <span className="df-win-name">{m.name}</span>
+          <State ask={m.ask} />
+          <span className="df-win-tag">Real sample</span>
+        </span>
+        <span className="df-win-view">
+          {MODS.map((x, i) => (
+            <img key={x.id} src={stillOf(x)} alt="" className={`${stillClass(x)}${i === shown ? ' on' : ''}`} draggable={false} decoding="async" />
+          ))}
+          <i className="df-tick tl" />
+          <i className="df-tick tr" />
+          <i className="df-tick bl" />
+          <i className="df-tick br" />
+          <span className="df-win-open">
+            Open
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+        </span>
+        <span className="df-win-sent">{m.sentence}</span>
+      </a>
+      <div className="df-strip">
+        <p className="df-strip-head">
+          <i className="df-lamp breathe" />
+          Six checks, running on this device
+        </p>
+        <div className="df-thumbs">
+          {MODS.map((x, i) => (
+            <a key={x.id} href={href(x.id)} className={`df-thumb${i === shown ? ' on' : ''}${hot === i ? ' is-hot' : ''}`} style={mc(x.color)} aria-label={`Open ${x.name}`} title={x.name} {...hotHandlers(i, setHot)}>
+              <img src={stillOf(x)} alt="" className={stillClass(x)} draggable={false} decoding="async" />
+              <i className={`df-lamp${x.ask ? ' ask' : ''}`} />
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/** Stand-in check page, used only while ./check.tsx is missing or still loading. */
+function StubCheck({ mod }: CheckProps) {
+  return (
+    <main className="df-mod" style={mc(mod.color)}>
+      <a className="df-back" href={href('home')}>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        Back
+      </a>
+      <div className="df-mod-body">
+        <StarIcon className="df-mod-star" />
+        <h1 className="df-mod-name">{mod.name}</h1>
+        <p className="df-mod-sent">{mod.sentence}</p>
+      </div>
+    </main>
+  )
+}
+function Check(props: CheckProps) {
+  if (!RealCheck) return <StubCheck {...props} />
+  return (
+    <Suspense fallback={<StubCheck {...props} />}>
+      <RealCheck {...props} />
+    </Suspense>
+  )
+}
+
+const PHOTO_CREDIT = 'Photo: NASA / Chris Williams (ISS), public domain'
+type LayerStyle = Partial<Record<'transform' | 'transformOrigin' | 'opacity' | 'filter' | 'visibility' | 'pointerEvents', string>>
+const setStyle = (el: HTMLElement | null, st: LayerStyle) => {
+  if (el) Object.assign(el.style, st)
+}
+
+export default function DF({ view, params }: Props) {
+  const reduce = useReducedMotion()
+  const still = reduce || params.get('state') === 'result'
+  const g = useGeom()
+  const mod = MODS.find((m) => m.id === view) ?? null
+
+  const rootRef = useRef<HTMLDivElement>(null)
+  const farRef = useRef<HTMLDivElement>(null)
+  const sceneRef = useRef<HTMLDivElement>(null)
+  const uiRef = useRef<HTMLDivElement>(null)
+  const glowRef = useRef<HTMLDivElement>(null)
+  const pageRef = useRef<HTMLDivElement>(null)
+  /** Zoom position: 0 = home, 1 = inside a check. */
+  const z = useRef(mod ? 1 : 0)
+  const raf = useRef(0)
+  const origin = useRef<{ x: number; y: number } | null>(null)
+  const pausedRef = useRef(!!mod)
+  const fadeOnly = useRef(reduce)
+  const [intro] = useState(!mod)
+  const [page, setPage] = useState<Mod | null>(mod)
+  const pageNow = useRef<Mod | null>(mod)
+  const [landed, setLanded] = useState(!!mod)
+  const [away, setAway] = useState(!!mod)
+  const [hot, setHotRaw] = useState(-1)
+  const [rest, setRest] = useState(ASK_INDEX)
+  const [figReady, setFigReady] = useState(false)
+  const onFigReady = useCallback(() => setFigReady(true), [])
+
+  const setHot = useCallback((i: number) => {
+    if (pausedRef.current) return
+    setHotRaw(i)
+    if (i >= 0) setRest(i)
+  }, [])
+
+  // at rest the window goes slowly round the six samples
+  useEffect(() => {
+    if (away || hot >= 0 || still || g.phone) return
+    const id = window.setInterval(() => setRest((r) => (r + 1) % MODS.length), 5200)
+    return () => window.clearInterval(id)
+  }, [away, hot, still, g.phone])
+
+  /** Paints the zoom at position v: every layer is a pure function of it, so it can stop and turn round anywhere. */
+  const apply = useCallback((v: number) => {
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+    const o = origin.current ?? { x: vw / 2, y: vh / 2 }
+    const home = v <= 0.0005
+    const there = v >= 0.9995
+    const seen = there ? 'hidden' : 'visible'
+    if (fadeOnly.current) {
+      setStyle(sceneRef.current, { transform: '', filter: '', opacity: String(1 - v), visibility: seen, pointerEvents: home ? '' : 'none' })
+      setStyle(uiRef.current, { transform: '', filter: '', opacity: String(1 - v), visibility: seen })
+      setStyle(farRef.current, { transform: '', opacity: String(1 - 0.7 * v) })
+      setStyle(glowRef.current, { opacity: '0' })
+      setStyle(pageRef.current, { transform: '', filter: '', opacity: String(v), visibility: home ? 'hidden' : 'visible', pointerEvents: there ? 'auto' : 'none' })
+      return
+    }
+    const fall = Math.pow(v, 2.2)
+    const sc = Math.exp(Math.log(9) * fall)
+    const mv = ss(0, 1, v)
+    const tx = (vw / 2 - o.x) * mv
+    const ty = (vh / 2 - o.y) * mv
+    const org = `${o.x.toFixed(1)}px ${o.y.toFixed(1)}px`
+    setStyle(
+      sceneRef.current,
+      home
+        ? { transform: '', filter: '', opacity: '1', visibility: 'visible', pointerEvents: '' }
+        : {
+            transformOrigin: org,
+            transform: `translate3d(${tx.toFixed(1)}px,${ty.toFixed(1)}px,0) scale(${sc.toFixed(4)})`,
+            filter: `blur(${(ss(0.12, 0.8, v) * 9).toFixed(2)}px) brightness(${(1 + 0.5 * ss(0.25, 0.85, v)).toFixed(3)})`,
+            opacity: (1 - ss(0.6, 0.97, v)).toFixed(3),
+            visibility: seen,
+            pointerEvents: 'none',
+          },
+    )
+    setStyle(
+      uiRef.current,
+      home
+        ? { transform: '', filter: '', opacity: '1', visibility: 'visible' }
+        : {
+            transformOrigin: org,
+            transform: `translate3d(${(tx * 1.4).toFixed(1)}px,${(ty * 1.4).toFixed(1)}px,0) scale(${(1 + 2.4 * Math.pow(v, 1.7)).toFixed(4)})`,
+            filter: `blur(${(ss(0, 0.3, v) * 7).toFixed(2)}px)`,
+            opacity: (1 - ss(0.02, 0.36, v)).toFixed(3),
+            visibility: v > 0.4 ? 'hidden' : 'visible',
+          },
+    )
+    setStyle(
+      farRef.current,
+      home
+        ? { transform: '', opacity: '1' }
+        : { transformOrigin: org, transform: `translate3d(${(tx * 0.22).toFixed(1)}px,${(ty * 0.22).toFixed(1)}px,0) scale(${(1 + 0.32 * fall).toFixed(4)})`, opacity: (1 - 0.72 * ss(0.3, 1, v)).toFixed(3) },
+    )
+    const gx = o.x + (vw / 2 - o.x) * mv
+    const gy = o.y + (vh / 2 - o.y) * mv
+    setStyle(glowRef.current, {
+      transform: `translate3d(${gx.toFixed(1)}px,${gy.toFixed(1)}px,0) scale(${(0.1 + 1.9 * fall).toFixed(4)})`,
+      opacity: (ss(0.16, 0.6, v) * (1 - ss(0.72, 1, v)) * 0.95).toFixed(3),
+    })
+    setStyle(pageRef.current, {
+      transform: there ? '' : `scale(${(1.1 - 0.1 * ss(0.5, 1, v)).toFixed(4)})`,
+      filter: there ? '' : `blur(${((1 - ss(0.6, 1, v)) * 8).toFixed(2)}px)`,
+      opacity: ss(0.58, 1, v).toFixed(3),
+      visibility: v < 0.5 ? 'hidden' : 'visible',
+      pointerEvents: v > 0.95 ? 'auto' : 'none',
+    })
+  }, [])
+
+  const animateTo = useCallback(
+    (target: number) => {
+      cancelAnimationFrame(raf.current)
+      const from = z.current
+      const dist = Math.abs(target - from)
+      const done = () => {
+        z.current = target
+        apply(target)
+        if (target === 1) setLanded(true)
+        else {
+          origin.current = null
+          pageNow.current = null
+          setPage(null)
+          setLanded(false)
+          setAway(false)
+        }
+      }
+      if (dist < 0.001) {
+        done()
+        return
+      }
+      const dur = (fadeOnly.current ? 240 : target > from ? 1080 : 940) * dist
+      const t0 = performance.now()
+      const step = (now: number) => {
+        const p = Math.min(1, (now - t0) / dur)
+        if (p >= 1) {
+          done()
+          return
+        }
+        z.current = from + (target - from) * p
+        apply(z.current)
+        raf.current = requestAnimationFrame(step)
+      }
+      raf.current = requestAnimationFrame(step)
+    },
+    [apply],
+  )
+
+  /** Where the check's body spot is on screen right now (viewport px), with the scene's own zoom taken off. */
+  const measure = useCallback((id: string) => {
+    const centre = { x: window.innerWidth / 2, y: window.innerHeight / 2 }
+    const scene = sceneRef.current
+    if (!scene) return centre
+    const prev = scene.style.transform
+    scene.style.transform = 'none'
+    const r = scene.querySelector(`.df-hs[data-id="${id}"]`)?.getBoundingClientRect()
+    scene.style.transform = prev
+    if (!r || r.width === 0) return centre
+    const x = r.left + r.width / 2
+    const y = r.top + r.height / 2
+    return x < 0 || x > window.innerWidth || y < 0 || y > window.innerHeight ? centre : { x, y }
+  }, [])
+
+  useLayoutEffect(() => {
+    fadeOnly.current = still
+    const target = MODS.find((m) => m.id === view) ?? null
+    if (target) {
+      if (z.current < 0.02 || !origin.current) origin.current = measure(target.id)
+      pausedRef.current = true
+      pageNow.current = target
+      setPage(target)
+      setAway(true)
+      setHotRaw(-1)
+      animateTo(1)
+    } else {
+      if (!origin.current && pageNow.current) origin.current = measure(pageNow.current.id)
+      pausedRef.current = false
+      animateTo(0)
+    }
+    return () => cancelAnimationFrame(raf.current)
+  }, [view, still, animateTo, measure])
+
+  // dev only: window.__dfZoom(id, 0..1) freezes the zoom at one position, for frame checks
+  useEffect(() => {
+    if (!import.meta.env.DEV) return
+    const w = window as unknown as { __dfZoom?: (id: string, v: number) => void }
+    w.__dfZoom = (id, v) => {
+      const m = MODS.find((x) => x.id === id)
+      if (!m) return
+      cancelAnimationFrame(raf.current)
+      if (!origin.current || z.current < 0.02) origin.current = measure(id)
+      pausedRef.current = true
+      pageNow.current = m
+      setPage(m)
+      z.current = v
+      apply(v)
+    }
+    return () => {
+      delete w.__dfZoom
+    }
+  }, [apply, measure])
+
+  // the layout changed under a finished zoom: repaint it for the new viewport
+  useLayoutEffect(() => {
+    apply(z.current)
+  }, [g, apply])
+
+  useEffect(() => {
+    if (!mod) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !e.defaultPrevented) window.location.hash = href('home')
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [mod])
+
+  const shown = hot >= 0 ? hot : rest
+  const ready = mod ? landed : figReady
+  const cls = `df${g.phone ? ' is-phone' : ''}${still ? ' is-still' : ''}${intro ? '' : ' no-intro'}`
+  const vars = { '--u': `${g.u}px`, '--k': `${g.k}px` } as CSSProperties
+
+  return (
+    <div ref={rootRef} className={cls} style={vars} data-ready={ready ? '1' : undefined} data-view={mod ? mod.id : 'home'} data-landed={landed ? '1' : undefined}>
+      <Backdrop g={g} still={still} slowRef={pausedRef} farRef={farRef} />
+      <div className="df-vignette" />
+      {g.phone ? (
+        <div className="df-scroll" ref={sceneRef} aria-hidden={away || undefined}>
+          <header className="df-phead">
+            <h1 className="df-wordmark">SuperHumans</h1>
+            <p className="df-tagline">Six AI health checks for astronauts, running in your browser.</p>
+            <Summary />
+          </header>
+          <div className="df-pwrap" style={{ height: g.H * g.s }}>
+            <div className="df-pstage" style={{ transform: `scale(${g.s})` }}>
+              <div className="df-photo" />
+              <Figure key="phone" g={g} still={still} intro={intro} pausedRef={pausedRef} hot={hot} setHot={setHot} onReady={onFigReady} />
+              <Callouts g={g} hot={hot} setHot={setHot} />
+              <AiMark />
+            </div>
+          </div>
+          <ul className="df-list" aria-label="The six checks">
+            {MODS.map((m, i) => (
+              <li key={m.id}>
+                <a className={`df-row${hot === i ? ' is-hot' : ''}`} href={href(m.id)} style={mc(m.color)} {...hotHandlers(i, setHot)}>
+                  <img className={`df-row-still ${stillClass(m)}`} src={stillOf(m)} alt="" draggable={false} decoding="async" />
+                  <span>
+                    <span className="df-row-name">{m.name}</span>
+                    <span className="df-row-hook">{m.hook}</span>
+                    {m.ask && <State ask />}
+                  </span>
+                  <span className="df-row-end">
+                    {!m.ask && <State />}
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="df-credit">{PHOTO_CREDIT}</p>
+        </div>
+      ) : (
+        <>
+          <div className="df-scene" ref={sceneRef} aria-hidden={away || undefined}>
+            <Figure key="desk" g={g} still={still} intro={intro} pausedRef={pausedRef} hot={hot} setHot={setHot} onReady={onFigReady} />
+          </div>
+          <main className="df-ui" ref={uiRef} aria-hidden={away || undefined}>
+            <div className="df-col" style={{ width: g.colW }}>
+              <h1 className="df-wordmark">SuperHumans</h1>
+              <p className="df-tagline">Six AI health checks for astronauts, running in your browser.</p>
+              <Summary />
+              <SampleWindow shown={shown} hot={hot} setHot={setHot} />
+            </div>
+            <Callouts g={g} hot={hot} setHot={setHot} />
+            <AiMark />
+            <p className="df-credit">{PHOTO_CREDIT}</p>
+          </main>
+        </>
+      )}
+      <div className="df-glow" ref={glowRef} style={mc(page?.color ?? '#8FB8FF')} aria-hidden="true" />
+      <div className="df-page" ref={pageRef}>
+        {page && <Check key={page.id} mod={page} live={landed} />}
+      </div>
+    </div>
+  )
+}

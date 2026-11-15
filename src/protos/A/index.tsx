@@ -11,12 +11,16 @@ import { setParam } from '../../lib/route'
 import { CHECKS, SITE, SPIKE, STATUS_WORD, checkById, type Check, type CheckId } from './content'
 import { HowHome, HowSpike } from './howContent'
 import { How, Loupe, Mark, Marks, Still, Swatch, Tag } from './parts'
+import { useBubble } from './bubble'
+import { useTrack } from './track'
 
 type Phase = 'idle' | 'running' | 'result' | 'error'
 const ROOT = 'proto/A'
 const STEP_MS = 40 // one cell every 40 ms, in the model's own order
 const HOME_STEP_MS = 28
 const f1 = (x: number) => x.toFixed(1)
+const REAL_TRACK = true
+const REAL_BUBBLE = true
 
 /** The moment's clock starts when the models have answered. */
 const timing = (n: number) => {
@@ -149,6 +153,13 @@ export default function ProtoA({ view, params }: ProtoProps) {
   const howOpen = params.get('how') === '1'
   const forceReplay = params.get('replay') === '1'
   const wantLive = !phone && !coarse && !forceReplay
+  // ---- TrackTrace: the real check (track.tsx). Set REAL_TRACK to false to hang the preview film again.
+  const isTrack = REAL_TRACK && v === 'tracktrace'
+  const track = useTrack({ active: isTrack, params, phone, coarse, reduced })
+  // ---- BubbleGrade: the real check (bubble.tsx). Set REAL_BUBBLE to false to hang the preview film again.
+  const isBubble = REAL_BUBBLE && v === 'bubblegrade'
+  const bubble = useBubble({ active: isBubble, params, phone, coarse })
+  const real = isTrack ? track : isBubble ? bubble : null
 
   // ---- stored outputs of field-96 (Home's outlines, pinned states, and the numbers behind "How do we know?")
   const [stored, setStored] = useState<spike.SpikeResult | null>(null)
@@ -305,8 +316,8 @@ export default function ProtoA({ view, params }: ProtoProps) {
   const stillReady = useCallback((id: CheckId) => setStills((s) => (s[id] ? s : { ...s, [id]: true })), [])
   const mainStill: CheckId = v === 'home' ? 'spikecount' : v
   const dataReady = v === 'home' ? !!stored || storedFailed : urlSettled ? !!run || storedFailed : true
-  const ready = late || ((fonts || late) && !!stills[mainStill] && dataReady)
-  const dataState: Phase = v === 'spikecount' ? phase : stateParam === 'result' ? 'result' : 'idle'
+  const ready = late || ((fonts || late) && (real ? real.ready : !!stills[mainStill] && dataReady))
+  const dataState: Phase = real ? real.phase : v === 'spikecount' ? phase : stateParam === 'result' ? 'result' : 'idle'
 
   // ---- links: every film is one
   const link = (path: string) => ({
@@ -440,7 +451,7 @@ export default function ProtoA({ view, params }: ProtoProps) {
     const isSpike = v === 'spikecount'
     const tagWord = run ? (run.live ? 'LIVE' : 'REPLAY') : wantLive && !urlSettled ? 'LIVE' : 'REPLAY'
     const openFilm = (
-      <section className="vb-film vb-open" data-qa="hero" data-film={v} style={vt(v)} aria-label={`${open.name}: ${open.specimen.toLowerCase()}`}>
+      <section className="vb-film vb-open" data-qa={real ? undefined : 'hero'} data-film={v} style={vt(v)} aria-label={`${open.name}: ${open.specimen.toLowerCase()}`}>
         {isSpike ? (
           <>
             {mission
@@ -469,6 +480,8 @@ export default function ProtoA({ view, params }: ProtoProps) {
               )}
             </p>
           </>
+        ) : real ? (
+          real.film
         ) : (
           <>
             <Still key={`${v}-${phone}`} id={v} frame="open" onReady={stillReady} />
@@ -538,6 +551,8 @@ export default function ProtoA({ view, params }: ProtoProps) {
                 ) : null}
               </div>
             </>
+          ) : real ? (
+            real.answer
           ) : (
             <>
               <h1 className="vb-sentence">
@@ -558,19 +573,21 @@ export default function ProtoA({ view, params }: ProtoProps) {
             <button type="button" className="vb-link" onClick={openHow} aria-haspopup="dialog">
               {SITE.how}
             </button>
+            {real ? real.foot : null}
             {phone ? wordmark : null}
           </div>
         </aside>
+        {real ? real.below : null}
       </>
     )
   }
 
   const howRes = run?.res ?? stored
   return (
-    <div className="vb" data-layout={v === 'home' ? 'home' : 'check'} data-view={v} data-ready={ready ? '1' : '0'} data-state={dataState} data-source={v === 'spikecount' && run ? (run.live ? 'live' : 'replay') : undefined}>
+    <div className="vb" data-layout={v === 'home' ? 'home' : 'check'} data-view={v} data-ready={ready ? '1' : '0'} data-state={dataState} data-source={real ? real.source : v === 'spikecount' && run ? (run.live ? 'live' : 'replay') : undefined} data-scroll={isTrack ? 1 : undefined} data-real={real ? 1 : undefined}>
       {body}
       <How open={howOpen} onClose={closeHow}>
-        {v === 'spikecount' ? howRes ? <HowSpike res={howRes} live={!!run?.live} onStep={onMission} /> : <p className="vb-quiet">{storedFailed ? 'The evidence did not load. Close this and try again.' : 'Loading the evidence.'}</p> : <HowHome />}
+        {real ? real.how : v === 'spikecount' ? howRes ? <HowSpike res={howRes} live={!!run?.live} onStep={onMission} /> : <p className="vb-quiet">{storedFailed ? 'The evidence did not load. Close this and try again.' : 'Loading the evidence.'}</p> : <HowHome />}
       </How>
     </div>
   )

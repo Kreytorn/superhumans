@@ -1,0 +1,76 @@
+/* Harness only: the stage fills the viewport under a thin test bar. Scoped under .vsqh. */
+.vsqh {
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: #0e1011;
+  color: #f4f2ec;
+  font: 12px/1.2 'Instrument Sans Variable', ui-sans-serif, sans-serif;
+  overflow: hidden;
+}
+.vsqh[data-bare] {
+  grid-template-rows: minmax(0, 1fr);
+}
+.vsqh .vsqh-stage {
+  height: 100%;
+  aspect-ratio: auto;
+}
+/* one line of scaffolding: what a page receives at the left edge, the test controls at the right edge */
+.vsqh-bar {
+  display: block;
+  min-height: 34px;
+  padding: 4px 12px 0;
+  line-height: 30px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: justify;
+  text-align-last: justify;
+}
+.vsqh-ctl {
+  display: inline-block;
+}
+.vsqh-tag {
+  font-family: 'Geist Mono Variable', ui-monospace, monospace;
+  font-size: 11px;
+  color: #a2a7a4;
+}
+.vsqh-info {
+  display: inline-block;
+  max-width: calc(100% - 190px);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+  text-align: left;
+  text-align-last: auto;
+  color: #a2a7a4;
+}
+.vsqh-tag {
+  margin-right: 8px;
+}
+.vsqh-bar button,
+.vsqh-bar select {
+  margin-left: 6px;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 1px solid rgb(244 242 236 / 0.24);
+  border-radius: 6px;
+  min-height: 26px;
+  padding: 0 9px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.vsqh-bar select {
+  background: #0e1011;
+}
+.vsqh-bar button:focus-visible,
+.vsqh-bar select:focus-visible {
+  outline: 2px solid #ffd84a;
+  outline-offset: 2px;
+}
+@media (max-width: 520px) {
+  .vsqh-got {
+    display: none;
+  }
+}

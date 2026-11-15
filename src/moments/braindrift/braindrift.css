@@ -1,0 +1,792 @@
+/* BrainDrift moment. Everything is scoped under .bdm and every colour and font is a token on that root. */
+.bdm {
+  /* the stage is dark because the specimen is an MRI */
+  --m-stage: #0e1114;
+  --m-ink: #eef0f1;
+  --m-ink-2: #929ca4;
+  /* what the model drew: the ventricles it measured */
+  --m-mark: #5cc4f0;
+  /* new fluid space: ventricle after flight that was not ventricle before */
+  --m-mark-2: #f4fbff;
+  /* the handle and the focus ring */
+  --m-accent: #eef0f1;
+  /* brain surface under the key light, and its glass half */
+  --m-specimen: #d9d2c6;
+  --m-glass: #cdd5db;
+  /* ventricles before the model has measured this frame */
+  --m-fluid: #77828b;
+  /* tint of the MRI slice */
+  --m-scan: #f3f1ec;
+  /* flat tones of the other four classes while the model reads */
+  --m-class-white: #d3e0ea;
+  --m-class-cortex: #7f93b4;
+  --m-class-deep: #4e6688;
+  --m-class-hind: #9fb0c6;
+  --m-font: 'Instrument Sans Variable', 'Instrument Sans', system-ui, sans-serif;
+  --m-font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--m-stage);
+  color: var(--m-ink);
+  font-family: var(--m-font);
+  font-size: 14px;
+  line-height: 1.25;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+.bdm *,
+.bdm *::before,
+.bdm *::after {
+  box-sizing: border-box;
+}
+.bdm .bdm-probe {
+  display: none;
+}
+.bdm .bdm-hero,
+.bdm .bdm-canvas,
+.bdm .bdm-poster,
+.bdm .bdm-marks {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.bdm .bdm-poster {
+  object-fit: contain;
+}
+.bdm .bdm-canvas {
+  transition: opacity 300ms ease-out;
+  opacity: 0;
+}
+.bdm[data-ready='1'] .bdm-canvas {
+  opacity: 1;
+}
+
+/* marks drawn on the specimen */
+.bdm .bdm-marks {
+  pointer-events: none;
+  overflow: visible;
+  --a: 1;
+  --b: 1;
+}
+.bdm .bdm-line,
+.bdm .bdm-lead {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  vector-effect: non-scaling-stroke;
+}
+.bdm .bdm-line-pre {
+  stroke: var(--m-ink-2);
+  stroke-width: 1.25;
+  stroke-dashoffset: var(--a);
+}
+.bdm .bdm-line-post {
+  stroke: var(--m-mark-2);
+  stroke-width: 1.75;
+  stroke-dashoffset: var(--a);
+}
+.bdm .bdm-lead {
+  stroke: var(--m-ink-2);
+  stroke-width: 1;
+  stroke-dashoffset: var(--b);
+}
+/* the name on the unmeasured ventricles, before the model has looked */
+.bdm .bdm-lead-idle {
+  fill: none;
+  stroke: var(--m-ink);
+  stroke-width: 1;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+.bdm .bdm-dot-idle {
+  fill: var(--m-ink);
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+.bdm .bdm-label-idle {
+  font-size: 14px;
+  color: var(--m-ink);
+  transition: opacity 180ms ease-out;
+}
+.bdm .bdm-off {
+  display: none;
+}
+
+.bdm .bdm-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  gap: 2px;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.bdm .bdm-big {
+  font-size: clamp(26px, 3.1vw, 40px);
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--m-mark);
+}
+.bdm .bdm-mid {
+  font-size: clamp(18px, 1.7vw, 22px);
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: var(--m-ink);
+}
+.bdm .bdm-cap {
+  font-size: 13px;
+  color: var(--m-ink);
+}
+.bdm .bdm-sub {
+  font-size: 13px;
+  color: var(--m-ink-2);
+}
+.bdm .bdm-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+  font-size: 12.5px;
+  color: var(--m-ink-2);
+}
+.bdm .bdm-key i {
+  /* the swatch is the rim itself: a light edge on the measured blue (not a box, so it never reads as a checkbox) */
+  width: 16px;
+  height: 7px;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, var(--m-mark-2) 0 42%, var(--m-mark) 42% 100%);
+  box-shadow: 0 0 7px color-mix(in srgb, var(--m-mark-2) 55%, transparent);
+}
+.bdm .bdm-label-vent {
+  text-align: right;
+  justify-items: end;
+}
+
+/* small tags: SIMULATION, LIVE, REPLAY */
+.bdm .bdm-tag {
+  display: inline-block;
+  padding: 2px 6px 1px;
+  border: 1px solid color-mix(in srgb, var(--m-ink-2) 60%, transparent);
+  border-radius: 3px;
+  font-family: var(--m-font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  color: var(--m-ink-2);
+}
+.bdm .bdm-status {
+  position: absolute;
+  left: 16px;
+  top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 20px;
+  pointer-events: none;
+}
+.bdm .bdm-status-text {
+  font-size: 12.5px;
+  color: var(--m-ink-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* with labels on, the reading line stands by the specimen, where the fluid spaces are named */
+.bdm .bdm-status[data-at] .bdm-status-text {
+  font-size: 14px;
+  color: var(--m-ink);
+}
+.bdm .bdm-status .bdm-tag {
+  opacity: calc(1 - var(--gone, 0));
+}
+.bdm .bdm-cap .bdm-tag {
+  margin-left: 7px;
+  vertical-align: 1px;
+  pointer-events: auto;
+}
+
+/* the one control: fly the brain */
+.bdm .bdm-flight {
+  --pos: 0;
+  position: absolute;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  width: min(520px, calc(100% - 40px));
+  transform: translateX(-50%);
+  display: grid;
+  /* the two end labels take their own width, so "After flight" and its tag stay on one line at 320 px */
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  row-gap: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.bdm .bdm-track {
+  grid-column: 1 / -1;
+  position: relative;
+  height: 44px;
+}
+.bdm .bdm-rail,
+.bdm .bdm-fill {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 50%;
+  height: 2px;
+  margin-top: -1px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--m-ink-2) 45%, transparent);
+  pointer-events: none;
+}
+.bdm .bdm-fill {
+  background: var(--m-accent);
+  transform-origin: left center;
+  transform: scaleX(var(--pos));
+}
+.bdm .bdm-tick {
+  position: absolute;
+  top: 50%;
+  left: calc(12px + (100% - 24px) * var(--i));
+  width: 2px;
+  height: 8px;
+  margin: -4px 0 0 -1px;
+  border-radius: 1px;
+  background: var(--m-ink-2);
+  pointer-events: none;
+}
+/* the invitation at rest: one line across the track that names the payoff */
+.bdm .bdm-cue {
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  bottom: calc(100% - 5px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.28em;
+  font-size: 16px;
+  line-height: 1.3;
+  color: var(--m-ink);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+.bdm .bdm-cue > span {
+  white-space: nowrap;
+}
+.bdm .bdm-cue[data-on] {
+  opacity: 1;
+}
+.bdm .bdm-note {
+  position: absolute;
+  bottom: calc(50% + 17px);
+  left: clamp(64px, calc(12px + (100% - 24px) * var(--pos)), calc(100% - 64px));
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  font-size: 12.5px;
+  color: var(--m-ink-2);
+  pointer-events: none;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.bdm .bdm-note-put {
+  color: var(--m-ink);
+}
+.bdm .bdm-note-ill {
+  order: -1;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+.bdm[data-beat='idle'][data-frame='1'] .bdm-note-ill,
+.bdm[data-beat='idle'][data-frame='2'] .bdm-note-ill,
+.bdm[data-beat='idle'][data-frame='3'] .bdm-note-ill,
+.bdm .bdm-flight[data-middle='1'] .bdm-note-ill {
+  opacity: 1;
+}
+.bdm .bdm-marks[data-only='pre'] .bdm-line-post,
+.bdm .bdm-marks[data-only='pre'] .bdm-lead {
+  visibility: hidden;
+}
+.bdm .bdm-range {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: grab;
+  touch-action: pan-y;
+  outline: none;
+}
+.bdm .bdm-range:active {
+  cursor: grabbing;
+}
+.bdm .bdm-range:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.bdm .bdm-range::-webkit-slider-runnable-track {
+  height: 44px;
+  background: transparent;
+}
+.bdm .bdm-range::-moz-range-track {
+  height: 44px;
+  background: transparent;
+}
+.bdm .bdm-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  margin-top: 10px;
+  border-radius: 50%;
+  border: 3px solid var(--m-stage);
+  background: var(--m-accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--m-accent) 55%, transparent);
+  transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.bdm .bdm-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid var(--m-stage);
+  background: var(--m-accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--m-accent) 55%, transparent);
+}
+.bdm .bdm-range:active::-webkit-slider-thumb {
+  transform: scale(1.18);
+}
+/* keyboard focus: a line round the whole track, and a second, heavier ring well clear of the thumb */
+.bdm .bdm-range:focus-visible {
+  outline: 1.5px solid color-mix(in srgb, var(--m-accent) 70%, transparent);
+  outline-offset: -3px;
+  border-radius: 22px;
+}
+.bdm .bdm-range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px var(--m-stage), 0 0 0 7px var(--m-accent);
+}
+.bdm .bdm-range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px var(--m-stage), 0 0 0 7px var(--m-accent);
+}
+.bdm .bdm-end,
+.bdm .bdm-btn {
+  appearance: none;
+  border: 0;
+  background: none;
+  color: var(--m-ink);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.bdm .bdm-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  white-space: nowrap;
+  padding: 2px 4px;
+  margin-top: -4px;
+  border-radius: 4px;
+  transition: transform 120ms ease-out;
+}
+.bdm .bdm-end-a {
+  justify-self: start;
+}
+.bdm .bdm-end-b {
+  justify-self: end;
+}
+.bdm .bdm-end:active {
+  transform: scale(0.97);
+}
+.bdm .bdm-end:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+/* at before flight the button has nothing to do: it stays as the slider's end label */
+.bdm .bdm-end[data-here]:disabled {
+  opacity: 1;
+}
+.bdm .bdm-end:focus-visible,
+.bdm .bdm-btn:focus-visible {
+  outline: 2px solid var(--m-accent);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .bdm .bdm-end:hover:not(:disabled) {
+    color: var(--m-mark);
+  }
+}
+
+.bdm .bdm-error {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+  background: var(--m-stage);
+}
+.bdm .bdm-error p {
+  margin: 0;
+  font-size: 16px;
+}
+.bdm .bdm-error .bdm-error-detail {
+  max-width: 44ch;
+  font-size: 12.5px;
+  color: var(--m-ink-2);
+}
+.bdm .bdm-btn {
+  margin-top: 6px;
+  padding: 10px 16px;
+  border: 1px solid var(--m-ink-2);
+  border-radius: 6px;
+}
+
+@media (max-width: 520px) {
+  .bdm .bdm-label-vent {
+    text-align: left;
+    justify-items: start;
+  }
+  .bdm .bdm-cap,
+  .bdm .bdm-sub {
+    font-size: 12.5px;
+  }
+  .bdm .bdm-cue {
+    font-size: 15px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bdm .bdm-canvas,
+  .bdm .bdm-lead-idle,
+  .bdm .bdm-dot-idle,
+  .bdm .bdm-cue,
+  .bdm .bdm-label-idle,
+  .bdm .bdm-note-ill,
+  .bdm .bdm-end,
+  .bdm .bdm-range::-webkit-slider-thumb {
+    transition: none;
+  }
+}
+
+/* ---- light, depth and motion (r3 k2): everything below reads the same tokens, plus the optional --m-glow ---- */
+.bdm {
+  /* the light the stage gives off: glow behind the brain, rim light, lit slices. Follows --m-mark unless set. */
+  --m-glow: var(--m-mark);
+  /* where the brain stands (set by the stage at every layout) */
+  --bx: 50%;
+  --by: 45%;
+  --bw: 520px;
+  --bh: 420px;
+}
+.bdm .bdm-atmo {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at var(--bx) var(--by), color-mix(in srgb, var(--m-glow) 21%, transparent) 0, color-mix(in srgb, var(--m-glow) 8%, transparent) calc(var(--bw) * 0.42), transparent calc(var(--bw) * 0.95)),
+    radial-gradient(130% 105% at 50% 42%, transparent 48%, color-mix(in srgb, #000 62%, transparent) 100%),
+    /* depth: two far, faint washes of the same light, so the dark has distance in it and is never flat */
+    radial-gradient(55% 48% at 88% 16%, color-mix(in srgb, var(--m-glow) 7%, transparent), transparent 72%),
+    radial-gradient(48% 42% at 8% 88%, color-mix(in srgb, var(--m-glow) 5%, transparent), transparent 72%);
+  opacity: 0;
+  transition: opacity 900ms ease-out;
+}
+.bdm[data-ready='1'] .bdm-atmo {
+  opacity: 1;
+}
+.bdm .bdm-orbit {
+  position: absolute;
+  left: var(--bx);
+  top: var(--by);
+  width: calc(var(--bw) * 1.3);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--m-glow) 34%, transparent);
+  -webkit-mask: conic-gradient(from 20deg, #000 0 14%, transparent 30% 52%, #000 72% 100%);
+  mask: conic-gradient(from 20deg, #000 0 14%, transparent 30% 52%, #000 72% 100%);
+  animation: bdm-spin 70s linear infinite;
+}
+.bdm .bdm-orbit-b {
+  width: calc(var(--bw) * 1.6);
+  border: 1px dashed color-mix(in srgb, var(--m-glow) 20%, transparent);
+  animation-duration: 160s;
+  animation-direction: reverse;
+}
+.bdm .bdm-floor {
+  position: absolute;
+  left: var(--bx);
+  top: calc(var(--by) + var(--bh) * 0.53);
+  width: calc(var(--bw) * 1.08);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  transform: scaleY(0.2);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--m-glow) 34%, transparent) 0, color-mix(in srgb, var(--m-glow) 10%, transparent) 36%, transparent 68%),
+    repeating-radial-gradient(circle, transparent 0 calc(8% - 3px), color-mix(in srgb, var(--m-glow) 30%, transparent) calc(8% - 3px) 8%);
+  -webkit-mask: radial-gradient(circle, #000 22%, transparent 70%);
+  mask: radial-gradient(circle, #000 22%, transparent 70%);
+}
+/* while the model reads, the floor and the glow answer */
+.bdm[data-beat='read'] .bdm-floor,
+.bdm[data-beat='seal'] .bdm-floor {
+  animation: bdm-floor 1.6s ease-in-out infinite;
+}
+@keyframes bdm-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes bdm-floor {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* the rise, made of light: the sliver between the two outlines, and a glow under the after-flight line */
+.bdm .bdm-band {
+  fill: var(--m-mark-2);
+  stroke: none;
+  opacity: calc((1 - var(--b)) * 0.34);
+}
+.bdm .bdm-line-glow {
+  stroke: var(--m-glow);
+  stroke-width: 7;
+  stroke-dashoffset: var(--a);
+  opacity: 0.42;
+  filter: blur(4px);
+}
+.bdm .bdm-marks[data-only='pre'] .bdm-band,
+.bdm .bdm-marks[data-only='pre'] .bdm-line-glow {
+  visibility: hidden;
+}
+.bdm .bdm-line-pre {
+  stroke-dasharray: 0.006 0.006;
+  stroke-width: 1.5;
+}
+.bdm .bdm-marks:not([data-only='pre']) .bdm-line-pre {
+  stroke-dasharray: 1;
+}
+.bdm .bdm-line-post {
+  stroke-width: 2;
+}
+
+/* the measured number: large, and lit by what it measures */
+.bdm .bdm-big {
+  font-size: clamp(34px, 4.6vw, 68px);
+  font-weight: 620;
+  letter-spacing: -0.035em;
+  text-shadow:
+    0 0 18px color-mix(in srgb, var(--m-glow) 55%, transparent),
+    0 0 46px color-mix(in srgb, var(--m-glow) 30%, transparent);
+}
+.bdm .bdm-mid {
+  font-size: clamp(20px, 2.1vw, 30px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.bdm .bdm-label-vent {
+  gap: 4px;
+}
+.bdm .bdm-cap {
+  font-size: 14px;
+}
+.bdm .bdm-label-idle {
+  font-size: 15px;
+  letter-spacing: 0.01em;
+}
+.bdm .bdm-dot-idle {
+  filter: drop-shadow(0 0 4px var(--m-ink));
+}
+
+/* the reading line: a live instrument readout */
+.bdm .bdm-status[data-at] .bdm-status-text {
+  font-family: var(--m-font-mono);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--m-glow);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--m-glow) 60%, transparent);
+}
+.bdm .bdm-status[data-at] .bdm-status-text:not(:empty)::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--m-glow);
+  box-shadow: 0 0 10px var(--m-glow);
+  animation: bdm-blink 0.9s ease-in-out infinite;
+}
+@keyframes bdm-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* the slider: a lit rail */
+.bdm .bdm-rail {
+  background: color-mix(in srgb, var(--m-ink-2) 38%, transparent);
+}
+.bdm .bdm-fill {
+  height: 3px;
+  margin-top: -1.5px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--m-glow) 55%, transparent), var(--m-accent));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--m-glow) 80%, transparent);
+}
+.bdm .bdm-range::-webkit-slider-thumb {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--m-accent) 55%, transparent),
+    0 0 18px 2px color-mix(in srgb, var(--m-glow) 70%, transparent);
+}
+.bdm .bdm-range::-moz-range-thumb {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--m-accent) 55%, transparent),
+    0 0 18px 2px color-mix(in srgb, var(--m-glow) 70%, transparent);
+}
+/* at rest the track shows where to go: a pulse of light runs from the thumb to after flight */
+.bdm .bdm-cue[data-on] ~ .bdm-range {
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--m-glow) 75%, transparent), transparent) no-repeat 0 50% / 90px 2px;
+  animation: bdm-go 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes bdm-go {
+  from {
+    background-position: 0 50%;
+    opacity: 1;
+  }
+  to {
+    background-position: 100% 50%;
+  }
+}
+.bdm .bdm-cue {
+  font-size: 17px;
+  letter-spacing: -0.005em;
+}
+.bdm .bdm-cue > span:first-child {
+  color: var(--m-glow);
+  text-shadow: 0 0 16px color-mix(in srgb, var(--m-glow) 50%, transparent);
+}
+.bdm .bdm-end {
+  font-size: 14.5px;
+  letter-spacing: 0.01em;
+}
+@media (max-width: 520px) {
+  .bdm .bdm-cue {
+    font-size: 15.5px;
+  }
+  .bdm .bdm-cap {
+    font-size: 13px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bdm .bdm-orbit,
+  .bdm .bdm-floor,
+  .bdm .bdm-status[data-at] .bdm-status-text::before,
+  .bdm .bdm-cue[data-on] ~ .bdm-range {
+    animation: none;
+  }
+  .bdm .bdm-atmo {
+    transition: none;
+  }
+}
+.bdm .bdm-floor {
+  top: calc(var(--by) + var(--bh) * 0.5);
+  width: calc(var(--bw) * 1.2);
+  transform: scaleY(0.15);
+}
+/* a point of light rides each orbit ring (it fades in and out with the ring's own mask) */
+.bdm .bdm-orbit::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--m-glow) 60%, #fff);
+  box-shadow: 0 0 10px 2px color-mix(in srgb, var(--m-glow) 80%, transparent);
+}
+.bdm .bdm-orbit-a {
+  border-color: color-mix(in srgb, var(--m-glow) 42%, transparent);
+}
+/* the moment the measurement lands: one ring of light leaves the brain */
+.bdm .bdm-atmo::after {
+  content: '';
+  position: absolute;
+  left: var(--bx);
+  top: var(--by);
+  width: calc(var(--bw) * 0.9);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--m-glow) 85%, transparent);
+  box-shadow:
+    0 0 30px color-mix(in srgb, var(--m-glow) 55%, transparent),
+    inset 0 0 30px color-mix(in srgb, var(--m-glow) 35%, transparent);
+  opacity: 0;
+}
+.bdm[data-beat='compare'] .bdm-atmo::after {
+  animation: bdm-land 1.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes bdm-land {
+  from {
+    opacity: 0.9;
+    scale: 0.55;
+  }
+  to {
+    opacity: 0;
+    scale: 2.1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bdm[data-beat='compare'] .bdm-atmo::after {
+    animation: none;
+  }
+}
+/* upright stage: the reading line is centred across the stage and may wrap */
+.bdm .bdm-status[data-narrow] {
+  justify-content: center;
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+.bdm .bdm-status[data-narrow] .bdm-status-text {
+  font-size: 11.5px;
+  letter-spacing: 0;
+}
+/* the entrance: the name of the fluid spaces waits until the camera has arrived and the cut is open */
+.bdm .bdm-label-idle,
+.bdm .bdm-lead-idle,
+.bdm .bdm-dot-idle {
+  transition: opacity 500ms ease-out;
+}
+.bdm[data-intro] .bdm-label-idle,
+.bdm[data-intro] .bdm-lead-idle,
+.bdm[data-intro] .bdm-dot-idle {
+  opacity: 0 !important;
+  transition: none;
+}

@@ -13,6 +13,8 @@ import { navigate, setParam } from '../../lib/route'
 import { BLOOD_PHOTO, CHECKS, FIG_H, FIG_W, SAMPLE, STATUS_WORD, checkById, route, type Check, type CheckId } from './data'
 import { Cells, Figure, Key, Layer, Mark, Poster, SiteMark, StatusLadder, Tag, cellsEnd, resolvePoster } from './parts'
 import { Spike, canRunLive, prewarm } from './Spike'
+import { Bubble } from './Bubble'
+import { Track } from './Track'
 
 type Phase = 'idle' | 'running' | 'result' | 'error'
 type Report = (ready: boolean, state: Phase) => void
@@ -35,7 +37,7 @@ const BLOOD = checkById('spikecount')!
 export default function ProtoB({ view, params }: ProtoProps) {
   const v = view.split('/')[0] || 'home'
   const check = checkById(v)
-  const kind = v === 'spikecount' ? 'spikecount' : check ? 'preview' : 'home'
+  const kind = v === 'spikecount' ? 'spikecount' : v === 'tracktrace' ? 'tracktrace' : v === 'bubblegrade' ? 'bubblegrade' : check ? 'preview' : 'home'
   const [hook, setHook] = useState<{ ready: boolean; state: Phase }>({ ready: false, state: 'idle' })
   const report = useCallback<Report>((ready, state) => setHook((h) => (h.ready === ready && h.state === state ? h : { ready, state })), [])
   const [opening, setOpening] = useState<OpeningState | null>(null)
@@ -83,6 +85,10 @@ export default function ProtoB({ view, params }: ProtoProps) {
     <div ref={root} className="pb" data-view={kind} data-ready={hook.ready ? '1' : undefined} data-state={hook.state} data-still={still ? '1' : undefined}>
       {kind === 'spikecount' ? (
         <Spike key="spikecount" params={params} report={report} />
+      ) : kind === 'tracktrace' ? (
+        <Track key="tracktrace" params={params} report={report} />
+      ) : kind === 'bubblegrade' ? (
+        <Bubble key="bubblegrade" params={params} report={report} />
       ) : kind === 'preview' ? (
         <Preview key={v} check={check!} params={params} report={report} />
       ) : (

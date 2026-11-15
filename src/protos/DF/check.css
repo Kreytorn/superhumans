@@ -1,0 +1,109 @@
+/* DF check page (one design for all six checks). Every rule is scoped under .df-check; the .df root gives the tokens. */
+@font-face{font-family:"JetBrains Mono";src:url("../../assets/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2");font-weight:100 800;font-display:swap}
+
+.df-check{position:absolute;inset:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:transparent;color:var(--text-1);font-family:var(--sans)}
+.df-check::before{content:"";position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(46% 56% at 80% 46%,color-mix(in srgb,var(--mc) 11%,transparent),transparent 72%)}
+.df-check .df-check-in{position:relative;display:flex;flex-direction:column;gap:22px;min-height:100%;padding:28px clamp(20px,3vw,48px) 32px}
+
+/* head: Back, the name, the one sentence */
+.df-check .df-check-head{display:flex;align-items:center;gap:26px;min-height:56px}
+.df-check .df-check-head .df-back{flex:none;align-self:center}
+.df-check .df-check-name{flex:none;margin:0;font:700 58px/1 var(--sans);letter-spacing:-.04em;color:var(--text-1)}
+.df-check .df-check-name::before{content:"";display:inline-block;width:14px;height:14px;margin:0 16px 8px 0;border-radius:50%;background:var(--mc);box-shadow:0 0 18px var(--mc)}
+.df-check .df-check-sent{margin:0;max-width:30em;font:500 21px/1.3 var(--sans);letter-spacing:-.005em;color:var(--text-2);text-wrap:balance}
+
+/* main: the stage, large, and the result beside it */
+.df-check .df-check-main{flex:1 1 auto;display:grid;grid-template-columns:minmax(0,1fr) 348px;gap:24px;min-height:560px;height:calc(100svh - 28px - 56px - 22px - 32px)}
+.df-check .df-check-stage{position:relative;min-width:0;min-height:0;overflow:hidden;border:1px solid var(--line-hair);border-radius:18px;background:#070A14;
+  box-shadow:0 0 0 1px rgba(0,0,0,.4),0 30px 80px rgba(0,0,6,.55),0 0 90px color-mix(in srgb,var(--mc) 9%,transparent)}
+.df-check[data-module="bubblegrade"] .df-check-stage{background:#071421}
+.df-check .df-check-stage > *{width:100%;height:100%}
+
+.df-check .df-check-wait{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;height:100%;color:var(--text-3);font:500 17px/1.3 var(--sans)}
+.df-check .df-check-wait p{margin:0}
+.df-check .df-check-wait i{width:14px;height:14px;border-radius:50%;background:var(--mc);box-shadow:0 0 22px var(--mc);animation:dfCheckPulse 1.4s ease-in-out infinite}
+@keyframes dfCheckPulse{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+.df-check .df-check-ghost{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border:1px solid var(--line);border-radius:999px;color:var(--text-1);font:600 16px/1 var(--sans)}
+
+/* result panel */
+.df-check .df-check-panel{display:flex;flex-direction:column;gap:18px;min-width:0;padding:26px 26px 24px;border:1px solid var(--line-hair);border-radius:18px;background:rgba(11,15,31,.72);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.df-check .df-check-eyebrow{display:flex;align-items:center;gap:12px;margin:0;font:600 14px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--text-3)}
+.df-check .df-check-tag{padding:4px 8px;border:1px solid var(--line-strong);border-radius:4px;font:600 12px/1 var(--m-font-mono,"JetBrains Mono",ui-monospace,monospace);letter-spacing:.08em;color:var(--text-1)}
+.df-check .df-check-before{margin:0;font:500 23px/1.32 var(--sans);letter-spacing:-.01em;color:var(--text-1);text-wrap:pretty}
+.df-check .df-check-result{display:flex;flex-direction:column;gap:18px;animation:dfCheckIn .5s var(--ease-out) both}
+@keyframes dfCheckIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.df-check .df-check-big{display:flex;flex-direction:column;gap:10px;margin:0}
+.df-check .df-check-big b{font:700 112px/.86 var(--sans);letter-spacing:-.05em;color:var(--text-1);text-shadow:0 0 44px color-mix(in srgb,var(--mc) 55%,transparent);font-variant-numeric:tabular-nums}
+.df-check .df-check-big span{font:500 18px/1.3 var(--sans);color:var(--text-2);text-wrap:balance}
+.df-check .df-check-who{display:flex;flex-direction:column;gap:7px;margin:0;padding-top:18px;border-top:1px solid var(--line-hair);font:600 22px/1.25 var(--sans);letter-spacing:-.01em;color:var(--mc)}
+.df-check .df-check-who span{font:600 13px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--text-3)}
+.df-check .df-check-action{margin:0;font:500 22px/1.32 var(--sans);letter-spacing:-.01em;color:var(--text-1);text-wrap:pretty}
+.df-check .df-check-fine{font:500 14px/1.45 var(--sans);color:var(--text-2)}
+.df-check .df-check-fine summary{display:inline-flex;align-items:center;min-height:36px;cursor:pointer;color:var(--accent);font:600 15px/1 var(--sans)}
+.df-check .df-check-fine ul{margin:6px 0 0;padding:0 0 0 18px;display:grid;gap:8px;max-height:190px;overflow-y:auto}
+
+.df-check .df-check-btn{margin-top:auto;display:inline-flex;align-items:center;justify-content:center;min-height:58px;padding:0 26px;border:0;border-radius:999px;cursor:pointer;
+  background:var(--mc);color:#05070F;font:700 19px/1 var(--sans);letter-spacing:-.01em;box-shadow:0 0 34px color-mix(in srgb,var(--mc) 40%,transparent);
+  transition:transform .15s var(--ease-out),filter .15s var(--ease-out),opacity .15s var(--ease-out)}
+.df-check .df-check-btn:hover{filter:brightness(1.1)}
+.df-check .df-check-btn:active{transform:scale(.97)}
+.df-check .df-check-btn:disabled{cursor:default;opacity:.5;filter:none;transform:none}
+.df-check .df-check-btn.is-quiet{background:transparent;color:var(--text-1);border:1px solid var(--line-strong);box-shadow:none}
+.df-check .df-check-btn.is-quiet:hover{border-color:var(--accent);background:var(--surface-2);filter:none}
+
+/* SpikeCount: the field photo with the stored outlines */
+.df-check .df-check-spike{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px;height:100%}
+.df-check .df-check-spike-field{position:relative;flex:0 1 auto;height:calc(100% - 44px);max-width:100%;aspect-ratio:1;overflow:hidden;border-radius:12px;background:#000105}
+.df-check .df-check-spike-field img{display:block;width:100%;height:100%;object-fit:cover;filter:contrast(1.12) brightness(.9)}
+.df-check .df-check-spike-field svg{position:absolute;inset:0;width:100%;height:100%}
+.df-check .df-check-spike-field polygon{fill-opacity:0;stroke-width:1.5;stroke-linejoin:round;vector-effect:non-scaling-stroke;stroke-dasharray:1;stroke-dashoffset:1;
+  animation:dfCheckDraw .55s var(--ease-out) both}
+.df-check .df-check-spike-field polygon.is-spiky{stroke-width:2.2;animation-name:dfCheckDrawHot}
+@keyframes dfCheckDraw{to{stroke-dashoffset:0}}
+@keyframes dfCheckDrawHot{to{stroke-dashoffset:0;fill-opacity:.22}}
+.df-check .df-check-spike-sweep{position:absolute;top:0;bottom:0;left:0;width:3px;background:linear-gradient(to bottom,transparent,var(--mc),transparent);box-shadow:0 0 26px 6px color-mix(in srgb,var(--mc) 55%,transparent);
+  animation:dfCheckSweep 1.5s linear both}
+@keyframes dfCheckSweep{from{transform:translateX(0)}to{transform:translateX(min(100vw,1400px))}}
+.df-check .df-check-spike-key{flex:none;display:flex;flex-wrap:wrap;justify-content:center;gap:6px 22px;margin:0;padding:0;list-style:none;font:500 15px/1.2 var(--sans);color:var(--text-2)}
+.df-check .df-check-spike-key li{display:inline-flex;align-items:center;gap:8px}
+.df-check .df-check-spike-key i{width:22px;height:8px;border-radius:4px}
+
+/* TrackTrace: our model's architecture on a white card in a thin frame */
+.df-check .df-check-arch{margin:6px 0 0;display:grid;grid-template-columns:minmax(0,600px) minmax(0,1fr);align-items:end;gap:18px 32px}
+.df-check .df-check-arch-card{padding:8px;border:1px solid var(--line-strong);border-radius:16px}
+.df-check .df-check-arch-card img{display:block;width:100%;height:auto;border-radius:9px;background:#fff}
+.df-check .df-check-arch figcaption{max-width:14em;padding-bottom:10px;font:600 30px/1.18 var(--sans);letter-spacing:-.02em;color:var(--text-1);text-wrap:balance}
+
+/* narrower laptops */
+@media (max-width:1180px){
+  .df-check .df-check-main{grid-template-columns:minmax(0,1fr) 300px}
+  .df-check .df-check-name{font-size:46px}
+  .df-check .df-check-sent{font-size:18px}
+  .df-check .df-check-big b{font-size:88px}
+}
+/* phone and upright screens: the stage first, then the result under it */
+@media (max-width:820px),(max-aspect-ratio:1/1){
+  .df-check .df-check-in{gap:16px;padding:16px 14px 28px}
+  .df-check .df-check-head{flex-wrap:wrap;gap:10px 14px;min-height:0}
+  .df-check .df-check-name{font-size:38px}
+  .df-check .df-check-name::before{width:10px;height:10px;margin:0 10px 5px 0}
+  .df-check .df-check-sent{flex:1 1 100%;font-size:16.5px;line-height:1.35}
+  .df-check .df-check-main{display:flex;flex-direction:column;height:auto;min-height:0;gap:14px}
+  .df-check .df-check-stage{height:min(66svh,620px);min-height:420px;border-radius:14px}
+  .df-check[data-module="spikecount"] .df-check-stage{height:auto;min-height:0}
+  .df-check .df-check-spike{padding:10px}
+  .df-check .df-check-spike-field{height:auto;width:100%}
+  .df-check .df-check-panel{padding:20px 18px;gap:14px}
+  .df-check .df-check-before{font-size:19px}
+  .df-check .df-check-big b{font-size:84px}
+  .df-check .df-check-who,.df-check .df-check-action{font-size:20px}
+  .df-check .df-check-btn{margin-top:4px;min-height:56px}
+  .df-check .df-check-arch{grid-template-columns:minmax(0,1fr);gap:12px}
+  .df-check .df-check-arch figcaption{padding-bottom:0;font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  .df-check .df-check-result,.df-check .df-check-wait i,.df-check .df-check-spike-sweep{animation:none}
+  .df-check .df-check-spike-field polygon{animation-duration:.01s;animation-delay:0s!important}
+}

@@ -1,0 +1,11 @@
+# S3 "Eclipse": direction (written before the build, per Meng To's "Build Awwwards-Quality Sites")
+
+- **Visual thesis:** inner space. Each real specimen (a cell nucleus, a blood field, a brain) is a dark world in eclipse; the light spilling round it is the space. No star wallpaper: space comes from one light source, scale and the dark.
+- **Hero focal asset:** a round lens holding the live specimen of one check, ringed by a corona drawn by one fragment shader (raw WebGL, no library). Six small moons, one per check, share an orbit round it; choosing one swings it to the dock, swaps the specimen and re-tints the light.
+- **Type hierarchy:** Bricolage Grotesque (display, 98 px hero, 80 px names) / Instrument Serif italic (one accent phrase per heading) / Geist (body 16-21 px) / Geist Mono (11-12 px labels, uppercase, tracked).
+- **Colour system:** near-black #030409, warm white ink #f3f1ec at 100 / 70 / 44 %, and one tint at a time, taken from the active check's own model marks (magenta, amber, cyan, yellow, blue, violet).
+- **Section sequence (home):** hero (message, lens, orbit, six-item strip) -> "The six checks" (six wide plates of real results, alternating) -> horizon footer with the one call to action.
+- **Module page:** a planet limb as the horizon under the nav, name + sentence, the working stage full width in one frame, a bar with Run / Reset and "What to do next" (from the engine at run time), then (TrackTrace only) the IonScan figure on a white card, then previous / next.
+- **Motion narrative:** corona ignites while the headline rises word by word; the orbit turns on a spring; the lens cross-fades; plates rise into view on scroll; pages morph lens -> stage with the View Transitions API. Motion library: `motion/react`; no GSAP, no smooth-scroll engine. Reduced motion renders the end states and a still corona.
+- **Three.js decision:** not used on these pages; one raw-WebGL shader with one job (the corona), DPR capped, paused off-screen and when hidden, CSS glow as the fallback.
+- **Asset provenance:** every image is our own specimen or model result from `app/public` (posters, field 96, IonScan figure); icons from @phosphor-icons/react; fonts from Fontsource. Nothing generated, nothing stock.

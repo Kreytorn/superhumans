@@ -1,0 +1,61 @@
+/* Harness page for the TrackTrace moment: a pale lab-bench page with the dark micrograph stage seated on it.
+   The bar keeps one height in every state, so the stage (and the 583-tile layout inside it) never reflows. */
+.ttm-harness {
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  padding: max(12px, env(safe-area-inset-top, 0px)) 12px 0;
+  background: #e4e8ea;
+  color: #141b20;
+  --m-font: 'Schibsted Grotesk Variable', sans-serif;
+  --m-font-mono: 'Spline Sans Mono Variable', monospace;
+  font-family: var(--m-font);
+}
+.ttm-harness[data-bare='1'] { padding: 0; }
+.ttm-harness .ttm-harness-stage { flex: 1 1 auto; min-height: 0; height: auto; border-radius: 10px; }
+.ttm-harness[data-bare='1'] .ttm-harness-stage { border-radius: 0; }
+.ttm-harness .ttm-harness-bar {
+  flex: none;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 10px 2px calc(10px + env(safe-area-inset-bottom, 0px));
+  font-size: 14px;
+}
+.ttm-harness button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 1px solid #9aa5ad;
+  border-radius: 6px;
+  padding: 7px 12px;
+  min-height: 40px;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.ttm-harness button:active { transform: scale(0.97); }
+.ttm-harness button:focus-visible,
+.ttm-harness input:focus-visible { outline: 2px solid #141b20; outline-offset: 2px; }
+.ttm-harness button:disabled { opacity: 0.5; cursor: default; }
+/* one width for all three labels, so the bar never rewraps when the label changes */
+.ttm-harness .ttm-harness-go { flex: none; width: 172px; background: #141b20; color: #f4f2ec; border-color: #141b20; font-weight: 650; }
+/* which nucleus of the pool is on stage (a fixed width, so the bar never reflows) */
+.ttm-harness .ttm-harness-samples { flex: none; width: 150px; color: #55616a; font-size: 13px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ttm-harness .ttm-harness-scrub { display: flex; align-items: center; gap: 8px; flex: 1 1 180px; min-width: 120px; font-variant-numeric: tabular-nums; }
+.ttm-harness .ttm-harness-scrub span { flex: none; width: 62px; white-space: nowrap; }
+.ttm-harness .ttm-harness-scrub input { flex: 1; min-width: 0; accent-color: #141b20; }
+@media (max-width: 760px) {
+  .ttm-harness { padding: max(8px, env(safe-area-inset-top, 0px)) 8px 0; }
+  .ttm-harness .ttm-harness-bar { display: grid; grid-template-columns: 172px minmax(0, 1fr); gap: 8px 12px; padding-inline: 4px; }
+  .ttm-harness .ttm-harness-samples { display: none; }
+  .ttm-harness .ttm-harness-scrub { min-width: 0; }
+  .ttm-harness .ttm-harness-scrub span { width: 58px; font-size: 13px; }
+}

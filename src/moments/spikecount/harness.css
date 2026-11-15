@@ -1,0 +1,56 @@
+/* Harness page for the SpikeCount stage: a dark instrument page; the bar keeps one height in every state. */
+.scm-harness {
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: #05070a;
+  color: #f3f1ea;
+  --m-font: 'Schibsted Grotesk Variable', sans-serif;
+  --m-font-mono: 'Spline Sans Mono Variable', monospace;
+  font-family: var(--m-font);
+}
+.scm-harness .scm-harness-stage { flex: 1 1 auto; min-height: 0; height: auto; }
+.scm-harness .scm-harness-bar {
+  flex: none;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 10px 28px calc(12px + env(safe-area-inset-bottom, 0px));
+  font-size: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.scm-harness-bar button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 6px;
+  padding: 7px 12px;
+  min-height: 40px;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1), background-color 140ms ease;
+}
+.scm-harness-bar button:active { transform: scale(0.97); }
+.scm-harness-bar button:focus-visible,
+.scm-harness-bar input:focus-visible { outline: 2px solid #f3f1ea; outline-offset: 2px; }
+.scm-harness-bar button:disabled { opacity: 0.5; cursor: default; }
+.scm-harness-bar .scm-harness-go { flex: none; width: 172px; background: #f3f1ea; color: #05070a; border-color: #f3f1ea; font-weight: 650; }
+.scm-harness-bar .scm-harness-samples { flex: none; display: flex; gap: 6px; }
+.scm-harness-bar .scm-harness-samples button[aria-pressed='true'] { background: rgba(255, 255, 255, 0.14); border-color: rgba(255, 255, 255, 0.5); }
+.scm-harness-bar .scm-harness-scrub { display: flex; align-items: center; gap: 8px; flex: 1 1 180px; min-width: 120px; font-variant-numeric: tabular-nums; color: #8f99a4; }
+.scm-harness-bar .scm-harness-scrub span { flex: none; width: 62px; white-space: nowrap; }
+.scm-harness-bar .scm-harness-scrub input { flex: 1; min-width: 0; accent-color: #f3f1ea; }
+@media (max-width: 760px) {
+  .scm-harness .scm-harness-bar { display: grid; grid-template-columns: 172px minmax(0, 1fr); gap: 8px 12px; padding-inline: 12px; }
+  .scm-harness-bar .scm-harness-samples { display: none; }
+  .scm-harness-bar .scm-harness-scrub { min-width: 0; }
+  .scm-harness-bar .scm-harness-scrub span { width: 58px; font-size: 13px; }
+}

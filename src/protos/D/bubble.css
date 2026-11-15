@@ -1,0 +1,144 @@
+/* Prototype D "Drape": the bubbles check (BubbleGrade). Every selector is scoped under .drp-bg. */
+
+/* The moment, restyled only through its custom properties: keyline green-black stage, bone sound, lilac attention. */
+.drp-bg .drp-stage {
+  --m-stage: #0c1f1b;
+  --m-ink: #f2eee3;
+  --m-ink-2: #a9c4b8;
+  --m-mark: #cdb8ff;
+  --m-mark-hot: #efe7ff;
+  --m-accent: #f2eee3;
+  --m-font: 'Hanken Grotesk Variable', sans-serif;
+  --m-font-mono: 'Hanken Grotesk Variable', sans-serif;
+}
+.drp-bg .drp-hero {
+  font-variant-numeric: lining-nums;
+}
+
+.drp-bg .drp-out {
+  visibility: hidden;
+}
+
+/* ---------- laptop: a full-width band bleeding off the top and both sides; the words sit under it ---------- */
+@media (min-width: 821px) and (min-aspect-ratio: 1/1) and (min-height: 540px) {
+  .drp-check.drp-bg .drp-win {
+    left: calc((1440 * var(--u) - 100vw) / 2);
+    top: calc((900 * var(--u) - 100svh) / 2);
+    width: 100vw;
+    height: calc(520 * var(--u) + (100svh - 900 * var(--u)) / 2);
+  }
+  .drp-check.drp-bg .drp-col {
+    left: calc(44 * var(--u));
+    top: calc(520 * var(--u));
+    width: calc(1352 * var(--u));
+    height: calc(336 * var(--u));
+  }
+  .drp-check.drp-bg .drp-back {
+    top: calc(22 * var(--u));
+  }
+  .drp-check.drp-bg .drp-name {
+    top: calc(52 * var(--u));
+    height: calc(96 * var(--u));
+    line-height: calc(96 * var(--u));
+  }
+  .drp-check.drp-bg .drp-btn {
+    top: calc(176 * var(--u));
+    left: 0;
+    min-width: calc(248 * var(--u));
+  }
+  .drp-check.drp-bg .drp-how-link {
+    left: 0;
+    right: auto;
+    bottom: 0;
+  }
+  /* right of the name: first the sentence, then the answer in its place */
+  .drp-bg .drp-slot {
+    display: contents;
+  }
+  .drp-check.drp-bg .drp-sentence {
+    top: calc(62 * var(--u));
+    left: calc(600 * var(--u));
+    max-width: calc(640 * var(--u));
+    font-size: calc(30 * var(--u));
+    line-height: calc(38 * var(--u));
+  }
+  .drp-check.drp-bg .drp-hero {
+    position: absolute;
+    left: calc(600 * var(--u));
+    right: auto;
+    top: calc(40 * var(--u));
+    height: calc(100 * var(--u));
+    line-height: calc(100 * var(--u));
+    padding: 0;
+  }
+  .drp-check.drp-bg .drp-compare {
+    left: calc(600 * var(--u));
+    top: calc(146 * var(--u));
+  }
+  .drp-check.drp-bg .drp-act {
+    left: calc(600 * var(--u));
+    top: calc(198 * var(--u));
+    width: calc(720 * var(--u));
+  }
+  .drp-check.drp-bg .drp-err {
+    left: calc(600 * var(--u));
+    top: calc(198 * var(--u));
+    white-space: nowrap;
+  }
+}
+
+/* ---------- phone: the answer lands where the sentence was, so the button never moves ---------- */
+@media (max-width: 820px), (max-aspect-ratio: 999/1000), (max-height: 539px) {
+  /* a green strip keeps the way back clear of the stage's own caption */
+  .drp-check.drp-bg .drp-win {
+    height: max(60svh, 340px);
+  }
+  .drp-bg .drp-stage {
+    top: 44px;
+    height: calc(100% - 44px);
+  }
+  /* the name sits under the band, clear of the stage's own time scale */
+  .drp-check.drp-bg .drp-col {
+    margin-top: 0;
+  }
+  .drp-check.drp-bg .drp-name {
+    padding-top: 0;
+  }
+  .drp-bg .drp-slot {
+    display: block;
+    min-height: 84px;
+    margin-top: 6px;
+  }
+  .drp-bg .drp-slot .drp-out {
+    display: none;
+  }
+  .drp-check.drp-bg .drp-sentence {
+    margin-top: 0;
+    min-height: 0;
+  }
+  .drp-check.drp-bg .drp-hero {
+    margin-top: 0;
+    height: 58px;
+    line-height: 58px;
+  }
+  .drp-check.drp-bg .drp-compare {
+    white-space: nowrap;
+  }
+  .drp-bg .drp-bar {
+    margin-top: 14px;
+  }
+  .drp-check.drp-bg .drp-btn,
+  .drp-check.drp-bg .drp-how-link {
+    margin-top: 0;
+  }
+  .drp-check.drp-bg .drp-act {
+    margin-top: 14px;
+    min-height: 48px;
+  }
+  .drp-check.drp-bg .drp-err {
+    position: absolute;
+    margin-top: 0;
+    top: calc(100% - 44px);
+    left: 16px;
+  }
+}

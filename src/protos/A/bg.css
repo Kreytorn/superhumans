@@ -1,0 +1,48 @@
+/* Prototype A "Viewbox": the BubbleGrade check. Everything is scoped under .vb.
+   The moment is restyled only through its --m-* custom properties (set on .vb-bg-stage). */
+
+/* the film: the heart-sound picture printed light on the film base; the model's attention in the one model colour */
+.vb .vb-bg-stage {
+  grid-row: 1;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  --m-stage: #0b0d0e;
+  --m-ink: #e9eeee;
+  --m-ink-2: #8d989e;
+  --m-mark: #2fd2f4;
+  --m-mark-hot: #c4f3fc;
+  --m-font: var(--sans);
+  --m-font-mono: var(--sans);
+}
+.vb .vb-bg-stage > .vb-bg-fill {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+}
+
+/* edge print: the key for the tint, and the speaker (sound is off until the press; this turns it off again) */
+.vb .vb-bg-swatch {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 7px;
+  background: var(--cyan);
+  vertical-align: -1px;
+}
+.vb .vb-edge .vb-tt-down.vb-bg-mute {
+  display: grid;
+}
+
+@media (max-width: 760px) {
+  /* the stage keeps just over half of the first screen; the answer fills the rest of it */
+  .vb[data-view='bubblegrade'][data-real] .vb-open {
+    height: calc(51.5svh + 36px);
+    grid-template-rows: minmax(0, 1fr) 36px;
+  }
+  .vb[data-view='bubblegrade'][data-real] .vb-open .vb-edge {
+    height: 36px;
+    line-height: 36px;
+  }
+}

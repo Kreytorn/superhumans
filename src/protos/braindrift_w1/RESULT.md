@@ -1,0 +1,9 @@
+# braindrift_w1 (free, immersive): BrainDrift as a place inside a scanner bore
+- Idea: a holographic real brain (flight_brain.glb, heat = injected SIMULATION field, labelled) floats in a scanner bore; a real MRI slice rides through it as the scan plane and lights up with Model B's 6-class map as the model reads; the measured ventricle surface sits inside. Drag to turn it; 3D-anchored labels name the fluid spaces and the scan plane.
+- Route: `#/proto/braindrift_w1/home` (`?state=result` pins the settled result, `?mode=live|replay`). One press ("Fly this brain") or the slider runs analyze() live on laptops, replay() on phones or on any failure; LIVE / REPLAY tag shown.
+- On screen from the engine only: measured +9.20% (17.48 -> 19.08 mL) next to the put-in +10.7%, rise 2.37 mm next to 2.46 mm, act() headline + fired rows + caveat; HONESTY strings for every caveat.
+- Scroll: the problem (side-view schematic marked "AI-generated illustration", before/after coronal slices scrubbed together through the brain with the "fluid here now, not before" mark, the two published numbers), the range (smallest vs largest fluid spaces at the same scale, Model A's 1,132-channel web in a glass brain with a Model/Expert toggle), the work (Model B test numbers, the simulation recipe, what it is not, a real axial montage), credits.
+- Extra material: only our own files in app/public/braindrift/ (meshes, volumes, stored maps, PVS montage). No third-party images. Fonts: Unbounded, Geist, Geist Mono (Fontsource, OFL). three.js (MIT).
+- Screenshots: work/Web/shots/k2/braindrift_w1/ (screen_1440.png, screen_390.png, scroll_1440.png, idle_390.png).
+- Type-check: 0 errors. Dev helper: _shot.mjs (playwright, port 5605).
+- Unfinished: not checked on a real phone or in Firefox/Safari; live run timing seen only on this laptop's headless browser; the 3D labels are hidden on phones.

@@ -1,0 +1,914 @@
+/* BubbleGrade moment. Everything is scoped under .bgm (the stage) and .bgh (the harness).
+   Restyle by setting the --m-* tokens on the root or any ancestor; the defaults are below. */
+.bgm {
+  --_stage: var(--m-stage, #0a222e); /* stage and the silent end of the sound picture */
+  --_ink: var(--m-ink, #e2f1f2); /* loudest sound, playhead, labels */
+  --_ink-2: var(--m-ink-2, color-mix(in srgb, var(--_ink) 62%, var(--_stage))); /* quiet labels */
+  --_mark: var(--m-mark, #ff8f3a); /* what the model drew: attention heat and ridge */
+  --_mark-hot: var(--m-mark-hot, #ffe8be); /* hottest end of the heat ramp */
+  --_accent: var(--m-accent, var(--_ink)); /* needle and pin once the alert fires, focus ring. Neutral by default: the page owns the status colour */
+  --_font: var(--m-font, 'Newsreader Variable', Georgia, serif);
+  --_mono: var(--m-font-mono, 'Geist Mono Variable', ui-monospace, monospace);
+  --_ease: cubic-bezier(0.23, 1, 0.32, 1);
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--_stage);
+  color: var(--_ink);
+  font-family: var(--_font);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.bgm *,
+.bgm *::before,
+.bgm *::after {
+  box-sizing: border-box;
+}
+.bgm-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* The one interaction: the whole sound picture is a scrubber. Vertical page scroll still passes through. */
+.bgm-scrub {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  touch-action: pan-y;
+  cursor: ew-resize;
+  outline: none;
+}
+.bgm[data-state='idle'] .bgm-scrub {
+  cursor: pointer;
+}
+.bgm-scrub:focus-visible {
+  outline: 2px solid var(--_accent);
+  outline-offset: -5px;
+}
+
+.bgm-ghost {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  background: color-mix(in srgb, var(--_ink) 55%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms var(--_ease);
+}
+
+/* Annotations that ride on the specimen. Moved with transforms from the clock. */
+.bgm-time,
+.bgm-slice,
+.bgm-verdict,
+.bgm-cap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.bgm-time {
+  padding: 4px 7px;
+  border-radius: 4px;
+  background: var(--_stage);
+  color: var(--_ink);
+  font: 500 13px/1 var(--_mono);
+  font-variant-numeric: tabular-nums;
+}
+.bgm-slice {
+  padding: 3px 8px 4px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--_stage) 82%, transparent);
+  color: var(--_ink);
+  font: italic 400 15px/1.1 var(--_font);
+}
+/* What the needle means and whether the alert is on, in words, beside the needle. */
+.bgm-verdict {
+  padding: 3px 9px 4px;
+  border-radius: 4px 0 0 4px;
+  background: var(--_stage);
+  color: var(--_ink);
+  font: italic 400 15px/1.1 var(--_font);
+}
+/* What the picture is, and how long. Stays put at idle, while it plays and at the result. */
+.bgm-what {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  padding: 3px 8px 4px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--_stage) 82%, transparent);
+  color: var(--_ink);
+  font: italic 400 15px/1.1 var(--_font);
+  white-space: nowrap;
+  pointer-events: none;
+}
+/* Seconds under the time rail, one label per 5-second tick. */
+.bgm-sec {
+  position: absolute;
+  color: var(--_ink-2);
+  font: 400 11px/1 var(--_mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+.bgm-sec[data-first] {
+  transform: translateX(9px);
+}
+
+.bgm-cap {
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 8px 4px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--_stage) 82%, transparent);
+  color: var(--_ink);
+  font: italic 400 15px/1.1 var(--_font);
+}
+
+/* The tint the label names: the same colour and strength as a fully attended column. */
+.bgm-cap i {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--_mark) 80%, var(--_stage));
+}
+
+/* The bubble-grade scale, 0 to IV: its own short gauge in the right gutter, named in words, with the needle on it. */
+.bgm-scale-name {
+  position: absolute;
+  right: 0;
+  top: 13px;
+  padding: 0 13px 0 10px;
+  color: var(--_ink);
+  font: italic 400 15px/1.1 var(--_font);
+  text-align: right;
+  pointer-events: none;
+}
+.bgm-scale::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: var(--_y4);
+  width: 1px;
+  height: calc(var(--_y0) - var(--_y4));
+  background: color-mix(in srgb, var(--_ink) 34%, var(--_stage));
+}
+.bgm-scale {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+}
+.bgm-scale li {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding-right: 13px;
+  text-align: right;
+  color: var(--_ink-2);
+  font: 400 clamp(17px, 1.1vw + 13px, 24px) / 1 var(--_font);
+  font-variant-numeric: lining-nums;
+  transform: translateY(-50%);
+  transition: color 200ms var(--_ease);
+}
+.bgm-scale li::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 9px;
+  height: 1px;
+  background: color-mix(in srgb, var(--_ink) 62%, var(--_stage));
+}
+/* The model's grade: the numeral keeps its place in the column and turns to full ink and weight. */
+.bgm-scale li > span {
+  display: inline-block;
+  padding-bottom: 3px;
+  border-bottom: 2px solid transparent;
+  transition: border-color 200ms var(--_ease);
+}
+.bgm-scale li[data-on] {
+  color: var(--_ink);
+  font-weight: 640;
+}
+/* The technician's grade, shown at the result: an underline and the word. */
+.bgm-scale li[data-tech] > span {
+  border-bottom-color: var(--_ink);
+}
+.bgm-scale li em {
+  position: absolute;
+  right: 13px;
+  top: 100%;
+  margin-top: 3px;
+  color: var(--_ink);
+  font: italic 400 clamp(12px, 0.2vw + 11px, 14px) / 1 var(--_font);
+  white-space: nowrap;
+  transition: opacity 200ms var(--_ease);
+}
+.bgm-scale li em[data-side='above'] {
+  top: auto;
+  bottom: 100%;
+  margin: 0 0 4px;
+}
+@starting-style {
+  .bgm-scale li em {
+    opacity: 0;
+  }
+}
+.bgm-needle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.bgm-needle::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -0.5px;
+  width: 9px;
+  height: 1px;
+  background: var(--_ink);
+}
+.bgm-needle i {
+  position: absolute;
+  left: 8.5px;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--_ink);
+  border-radius: 50%;
+  background: var(--_stage);
+  transition:
+    background-color 180ms var(--_ease),
+    border-color 180ms var(--_ease),
+    transform 260ms var(--_ease);
+}
+/* Alert crossed: the ring fills (shape change, not colour alone). */
+.bgm-needle[data-alert='1'] i {
+  border-color: var(--_accent);
+  background: var(--_accent);
+  transform: scale(1.18);
+}
+
+.bgm-sound {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--_ink) 38%, var(--_stage));
+  border-radius: 50%;
+  background: var(--_stage);
+  color: var(--_ink);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    transform 140ms var(--_ease),
+    background-color 160ms var(--_ease),
+    color 160ms var(--_ease);
+}
+.bgm-sound[aria-pressed='true'] {
+  border-color: var(--_ink);
+  background: var(--_ink);
+  color: var(--_stage);
+}
+.bgm-sound:active {
+  transform: scale(0.95);
+}
+.bgm-sound:focus-visible {
+  outline: 2px solid var(--_accent);
+  outline-offset: 3px;
+}
+.bgm-sound:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+@media (hover: hover) and (pointer: fine) {
+  .bgm-sound:not(:disabled):hover {
+    border-color: var(--_ink);
+  }
+}
+
+.bgm-load {
+  position: absolute;
+  inset: 0 0 auto 0;
+  pointer-events: none;
+}
+.bgm-load i {
+  display: block;
+  height: 3px;
+  background: var(--_ink);
+  transform-origin: left center;
+  transition: transform 160ms linear;
+}
+.bgm-load span {
+  position: absolute;
+  left: 12px;
+  top: 14px;
+  padding: 4px 9px 5px;
+  border-radius: 4px;
+  background: var(--_stage);
+  font: 400 15px/1.1 var(--_font);
+}
+.bgm-error {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(30ch, 80%);
+  margin: 0;
+  padding: 14px 18px;
+  border: 1px solid var(--_ink-2);
+  border-radius: 6px;
+  background: var(--_stage);
+  font: 400 17px/1.35 var(--_font);
+  text-align: center;
+  transform: translate(-50%, -50%);
+  -webkit-user-select: text;
+  user-select: text;
+}
+.bgm-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bgm-scale li,
+  .bgm-scale li > span,
+  .bgm-scale li em,
+  .bgm-needle i,
+  .bgm-sound {
+    transition-duration: 0ms;
+  }
+}
+
+/* ---------- harness (#/moment/bubblegrade): the stage plus the few controls that exercise it ---------- */
+.bgh {
+  --_stage: var(--m-stage, #0a222e);
+  --_ink: var(--m-ink, #e2f1f2);
+  --_ink-2: var(--m-ink-2, color-mix(in srgb, var(--_ink) 62%, var(--_stage)));
+  --_ease: cubic-bezier(0.23, 1, 0.32, 1);
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--_stage);
+  color: var(--_ink);
+  font-family: var(--m-font, 'Newsreader Variable', Georgia, serif);
+}
+.bgh[data-bare='1'] {
+  grid-template-rows: minmax(0, 1fr);
+}
+.bgh-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid color-mix(in srgb, var(--_ink) 22%, var(--_stage));
+}
+.bgh-bar button,
+.bgh-bar select {
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid color-mix(in srgb, var(--_ink) 45%, var(--_stage));
+  border-radius: 22px;
+  background: var(--_stage);
+  color: var(--_ink);
+  font: 500 16px/1 var(--m-font, 'Newsreader Variable', Georgia, serif);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: transform 140ms var(--_ease);
+}
+.bgh-bar button:active {
+  transform: scale(0.97);
+}
+.bgh-bar button[data-qa='primary'] {
+  border-color: var(--_ink);
+  background: var(--_ink);
+  color: var(--_stage);
+  font-weight: 620;
+}
+.bgh-bar button:focus-visible,
+.bgh-bar select:focus-visible {
+  outline: 2px solid var(--m-accent, var(--_ink));
+  outline-offset: 2px;
+}
+.bgh-bar button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.bgh-bar select {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+.bgh-read {
+  flex: 1 1 260px;
+  min-width: 0;
+  margin: 0;
+  color: var(--_ink);
+  font-size: 17px;
+  line-height: 1.25;
+}
+.bgh-read b {
+  margin-right: 8px;
+  color: var(--_ink-2);
+  font: 500 12px/1 var(--m-font-mono, 'Geist Mono Variable', ui-monospace, monospace);
+  letter-spacing: 0.04em;
+}
+
+/* ---------- k1: the stage's three frames ---------- */
+/* The sound picture's frame (scrubber, its labels and the estimate strip under it) and the gauge's frame. */
+.bgm-tape,
+.bgm-gutter {
+  position: absolute;
+}
+.bgm-gutter {
+  right: 0;
+  pointer-events: none;
+}
+.bgm-gutter .bgm-sound {
+  pointer-events: auto;
+}
+
+/* The part of the 0 to IV gauge that the estimate strip shows zoomed in. */
+.bgm-zoomband {
+  position: absolute;
+  left: 7px;
+  width: 6px;
+  border: 1.5px solid var(--_mark-hot);
+  border-right: 0;
+  border-radius: 3px 0 0 3px;
+  opacity: 0.85;
+}
+
+/* A new reading lands: the needle throws one ring. Two identical keyframes so that every step restarts it. */
+.bgm-needle[data-kick='0'] i {
+  animation: bgm-kick-a 800ms var(--_ease);
+}
+.bgm-needle[data-kick='1'] i {
+  animation: bgm-kick-b 800ms var(--_ease);
+}
+@keyframes bgm-kick-a {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--_mark) 85%, transparent);
+  }
+  to {
+    box-shadow: 0 0 0 16px transparent;
+  }
+}
+@keyframes bgm-kick-b {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--_mark) 85%, transparent);
+  }
+  to {
+    box-shadow: 0 0 0 16px transparent;
+  }
+}
+
+/* ---------- k1: the estimate strip (the trace itself is drawn on the canvas) ---------- */
+.bgm-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+.bgm-strip-name {
+  position: absolute;
+  left: 10px;
+  top: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--_ink);
+  font: italic 400 15px/1.1 var(--_font);
+  white-space: nowrap;
+}
+.bgm-strip-name i[data-k='line'] {
+  width: 18px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: var(--_mark-hot);
+  box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--_mark) 26%, transparent);
+}
+.bgm-strip-name i[data-k='dot'] {
+  width: 7px;
+  height: 7px;
+  margin-left: 12px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--_ink) 62%, var(--_stage));
+}
+.bgm-zoomnote {
+  position: absolute;
+  right: 10px;
+  top: 11px;
+  color: var(--_ink-2);
+  font: 400 11px/1.1 var(--_mono);
+  white-space: nowrap;
+}
+.bgm-strip[data-narrow] .bgm-zoomnote {
+  left: 10px;
+  right: auto;
+  top: auto;
+  bottom: 7px;
+}
+.bgm-fig-heart .bgm-fig-heart-vein {
+  stroke-width: 1;
+  opacity: 0.7;
+}
+.bgm-gl {
+  position: absolute;
+  left: 10px;
+  color: var(--_ink-2);
+  font: 400 14px/1 var(--_font);
+  font-variant-numeric: lining-nums;
+  transform: translateY(-50%);
+}
+.bgm-gl[data-end] {
+  font: 400 10.5px/1 var(--_mono);
+  opacity: 0.85;
+}
+.bgm-hint {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  color: var(--_ink-2);
+  font: italic 400 15px/1.1 var(--_font);
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+  transition: opacity 260ms var(--_ease);
+}
+.bgm-chip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 4px 7px;
+  border-radius: 4px;
+  background: var(--_stage);
+  color: var(--_mark-hot);
+  font: 500 13px/1 var(--_mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.bgm-chip[data-kick='0'] {
+  animation: bgm-chip-a 900ms var(--_ease);
+}
+.bgm-chip[data-kick='1'] {
+  animation: bgm-chip-b 900ms var(--_ease);
+}
+@keyframes bgm-chip-a {
+  from {
+    background: var(--_mark);
+    color: var(--_stage);
+  }
+}
+@keyframes bgm-chip-b {
+  from {
+    background: var(--_mark);
+    color: var(--_stage);
+  }
+}
+
+/* ---------- k1: the side panel: a drawn chest and the strength of each grade ---------- */
+.bgm-side {
+  overflow: hidden;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid color-mix(in srgb, var(--_ink) 18%, var(--_stage));
+  background: radial-gradient(120% 62% at 50% 36%, color-mix(in srgb, var(--_ink) 10%, var(--_stage)), var(--_stage) 78%);
+  pointer-events: none;
+}
+.bgm-side[data-narrow] {
+  flex-direction: row;
+  border-right: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--_ink) 18%, var(--_stage));
+  background: radial-gradient(60% 120% at 20% 50%, color-mix(in srgb, var(--_ink) 10%, var(--_stage)), var(--_stage) 78%);
+}
+.bgm-fig {
+  --beat: 0;
+  --att: 0;
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+}
+.bgm-side[data-narrow] .bgm-fig {
+  flex: 0 0 36%;
+}
+.bgm-fig svg {
+  position: absolute;
+  left: 6px;
+  top: 44px;
+  width: calc(100% - 12px);
+  height: calc(100% - 76px);
+  overflow: visible;
+}
+.bgm-side[data-narrow] .bgm-fig svg {
+  top: 8px;
+  height: calc(100% - 28px);
+}
+.bgm-fig-body {
+  fill: color-mix(in srgb, var(--_ink) 7%, transparent);
+}
+.bgm-fig-scan path {
+  fill: none;
+  stroke: color-mix(in srgb, var(--_ink) 13%, transparent);
+  stroke-width: 1;
+}
+.bgm-fig-bone path {
+  fill: none;
+  stroke: color-mix(in srgb, var(--_ink) 26%, transparent);
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+.bgm-fig-line {
+  fill: none;
+  stroke: color-mix(in srgb, var(--_ink) 70%, transparent);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+.bgm-fig-glow {
+  opacity: calc(var(--att) * 0.95);
+}
+.bgm-fig-heart {
+  transform: scale(calc(1 + var(--beat) * 0.16));
+  transform-box: fill-box;
+  transform-origin: 50% 55%;
+}
+.bgm-fig-heart path {
+  fill: none;
+  stroke: var(--_mark-hot);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.bgm-fig-heart .bgm-fig-heart-body {
+  fill: var(--_mark);
+  fill-opacity: calc(0.22 + var(--att) * 0.6);
+}
+.bgm-fig-spot {
+  fill: none;
+  stroke: color-mix(in srgb, var(--_ink) 80%, transparent);
+  stroke-width: 1.2;
+}
+.bgm-fig-ticks {
+  fill: none;
+  stroke: color-mix(in srgb, var(--_ink) 80%, transparent);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+/* The lead from the listening spot towards the sound picture; a dash runs along it while the clip plays. */
+.bgm-fig-lead {
+  fill: none;
+  stroke: color-mix(in srgb, var(--_ink) 55%, transparent);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 6;
+}
+.bgm[data-state='running'][data-paused='0'] .bgm-fig-lead {
+  stroke: var(--_ink);
+  animation: bgm-lead 600ms linear infinite;
+}
+@keyframes bgm-lead {
+  to {
+    stroke-dashoffset: -9;
+  }
+}
+.bgm-side[data-narrow] .bgm-fig-lead {
+  display: none;
+}
+.bgm-fig-ripple {
+  fill: none;
+  stroke: var(--_ink);
+  stroke-width: 1.2;
+  opacity: calc(var(--beat) * 0.75);
+  transform: scale(calc(1 + var(--beat) * 0.3));
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.bgm-fig-what {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  padding: 3px 8px 4px;
+  color: var(--_ink);
+  font: italic 400 15px/1.1 var(--_font);
+  white-space: nowrap;
+}
+.bgm-side[data-narrow] .bgm-fig-what {
+  display: none;
+}
+/* Required mark: the chest is a drawing, not this crew member and not a scan. */
+.bgm-ai {
+  position: absolute;
+  left: 18px;
+  bottom: 10px;
+  color: var(--_ink-2);
+  font: 400 10px/1 var(--_mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.bgm-side[data-narrow] .bgm-ai {
+  left: 10px;
+  bottom: 6px;
+  font-size: 8.5px;
+  letter-spacing: 0;
+}
+
+.bgm-odds {
+  flex: 0 0 auto;
+  padding: 14px 18px 18px;
+  border-top: 1px solid color-mix(in srgb, var(--_ink) 18%, var(--_stage));
+}
+.bgm-side[data-narrow] .bgm-odds {
+  flex: 1 1 0;
+  min-width: 0;
+  align-self: center;
+  padding: 6px 14px 6px 6px;
+  border-top: 0;
+}
+.bgm-odds-head {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: var(--_ink);
+  font: italic 400 15px/1.1 var(--_font);
+  white-space: nowrap;
+}
+.bgm-odds-head em {
+  color: var(--_ink-2);
+  font: 400 11px/1.1 var(--_mono);
+}
+.bgm-side[data-narrow] .bgm-odds-head {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+.bgm-side[data-narrow] .bgm-odds-head em {
+  overflow: hidden;
+  font-size: 9.5px;
+  text-overflow: ellipsis;
+}
+.bgm-odds ol {
+  display: grid;
+  gap: 11px;
+  margin: 13px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.bgm-side[data-narrow] .bgm-odds ol {
+  gap: 7px;
+  margin-top: 7px;
+}
+.bgm-odds li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+}
+.bgm-odds li b {
+  color: var(--_ink-2);
+  font: 400 17px/1 var(--_font);
+  font-variant-numeric: lining-nums;
+  transition: color 200ms var(--_ease);
+}
+.bgm-side[data-narrow] .bgm-odds li b {
+  font-size: 13px;
+}
+.bgm-odds li[data-on] b {
+  color: var(--_ink);
+  font-weight: 640;
+}
+.bgm-odds li i {
+  position: relative;
+  height: 9px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--_ink) 11%, var(--_stage));
+}
+.bgm-side[data-narrow] .bgm-odds li i {
+  height: 6px;
+}
+/* The middle line: a bar that passes it counts towards the grade. */
+.bgm-odds li i::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  left: calc(50% - 0.5px);
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background: var(--_stage);
+  box-shadow: 0 0 0 0.5px color-mix(in srgb, var(--_ink) 70%, var(--_stage));
+}
+.bgm-odds-rule {
+  display: block;
+  margin-top: 12px;
+  color: var(--_ink-2);
+  font: italic 400 13px/1.2 var(--_font);
+}
+.bgm-side[data-narrow] .bgm-odds-rule {
+  display: none;
+}
+.bgm-odds li u,
+.bgm-odds li s {
+  position: absolute;
+  inset: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+/* The trail: where the bar was a moment ago. */
+.bgm-odds li u {
+  background: color-mix(in srgb, var(--_mark) 70%, var(--_stage));
+  transition: transform 1600ms var(--_ease) 500ms;
+}
+.bgm-odds li s {
+  background: color-mix(in srgb, var(--_ink) 72%, var(--_stage));
+  transition:
+    transform 520ms var(--_ease),
+    background-color 300ms var(--_ease);
+}
+.bgm-odds li[data-on] s {
+  background: var(--_mark-hot);
+}
+.bgm-odds ol[data-kick='0'] s {
+  animation: bgm-flash-a 900ms var(--_ease);
+}
+.bgm-odds ol[data-kick='1'] s {
+  animation: bgm-flash-b 900ms var(--_ease);
+}
+@keyframes bgm-flash-a {
+  from {
+    background: var(--_mark);
+  }
+}
+@keyframes bgm-flash-b {
+  from {
+    background: var(--_mark);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bgm-odds li u,
+  .bgm-odds li s,
+  .bgm-hint {
+    transition-duration: 0ms;
+    transition-delay: 0ms;
+  }
+  .bgm-needle i,
+  .bgm-chip,
+  .bgm-fig-lead,
+  .bgm-odds ol s {
+    animation: none !important;
+  }
+}
+/* Poster stills (harness ?poster=1): the whole stage at rest, without the sound button. */
+.bgh[data-poster='1'] {
+  grid-template-rows: minmax(0, 1fr);
+}
+.bgh[data-poster='1'] .bgm-sound {
+  display: none;
+}
+/* At rest, the zoom bracket on the gauge stays quiet until the first reading lands. */
+.bgm[data-state='idle'] .bgm-zoomband {
+  opacity: 0.35;
+}
+/* On a narrow strip the zoom note sits at the foot, where it already names the bottom of the range. */
+.bgm-strip[data-narrow] .bgm-gl[data-end='lo'] {
+  display: none;
+}

@@ -1,0 +1,431 @@
+/* Garn Meter moment. Everything is scoped under .gm-root; every colour and font is a custom property on it.
+   Restyle by setting these on .gm-root (or any parent). The canvas reads them when it mounts, resizes or runs. */
+.gm-root {
+  --m-stage: #070a12; /* the surface the recording sits on */
+  --m-ink: #eef1fb; /* the EEG traces and primary text */
+  --m-ink-2: #8f98b3; /* axes, quiet text, instrument captions */
+  --m-mark: #8a93ad; /* what the model drew: its 4 s window, the estimate thread, the tick on the rail and on the dial */
+  --m-accent: #8fa6ff; /* the person's own check-ins on the strip */
+  --m-ok: #2ee6a6; /* green zone (ring): rail, dial, the scenes' dots */
+  --m-watch: #ffb224; /* yellow zone (triangle) */
+  --m-alert: #ff4d5e; /* red zone (square) */
+  --m-field-hi: #ff6fc4; /* scalp map: theta above the baseline */
+  --m-field-lo: #31d6f0; /* scalp map: theta below the baseline */
+  /* --m-glow: optional. The halo of the traces and the light in the two instrument panels; falls back to --m-accent. */
+  --m-font: 'Schibsted Grotesk Variable', 'Schibsted Grotesk', ui-sans-serif, sans-serif;
+  --m-font-mono: 'Spline Sans Mono Variable', 'Spline Sans Mono', ui-monospace, monospace;
+  --m-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  /* set by the component from the stage width (1 on a phone, up to 1.75 on a wide stage): every label scales with it */
+  --gm-u: 1;
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--m-stage);
+  color: var(--m-ink);
+  font-family: var(--m-font);
+  font-size: calc(12px * var(--gm-u));
+  line-height: 1.2;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+.gm-root *,
+.gm-root *::before,
+.gm-root *::after {
+  box-sizing: border-box;
+}
+.gm-root .gm-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* words on the stage */
+.gm-root .gm-say,
+.gm-root .gm-legend,
+.gm-root .gm-status,
+.gm-root .gm-scale,
+.gm-root .gm-reads,
+.gm-root .gm-axis,
+.gm-root .gm-tag-scene,
+.gm-root .gm-ask,
+.gm-root .gm-verdict,
+.gm-root .gm-eeg {
+  position: absolute;
+  white-space: nowrap;
+  pointer-events: none;
+  color: var(--m-ink-2);
+  font-size: calc(12px * var(--gm-u));
+  letter-spacing: 0.005em;
+}
+/* idle: the one sentence over the traces. It leaves when Play opens the session view. */
+.gm-root .gm-say {
+  white-space: normal;
+  color: var(--m-ink);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  transition: opacity 160ms ease;
+}
+.gm-root[data-open='1'] .gm-say {
+  opacity: 0;
+  visibility: hidden;
+}
+/* the session view's own labels are on stage only once the strip is */
+.gm-root .gm-scale,
+.gm-root .gm-legend,
+.gm-root .gm-axis {
+  transition: opacity 200ms ease;
+}
+.gm-root:not([data-open='1']) .gm-scale,
+.gm-root:not([data-open='1']) .gm-legend,
+.gm-root:not([data-open='1']) .gm-axis {
+  opacity: 0;
+  visibility: hidden;
+}
+/* above the traces: their name (what is in view), and at the right end a bar of a round duration */
+.gm-root .gm-scale {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  line-height: calc(15px * var(--gm-u));
+}
+.gm-root .gm-scale-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.gm-root .gm-scale i {
+  flex: none;
+  width: 40px;
+  height: 5px;
+  border: 1px solid var(--m-ink-2);
+  border-top: 0;
+}
+.gm-root .gm-view {
+  color: var(--m-ink);
+  font-weight: 600;
+}
+/* the name of the 4 s window: it hangs from the window's left edge and travels with it */
+.gm-root .gm-reads {
+  padding-left: 6px;
+  border-left: 1.5px solid var(--m-mark);
+  line-height: calc(14px * var(--gm-u));
+  opacity: 0;
+  visibility: hidden;
+  will-change: transform;
+}
+/* the two lines of the strip, each named after a sample of its own stroke */
+.gm-root .gm-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 calc(22px * var(--gm-u));
+  white-space: normal;
+  line-height: calc(16px * var(--gm-u));
+}
+.gm-root .gm-key {
+  display: inline-block;
+  width: calc(16px * var(--gm-u));
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.gm-root .gm-key-own {
+  height: 0;
+  border-top: calc(2px * var(--gm-u)) solid var(--m-accent);
+}
+.gm-root .gm-key-eeg {
+  position: relative;
+  height: 0;
+  border-top: 1.25px solid var(--m-mark);
+}
+/* the same grey triangle as the tick on the rail */
+.gm-root .gm-key-eeg::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: -7px;
+  border: 4px solid transparent;
+  border-top: 6px solid var(--m-mark);
+  border-bottom: 0;
+}
+/* LIVE or REPLAY: where the grey line's values come from */
+.gm-root .gm-tag {
+  margin-right: 6px;
+  color: var(--m-ink);
+  font-size: 0.9em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.gm-root .gm-axis {
+  font-size: calc(11px * var(--gm-u));
+  line-height: calc(14px * var(--gm-u));
+  font-variant-numeric: tabular-nums;
+}
+/* the scene in view: a name tag on top of its band; it is the strip's handle */
+.gm-root .gm-tag-scene {
+  padding: 0 6px;
+  border-radius: 3px;
+  background: var(--m-ink);
+  color: var(--m-stage);
+  font-size: calc(11px * var(--gm-u));
+  font-weight: 600;
+  line-height: calc(16px * var(--gm-u));
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 150ms ease;
+}
+/* the rail's question (its size comes from the layout, like the idle sentence and the verdict) */
+.gm-root .gm-ask {
+  color: var(--m-ink);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  transition: opacity 160ms ease;
+}
+/* the verdict: one large line above the rail with both values, the model's and the person's */
+.gm-root .gm-verdict {
+  color: var(--m-ink);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 200ms ease;
+}
+.gm-root .gm-verdict b {
+  font-weight: 700;
+}
+.gm-root .gm-verdict i {
+  font-style: normal;
+  color: var(--m-ink-2);
+}
+.gm-root[data-narrow] .gm-verdict > span,
+.gm-root[data-narrow] .gm-verdict > b {
+  display: block;
+}
+.gm-root[data-narrow] .gm-verdict > i {
+  display: none;
+}
+/* while the model's window slides, its value rides on its tick */
+.gm-root .gm-eeg {
+  padding: 0 4px;
+  background: var(--m-stage);
+  font-size: calc(13px * var(--gm-u));
+  line-height: calc(18px * var(--gm-u));
+  opacity: 0;
+  visibility: hidden;
+  will-change: transform;
+}
+/* the check-in: status word above the handle */
+.gm-root .gm-status {
+  z-index: 1;
+  padding: 0 5px;
+  background: var(--m-stage);
+  color: var(--m-ink);
+  font-size: calc(14px * var(--gm-u));
+  line-height: calc(18px * var(--gm-u));
+  transform: translateX(-50%);
+  transition: opacity 180ms ease;
+}
+.gm-root .gm-status b {
+  font-weight: 700;
+}
+.gm-root .gm-status-start {
+  transform: translateX(calc(-14px * var(--gm-u)));
+}
+.gm-root .gm-status-end {
+  transform: translateX(calc(-100% + 14px * var(--gm-u)));
+}
+/* before any answer: the invitation over the resting handle */
+.gm-root .gm-hint {
+  color: var(--m-ink-2);
+  font-weight: 500;
+}
+@starting-style {
+  .gm-root .gm-status {
+    opacity: 0;
+  }
+}
+
+/* the session strip: tap or drag to bring another scene into view (horizontal drags are ours, vertical scroll stays) */
+.gm-root .gm-scenes {
+  position: absolute;
+  border-radius: 6px;
+  cursor: ew-resize;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.gm-root .gm-scenes[aria-disabled='true'] {
+  cursor: default;
+  pointer-events: none;
+}
+.gm-root .gm-scene-hover {
+  position: absolute;
+  width: 0;
+  background: color-mix(in srgb, var(--m-ink) 9%, transparent);
+  box-shadow: inset 1px 0 0 color-mix(in srgb, var(--m-ink) 40%, transparent), inset -1px 0 0 color-mix(in srgb, var(--m-ink) 40%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+.gm-root .gm-scenes:focus-visible {
+  outline: 2px solid var(--m-accent);
+  outline-offset: 4px;
+}
+
+/* the check-in rail: seven stops, 48 px targets. Numeral and word are stacked from the top, so all seven numerals share one line. */
+.gm-root .gm-stops {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.gm-root .gm-stop {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 48px; /* the component widens each stop to its share of the rail, so the whole rail can be pressed and dragged */
+  height: calc(32px + 46px * var(--gm-u));
+  margin: 0;
+  padding: calc(30px + 14px * var(--gm-u)) 0 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--m-ink-2);
+  font: inherit;
+  font-family: var(--m-font-mono);
+  font-size: calc(15px * var(--gm-u));
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  transform: translateX(-50%);
+  transition: color 160ms ease, opacity 200ms ease;
+}
+.gm-root .gm-stop:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+.gm-root .gm-stop-n,
+.gm-root .gm-stop-w {
+  display: block;
+  transition: transform 140ms var(--m-ease-out);
+}
+.gm-root .gm-stop-w {
+  margin-top: 2px;
+  font-family: var(--m-font);
+  font-size: calc(11.5px * var(--gm-u));
+  white-space: nowrap;
+}
+.gm-root .gm-stop[aria-checked='true'] {
+  color: var(--m-ink);
+  font-weight: 600;
+}
+.gm-root .gm-stop[aria-checked='true'] .gm-stop-n {
+  transform: scale(1.22);
+}
+/* where the person's own rating was, once the viewer moved the handle (the hollow ring on the rail) */
+.gm-root .gm-stop[data-own] .gm-stop-w {
+  color: var(--m-accent);
+  font-weight: 600;
+}
+.gm-root .gm-stop:not(:disabled):active .gm-stop-n {
+  transform: scale(0.92);
+}
+.gm-root .gm-stop:not(:disabled) {
+  cursor: grab;
+}
+.gm-root .gm-stop:not(:disabled):active {
+  cursor: grabbing;
+}
+.gm-root .gm-stop:focus-visible {
+  outline: 2px solid var(--m-accent);
+  outline-offset: -3px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .gm-root .gm-stop:not(:disabled):hover {
+    color: var(--m-ink);
+  }
+}
+
+.gm-root .gm-wait,
+.gm-root .gm-error {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  color: var(--m-ink-2);
+  font-size: 14px;
+  text-align: center;
+}
+.gm-root .gm-error button {
+  display: block;
+  margin: 10px auto 0;
+  padding: 8px 14px;
+  border: 1px solid var(--m-ink-2);
+  border-radius: 8px;
+  background: none;
+  color: var(--m-ink);
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* The scalp map of measured theta, for a "How do we know?" layer (scalp.tsx). It stands outside .gm-root and
+   reads the same tokens from wherever it is placed. */
+.gm-scalp {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+.gm-scalp canvas {
+  flex: none;
+  display: block;
+}
+.gm-scalp .gm-ramp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 12px;
+}
+.gm-scalp .gm-ramp i {
+  flex: none;
+  width: 44px;
+  height: 8px;
+  border-radius: 2px;
+  border: 1px solid color-mix(in srgb, var(--m-ink-2, #8f98b3) 45%, transparent);
+  background: linear-gradient(to right, var(--m-field-lo, #31d6f0), color-mix(in srgb, var(--m-ink, #eef1fb) 22%, var(--m-stage, #070a12)), var(--m-field-hi, #ff6fc4));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gm-root .gm-stop,
+  .gm-root .gm-stop-n,
+  .gm-root .gm-status,
+  .gm-root .gm-say,
+  .gm-root .gm-ask,
+  .gm-root .gm-verdict,
+  .gm-root .gm-scale,
+  .gm-root .gm-legend,
+  .gm-root .gm-axis,
+  .gm-root .gm-tag-scene {
+    transition: none;
+  }
+}

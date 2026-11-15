@@ -1,0 +1,709 @@
+/* VeinSqueeze moment. Everything is scoped under .vsq; every colour and font is a custom property on the root.
+   Restyle by setting the --m-* tokens on the root (className or style). The stage is dark because the specimen is. */
+.vsq {
+  --m-stage: #0e1011; /* stage background */
+  --m-ink: #f4f2ec; /* words and the classifier's bar */
+  --m-ink-2: #a2a7a4; /* quiet words: tick labels, "AI clot chance", the rule line */
+  --m-line: color-mix(in srgb, var(--m-ink) 17%, transparent); /* chart rules, bar track */
+  --m-mark: #ffd84a; /* what the model drew: SAM 2 outline, squeeze curve, lowest point (ultrasound caliper yellow) */
+  --m-accent: #ffd84a; /* the viewer's own press: hold fill, probe edge, focus ring */
+  --m-font: 'Instrument Sans Variable', 'Instrument Sans', ui-sans-serif, sans-serif;
+  --m-font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+  --m-radius: 6px; /* frame corners (also read by the canvas) */
+  --m-pad: clamp(8px, 1.1cqi, 16px); /* small on purpose: the pictures use the stage's full width */
+  --m-gap: clamp(8px, 1cqi, 14px);
+  /* --m-chart-h (optional, unset): height of the squeeze chart under each picture. Default: a share of the stage height. */
+
+  position: relative;
+  container: vsq / inline-size;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 10; /* override with a height when the page sizes the stage */
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: var(--m-gap);
+  padding: var(--m-pad);
+  background: var(--m-stage);
+  color: var(--m-ink);
+  font-family: var(--m-font);
+  font-size: 15px;
+  line-height: 1.2;
+  overflow: hidden;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+.vsq *,
+.vsq *::before,
+.vsq *::after {
+  box-sizing: border-box;
+}
+.vsq[data-bare] {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.vsq-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------ the pair */
+.vsq-pair {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+  display: grid;
+  gap: var(--m-gap);
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  /* one chart height for both clips: a share of the stage height (--vsq-h, set by index.tsx), so the pictures come out
+     wider than tall and the curve is large enough to read */
+  --vsq-chart-h: clamp(96px, calc(var(--vsq-h, 640px) * 0.275), 270px);
+  --vsq-band-fs: clamp(22px, 2.75cqi, 40px);
+  --vsq-op-h: clamp(26px, 2.4cqi, 36px);
+  /* band word on one line, the AI line under it: the same height before and after the values arrive */
+  --vsq-cap-h: calc(var(--vsq-band-fs) * 1.12 + 4px + var(--vsq-op-h));
+}
+.vsq[data-layout='col'] .vsq-pair {
+  grid-auto-flow: row;
+  grid-auto-columns: auto;
+  grid-auto-rows: minmax(0, 1fr);
+  --vsq-chart-h: clamp(72px, calc(var(--vsq-h, 780px) * 0.125), 140px);
+  --vsq-band-fs: clamp(19px, 5.4cqi, 30px);
+  --vsq-op-h: 24px;
+}
+/* a very wide stage has room for the band word and the AI line side by side */
+@container vsq (min-width: 1640px) {
+  .vsq[data-layout='row']:not([data-count='1']) .vsq-pair {
+    --vsq-cap-h: max(calc(var(--vsq-band-fs) * 1.12), var(--vsq-op-h));
+  }
+  .vsq[data-layout='row']:not([data-count='1']) .vsq-op {
+    flex: 0 0 auto;
+  }
+}
+.vsq-clip {
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: clamp(6px, 0.7cqi, 10px);
+}
+.vsq-frame {
+  position: relative;
+  min-height: 0;
+  border-radius: var(--m-radius);
+  overflow: hidden;
+}
+/* a hairline around each picture, so its edge reads against a dark stage */
+.vsq-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-ink) 13%, transparent);
+  pointer-events: none;
+}
+/* The viewer's press, on the picture: the probe edge at the top (where the probe sits on the skin) lights up and leans
+   in while the control is held, and lets go with the control's fill. It shows the press, it is not a result. */
+.vsq-probe {
+  --vsq-press: 0;
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: clamp(22px, 11%, 52px);
+  opacity: calc(var(--vsq-press) * 3);
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--m-accent) 26%, transparent), transparent);
+  border-top: 3px solid var(--m-accent);
+  transform-origin: 50% 0;
+  transform: scaleY(calc(0.35 + var(--vsq-press) * 0.65));
+  pointer-events: none;
+}
+.vsq[data-bare] .vsq-probe {
+  display: none;
+}
+/* one clip alone: a wide picture in the middle, with its words kept inside the picture's width */
+.vsq[data-count='1'][data-layout='row'] .vsq-clip {
+  width: min(100%, calc(var(--vsq-solo, 100%) * 1.5));
+  justify-self: center;
+}
+.vsq-marks {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  --vsq-u: 1;
+}
+.vsq-outline {
+  fill: var(--m-mark);
+  stroke: var(--m-mark);
+  stroke-width: calc(var(--vsq-u) * 2.75px);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.vsq-ghost {
+  fill: none;
+  stroke: var(--m-ink);
+  stroke-width: calc(var(--vsq-u) * 1.25px);
+  stroke-dasharray: calc(var(--vsq-u) * 2px) calc(var(--vsq-u) * 6px);
+  stroke-linecap: round;
+}
+/* words on the picture: "vein" inside the outline at rest, "artery" at SAM 2's artery click, "start" by the dotted
+   start outline, and the expert's label in the corner once the values have landed */
+.vsq-marks text {
+  font-family: var(--m-font);
+  font-size: 14px;
+  font-weight: 560;
+  letter-spacing: 0.01em;
+  paint-order: stroke;
+  stroke: color-mix(in srgb, var(--m-stage) 82%, transparent);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+}
+.vsq-click text,
+.vsq-start text,
+.vsq-expert text {
+  fill: var(--m-ink);
+}
+.vsq-artery text,
+.vsq-start-note {
+  fill: var(--m-ink-2);
+  font-weight: 500;
+}
+.vsq-expert text {
+  font-size: 18px;
+  font-weight: 620;
+  letter-spacing: -0.005em;
+}
+
+/* ------------------------------------------------------------ under each picture: the bet at rest, then chart and words */
+.vsq-under {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: clamp(6px, 0.7cqi, 10px);
+  /* the same room at rest (the bet) and at the result (chart, band word, AI line): the pictures never resize */
+  min-height: calc(var(--m-chart-h, var(--vsq-chart-h)) + var(--vsq-cap-h) + clamp(6px, 0.7cqi, 10px));
+}
+.vsq-bet {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: block;
+  align-content: center;
+  padding: 0 4% 0 2px;
+  font-size: clamp(20px, 3.5cqi, 54px);
+  font-weight: 560;
+  letter-spacing: -0.026em;
+  line-height: 1.1;
+  text-wrap: balance;
+  pointer-events: none;
+}
+/* two lines each in a wide box: the two sentences sit as a matched pair under the two pictures */
+.vsq[data-layout='row']:not([data-count='1']) .vsq-bet > span:not(.vsq-bet-rule) {
+  display: block;
+  max-width: 11.5em;
+}
+.vsq[data-layout='col'] .vsq-bet {
+  font-size: clamp(18px, 5cqi, 25px);
+}
+/* the rule explains the button, so it is said at the bet's own weight: under the second picture in a wide box,
+   right under the bet in a tall one (and when there is one clip) */
+.vsq-bet-rule {
+  display: none;
+}
+.vsq[data-count='1'] .vsq-bet-rule {
+  display: inline;
+}
+.vsq[data-layout='col'] .vsq-bet-rule {
+  display: block;
+}
+.vsq[data-layout='col'] .vsq-clip + .vsq-clip .vsq-bet {
+  display: none;
+}
+/* in a wide box the rule is the quieter half of the pair of sentences */
+.vsq[data-layout='row'] .vsq-clip + .vsq-clip .vsq-bet {
+  color: var(--m-ink-2);
+}
+
+/* ------------------------------------------------------------ the squeeze curve, under its clip */
+.vsq-curve {
+  display: grid;
+  grid-template-columns: var(--vsq-tickw) minmax(0, 1fr);
+  gap: 8px;
+  height: var(--m-chart-h, var(--vsq-chart-h));
+}
+.vsq {
+  --vsq-tickw: 38px; /* tick label column; the words under the chart line up with the plot */
+}
+.vsq-ticks {
+  position: relative;
+  font-size: clamp(11px, 1cqi, 14px);
+  line-height: 1;
+  color: var(--m-ink-2);
+}
+.vsq-ticks span {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+  font-variant-numeric: tabular-nums;
+}
+.vsq-plot {
+  position: relative;
+  min-width: 0;
+}
+.vsq-plot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+.vsq-grid line {
+  stroke: var(--m-line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.vsq-grid line[data-start] {
+  stroke-dasharray: 2 4;
+  stroke: color-mix(in srgb, var(--m-ink) 34%, transparent);
+}
+/* what the chart measures, in the headroom above the start line */
+.vsq-axis {
+  position: absolute;
+  left: 0;
+  top: 1px;
+  font-size: clamp(11px, 1cqi, 14px);
+  line-height: 1;
+  color: var(--m-ink-2);
+  white-space: nowrap;
+}
+.vsq-reveal {
+  position: absolute;
+  inset: 0;
+}
+/* the fill under the curve: the same line closed down to the floor of the chart, fading out */
+.vsq-area {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / 0.3) 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgb(0 0 0 / 0.3) 55%, transparent 100%);
+}
+.vsq-area path {
+  fill: var(--m-mark);
+  fill-opacity: 0.34;
+  stroke: none;
+}
+.vsq-area path.vsq-area-rest {
+  fill-opacity: 0.1;
+}
+/* the playhead: where the frame on screen sits on the curve */
+.vsq-head {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  margin-left: -0.5px;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--m-mark) 65%, transparent) 35%, color-mix(in srgb, var(--m-mark) 65%, transparent));
+  pointer-events: none;
+}
+.vsq-reveal svg:not(.vsq-area) {
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--m-mark) 45%, transparent));
+}
+.vsq-line {
+  fill: none;
+  stroke: var(--m-mark);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.vsq-line-rest {
+  opacity: 0.42;
+  stroke-width: 2;
+}
+.vsq-dot {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  margin: -6.5px 0 0 -6.5px;
+  border-radius: 50%;
+  background: var(--m-mark);
+  box-shadow:
+    0 0 0 3px var(--m-stage),
+    0 0 18px 4px color-mix(in srgb, var(--m-mark) 55%, transparent);
+}
+/* while the press runs the dot is the pen that draws the curve: a white-hot core in a wide halo */
+.vsq[data-beat='press'] .vsq-dot,
+.vsq[data-beat='outline'] .vsq-dot {
+  background: color-mix(in srgb, var(--m-mark) 40%, #fff);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--m-mark) 30%, transparent),
+    0 0 26px 9px color-mix(in srgb, var(--m-mark) 60%, transparent);
+}
+.vsq-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid var(--m-mark);
+}
+/* the lowest value, written at its point */
+.vsq-low {
+  position: absolute;
+  font-style: normal;
+  font-size: clamp(12px, 1.1cqi, 16px);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--m-ink-2);
+  /* the chart rules stop behind the words (the label sits clear of the curve) */
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--m-stage) 88%, transparent);
+}
+.vsq-low b {
+  font-size: clamp(18px, 1.95cqi, 28px);
+  font-weight: 640;
+  letter-spacing: -0.01em;
+  color: var(--m-ink);
+  font-variant-numeric: tabular-nums;
+}
+.vsq-low[data-side='left'] {
+  right: calc(100% + 12px);
+  top: calc(50% + 8px);
+}
+.vsq-low[data-side='right'] {
+  left: calc(100% + 12px);
+  bottom: calc(50% + 10px);
+}
+
+/* ------------------------------------------------------------ band word, then the AI clot chance against the alarm */
+.vsq-cap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: start;
+  justify-content: space-between;
+  gap: 4px 20px;
+  min-height: var(--vsq-cap-h);
+  padding-left: calc(var(--vsq-tickw) + 8px);
+}
+.vsq-under:not([data-curve]) .vsq-cap {
+  padding-left: 0;
+}
+.vsq-band {
+  display: block;
+  font-size: var(--vsq-band-fs);
+  font-weight: 620;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  white-space: nowrap;
+  will-change: transform, opacity;
+}
+/* The AI line has its own line under the band word and a fixed height, so the pictures keep their size when the values
+   arrive. In a very narrow box the alarm words may drop to a second line; each piece stays whole. */
+.vsq-op {
+  flex: 0 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-height: var(--vsq-op-h);
+  line-height: 1;
+}
+.vsq-op-label {
+  font-size: clamp(12px, 1.12cqi, 16px);
+  color: var(--m-ink-2);
+  white-space: pre;
+}
+/* LIVE or REPLAY: the tag sits on the value it qualifies and exists only when that value does */
+.vsq-mode {
+  display: inline-block;
+  margin-left: 2px;
+  padding: 3px 5px 2px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-ink-2) 50%, transparent);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: var(--m-ink-2);
+  white-space: nowrap;
+}
+.vsq-op-bar {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  width: clamp(38px, 13cqi, 230px);
+  height: 8px;
+  margin: 0 12px 0 10px;
+}
+.vsq-op-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background: var(--m-line);
+  overflow: hidden;
+}
+.vsq-op-track i {
+  position: absolute;
+  inset: 0;
+  background: var(--m-ink);
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+/* the alarm threshold on the bar, and the same shape next to the words that name it */
+.vsq-op-tick,
+.vsq-alarm-mark {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 6px solid var(--m-ink);
+}
+.vsq-op-tick {
+  position: absolute;
+  top: calc(100% + 2px);
+  margin-left: -4px;
+}
+.vsq-op-value {
+  display: inline-block;
+  line-height: 1; /* the line keeps its height when the value arrives, so the pictures do not resize */
+  min-width: 3.4ch;
+  text-align: right;
+  font-size: clamp(18px, 2.2cqi, 32px);
+  font-variant-numeric: tabular-nums;
+  font-weight: 640;
+  letter-spacing: -0.015em;
+}
+.vsq-alarm {
+  display: inline-block;
+  white-space: nowrap;
+  margin-left: 14px;
+  font-size: clamp(12px, 1.12cqi, 16px);
+}
+.vsq-alarm-mark {
+  display: inline-block;
+  margin-right: 5px;
+  position: relative;
+  top: -1px; /* not vertical-align: the line must keep its height when the words arrive */
+}
+.vsq-alarm[data-above='0'] .vsq-alarm-mark {
+  transform: rotate(180deg);
+}
+/* a tall, narrow box: a shorter bar and tighter gaps keep the AI line on one line, so the pictures never resize */
+.vsq[data-layout='col'] {
+  --vsq-tickw: 32px;
+}
+.vsq[data-layout='col'] .vsq-op-bar {
+  width: clamp(28px, 9cqi, 120px);
+  margin: 0 8px 0 7px;
+}
+.vsq[data-layout='col'] .vsq-alarm {
+  margin-left: 9px;
+}
+.vsq-tag {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 2px 7px;
+  border: 1px solid color-mix(in srgb, var(--m-ink) 46%, transparent);
+  border-radius: 4px;
+  font-size: clamp(12px, 1.05cqi, 15px);
+  line-height: 1.2;
+}
+
+/* ------------------------------------------------------------ the hold control (the probe) */
+.vsq-hold {
+  --vsq-press: 0;
+  position: relative;
+  z-index: 1;
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-width: min(100%, 400px);
+  min-height: 60px;
+  padding: 0 30px 0 24px;
+  margin: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--m-ink);
+  color: var(--m-stage);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 620;
+  letter-spacing: -0.012em;
+  cursor: pointer;
+  overflow: hidden;
+  touch-action: none; /* a finger held here presses the probe, it never scrolls the page */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--m-ink) 30%, transparent),
+    0 10px 30px -12px color-mix(in srgb, var(--m-accent) 60%, transparent);
+}
+.vsq[data-layout='col'] .vsq-hold {
+  justify-self: stretch;
+  min-height: 58px;
+}
+.vsq[data-bare] .vsq-hold,
+.vsq[data-bare] .vsq-under,
+.vsq[data-bare] .vsq-marks text {
+  display: none;
+}
+.vsq[data-bare] .vsq-clip {
+  grid-template-rows: minmax(0, 1fr);
+}
+.vsq-hold[aria-disabled='true'] {
+  cursor: default;
+}
+.vsq-hold[aria-busy='true'] {
+  background: color-mix(in srgb, var(--m-ink) 22%, var(--m-stage));
+  color: var(--m-ink);
+  box-shadow: none;
+}
+/* once the result is in, the control steps back: the result is the thing to look at, pressing again is the second thing */
+.vsq[data-state='result'] .vsq-hold {
+  background: color-mix(in srgb, var(--m-ink) 9%, var(--m-stage));
+  color: var(--m-ink);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-ink) 34%, transparent);
+}
+.vsq[data-state='result'] .vsq-key {
+  border-color: color-mix(in srgb, var(--m-ink) 36%, transparent);
+}
+.vsq-hold:focus-visible {
+  outline: 2px solid var(--m-accent);
+  outline-offset: 3px;
+}
+.vsq-hold-fill,
+.vsq-hold-load {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transform: scaleX(0);
+  pointer-events: none;
+}
+.vsq-hold-fill {
+  background: var(--m-accent);
+}
+.vsq-hold-load {
+  background: color-mix(in srgb, var(--m-ink) 22%, transparent);
+}
+/* the control's own picture of the test: a probe bar pressing a round vein flat (drawn by --vsq-press, 0 to 1) */
+.vsq-hold-icon {
+  position: relative;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+}
+.vsq-hold-icon::before {
+  content: '';
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  top: 1px;
+  height: 3px;
+  border-radius: 2px;
+  background: currentColor;
+  transform: translateY(calc(var(--vsq-press) * 9px));
+}
+.vsq-hold-icon i {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 7px;
+  bottom: 1px;
+  border: 2.5px solid currentColor;
+  border-radius: 50%;
+  transform-origin: 50% 100%;
+  transform: scaleY(calc(1 - var(--vsq-press) * 0.56)) scaleX(calc(1 + var(--vsq-press) * 0.2));
+}
+.vsq-hold-label {
+  position: relative;
+}
+.vsq-key {
+  display: none;
+  margin-left: 8px;
+  vertical-align: 1px;
+  padding: 3px 7px 2px;
+  border-radius: 5px;
+  border: 1px solid color-mix(in srgb, var(--m-stage) 36%, transparent);
+  font-family: var(--m-font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+@media (hover: hover) and (pointer: fine) {
+  .vsq-key {
+    display: inline-block;
+  }
+  .vsq[data-state='result'] .vsq-hold:hover {
+    background: color-mix(in srgb, var(--m-ink) 16%, var(--m-stage));
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vsq-hold {
+    transition:
+      transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+      background-color 240ms ease,
+      color 240ms ease,
+      box-shadow 240ms ease;
+  }
+  .vsq-hold:active,
+  .vsq-hold[aria-pressed='true'] {
+    transform: scale(0.97);
+  }
+  /* at rest the control breathes once every few seconds: it is the one thing to press */
+  .vsq[data-state='idle'][data-ready] .vsq-hold:not([aria-pressed='true']) {
+    animation: vsq-breathe 2.8s ease-in-out infinite;
+  }
+}
+@keyframes vsq-breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--m-ink) 30%, transparent),
+      0 0 0 0 color-mix(in srgb, var(--m-accent) 55%, transparent),
+      0 10px 30px -12px color-mix(in srgb, var(--m-accent) 60%, transparent);
+  }
+  55% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--m-ink) 30%, transparent),
+      0 0 0 9px color-mix(in srgb, var(--m-accent) 0%, transparent),
+      0 10px 34px -10px color-mix(in srgb, var(--m-accent) 80%, transparent);
+  }
+}
+
+.vsq-note {
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 96px 0;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  padding: 0 24px;
+  text-align: center;
+  font-size: 17px;
+  color: var(--m-ink-2);
+  pointer-events: none;
+}
+
+.vsq-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* the clips did not load: nothing is said about pictures that are not there */
+.vsq[data-state='error'] .vsq-bet,
+.vsq[data-state='error'] .vsq-marks {
+  display: none;
+}
