@@ -43,6 +43,30 @@ if (what === 'posters') {
   await still('poster', '?poster=1', 1600, 1000, { jpeg: resolve(posters, 'braindrift.jpg') })
   await still('poster_portrait', '?poster=1', 900, 1200, { jpeg: resolve(posters, 'braindrift_portrait.jpg') })
 }
+// r4: the DF site's still of this check (home window, home thumbnails, the story image): the slice view the owner picked
+// (the mockup-A scanner window), before flight, in the DF colours, with no words in the picture.
+if (what === 'dfposter') {
+  const { ctx, page, logs } = await open('?state=idle&labels=0&tags=0&controls=0&bare=1&mode=replay', 1600, 1000)
+  await page.addStyleTag({
+    content: `.bdm.bds{--m-stage:#070A14;--m-mark:#5CF2B0;--m-mark-2:#F4FFFA;--m-ink:#F1F4FF;--m-ink-2:#9AA3BF}
+      .bds .bds-chips{display:none}
+      .bds .bds-well{transform:scale(.86)}
+      .bds .bds-v-line{stroke-width:6px}
+      .bds .bds-v-glow{stroke-width:30px;stroke-opacity:.5;filter:blur(12px)}
+      .bds .bds-v-fill{fill-opacity:.5}
+      .bds .bds-tick{width:54px;height:54px;border-width:4px}
+      .bds .bds-tl,.bds .bds-bl{left:-24px}.bds .bds-tr,.bds .bds-br{right:-24px}
+      .bds .bds-tl,.bds .bds-tr{top:-24px}.bds .bds-bl,.bds .bds-br{bottom:-24px}
+      .bds .bds-atmo{background:
+        radial-gradient(560px 560px at 50% 50%, rgba(92,242,176,.13), transparent 72%),
+        radial-gradient(60% 55% at 86% 10%, rgba(70,60,170,.22), transparent 70%),
+        radial-gradient(55% 60% at 8% 92%, rgba(20,90,140,.18), transparent 70%)}`,
+  })
+  await page.waitForTimeout(900)
+  await page.screenshot({ path: resolve(posters, 'braindrift.jpg'), type: 'jpeg', quality: 90 })
+  console.log('dfposter', JSON.stringify(await attrs(page)), logs.slice(0, 6).join(' | '))
+  await ctx.close()
+}
 if (what === 'shots') {
   await still('idle_1440', '?state=idle', 1440, 900)
   await still('result_1440', '?state=result', 1440, 900)

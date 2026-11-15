@@ -5,9 +5,18 @@
     <!-- First script: makes a static host (GitHub Pages) cross-origin isolated so the models can use wasm threads.
          Does nothing where the page is already isolated (dev server, Electron). coi-serviceworker v0.1.7, MIT. -->
     <script src="./coi-serviceworker.js"></script>
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <!-- Our own icon: the four-point star of the body spots, inline (the Vite template's logo is no longer used). -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-10 -10 20 20'%3E%3Crect x='-10' y='-10' width='20' height='20' rx='5' fill='%2305070d'/%3E%3Cpath d='M0 -8C.9 -2.2 2.2 -.9 8 0C2.2 .9 .9 2.2 0 8C-.9 2.2 -2.2 .9 -8 0C-2.2 -.9 -.9 -2.2 0 -8Z' fill='%238FB8FF'/%3E%3Ccircle r='1.6' fill='%23fff'/%3E%3C/svg%3E" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SuperHumans</title>
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#05070d" />
+    <title>SuperHumans: six AI health checks for astronauts</title>
+    <meta name="description" content="SuperHumans: six AI health checks for astronauts, running in your browser on real, openly published research data. Team SuperHumans, NASA Space Apps Challenge 2026, Istanbul." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SuperHumans" />
+    <meta property="og:description" content="Six AI health checks for astronauts, running in your browser." />
+    <!-- Dark from the first frame, so no page flashes white while it loads. -->
+    <style>html, body, #root { background: #05070d; color: #eef0f7; }</style>
   </head>
   <body>
     <div id="root"></div>

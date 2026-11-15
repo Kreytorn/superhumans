@@ -1,3 +1,7 @@
+# RESULT r4: slice view (Sun 15 Nov, 09:40)
+
+**Owner's note** [U r4]: "brain image none of these original image of .../work/App/mockups/A/braindrift.html this one had best." The stage's picture is now the mockup's: a real coronal MRI slice of the flight brain in a dark framed scanner window, the fluid spaces outlined in glowing mint (the DF token `--m-mark`). The 3D brain stays available as `view="3d"`. Every number is still the engine's (replay and live both measured +9.2 % against +10.7 % put in; 2.4 mm against 2.46 mm); SIMULATION and LIVE / REPLAY tags kept. No new data files: the slice, the outlines and the growth come from the shipped `flight/` crops and stored Model B maps. README "Slice view (r4)" has the details.
+
 # RESULT: BrainDrift stage, k2 NOTES version (Sun 15 Nov, 04:35)
 
 **Owner's note.** "Brain drift. So much potential here tht im not gonna say anything I bet you can crate a 10x cooler looking thing here." Kept everything the stage does (props, ref, tokens, beats, honesty tags, numbers) and made it look like an instrument reading a real brain.

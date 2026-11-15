@@ -1,0 +1,156 @@
+/* Garn Meter panel body. Scoped under .gn-stage; the moment inside keeps its own .gm-* classes and is
+   restyled only through its --m-* tokens (Stage.tsx). Colours, faces and steps are the shell's --st-* tokens. */
+.gn-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--st-well);
+}
+.gn-moment {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+/* Phone sheet: the moment lays itself out for this much height; the panel body scrolls (Stage.tsx follows the
+   story while it plays). */
+.gn-stage[data-layout='sheet'] {
+  height: auto;
+  min-height: 100%;
+}
+.gn-stage[data-layout='sheet'] .gn-moment {
+  flex: none;
+  height: 660px;
+}
+/* A short landscape panel (a laptop with its browser bars, 1440 x 731; a 1280 x 720 projector): below about
+   525 px the moment's rows run into each other, so it keeps that height, runs past the body's bottom edge and
+   the panel body scrolls (Stage.tsx follows the story there too). Taller panels are filled as before. */
+.gn-stage[data-layout='side'] .gn-moment {
+  flex: 1 0 auto;
+  min-height: 525px;
+}
+
+/* ------------------------------------------------------------------------------ How do we know? */
+.gn-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 44px;
+  padding: 0 var(--st-1);
+  border-top: 1px solid var(--st-hair-2);
+}
+.gn-how-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 var(--st-3);
+  border: 0;
+  border-radius: 2px;
+  background: none;
+  color: var(--st-ink-2);
+  font: 500 var(--st-t-label) / 1 var(--st-font-mono);
+  letter-spacing: var(--st-track-label);
+  text-transform: uppercase;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: color 0.18s linear;
+}
+.gn-how-btn svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+@media (hover: hover) {
+  .gn-how-btn:hover {
+    color: #fff;
+  }
+}
+.gn-how-btn[aria-expanded='true'] {
+  color: var(--st-amber);
+}
+.gn-how-btn:focus-visible {
+  outline: 1.5px solid var(--st-ink);
+  outline-offset: -4px;
+}
+
+.gn-how {
+  position: absolute;
+  z-index: 3;
+  inset: 0 0 44px 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: var(--st-6) var(--st-7) var(--st-5) var(--st-6);
+  background: rgba(5, 7, 10, 0.97);
+  border-bottom: 1px solid var(--st-hair-2);
+  animation: gn-how 0.34s var(--st-ease) both;
+}
+@keyframes gn-how {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+}
+.gn-how-in {
+  max-width: 38em;
+}
+.gn-how p {
+  margin: 0 0 var(--st-4);
+  font: 400 15px/1.55 var(--st-font-body);
+  text-wrap: pretty;
+  color: var(--st-ink-2);
+}
+.gn-how .gn-how-k {
+  margin-bottom: var(--st-5);
+  font: 500 var(--st-t-label) / 1 var(--st-font-mono);
+  letter-spacing: var(--st-track-label);
+  text-transform: uppercase;
+  color: var(--st-amber);
+}
+.gn-how .gn-how-card {
+  color: var(--st-ink);
+}
+.gn-how-x {
+  position: absolute;
+  top: var(--st-3);
+  right: var(--st-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: none;
+  color: var(--st-ink-2);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: color 0.18s linear;
+}
+.gn-how-x svg {
+  width: 18px;
+  height: 18px;
+}
+@media (hover: hover) {
+  .gn-how-x:hover {
+    color: #fff;
+  }
+}
+.gn-how-x:focus-visible {
+  outline: 1.5px solid var(--st-ink);
+  outline-offset: -4px;
+}
+.gn-stage[data-layout='sheet'] .gn-how {
+  padding: var(--st-5) var(--st-6) var(--st-4) var(--st-4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gn-how {
+    animation: none;
+  }
+}

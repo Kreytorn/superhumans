@@ -1,0 +1,91 @@
+/* Station: the stand-in frozen scene. Scoped under .st-stub. Only transform, opacity and stroke-dashoffset move. */
+.st-stub {
+  fill: none;
+  stroke: #ffb45a;
+  stroke-linecap: round;
+}
+.st-stub-ring {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0.85;
+  animation: st-stub-draw 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+@keyframes st-stub-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.st-stub-echo {
+  opacity: 0;
+  animation: st-stub-echo 1.5s cubic-bezier(0.2, 0.6, 0.3, 1) 0.9s both;
+}
+@keyframes st-stub-echo {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+/* the particle: a short bright dash that crosses the whole path, then the faint line it leaves */
+.st-stub-streak {
+  stroke: #fff;
+  stroke-dasharray: 0.16 2;
+  stroke-dashoffset: 0.16;
+  filter: drop-shadow(0 0 6px #ffd9a8);
+  animation: st-stub-streak 0.42s cubic-bezier(0.4, 0, 0.8, 0.6) 0.55s both;
+}
+@keyframes st-stub-streak {
+  to {
+    stroke-dashoffset: -1.02;
+  }
+}
+.st-stub-trail {
+  stroke: #ffe2b8;
+  opacity: 0;
+  animation: st-stub-trail 1.2s linear 0.72s both;
+}
+@keyframes st-stub-trail {
+  0% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+.st-stub-hit {
+  fill: #fff;
+  stroke: none;
+  opacity: 0;
+  animation: st-stub-hit 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) 0.76s both;
+}
+@keyframes st-stub-hit {
+  0% {
+    transform: scale(0.4);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3.4);
+    opacity: 0;
+  }
+}
+.st-stub-drift {
+  stroke: #8fb3d9;
+  opacity: 0;
+  animation: st-stub-drift 1.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes st-stub-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate3d(var(--ux), var(--uy), 0);
+    opacity: 0.55;
+  }
+}

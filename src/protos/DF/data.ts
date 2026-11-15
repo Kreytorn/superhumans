@@ -76,7 +76,7 @@ export const MODS: Mod[] = [
     id: 'garnmeter',
     name: 'Garn Meter',
     hook: 'Space sickness, in Garns',
-    sentence: 'Space sickness, in Garns. You say how you feel; reading it from brainwaves doesn’t work yet.',
+    sentence: 'Space sickness, in Garns: an experimental model reads it from brainwaves.',
     color: '#FFD34D',
     org: [0.082, 1.6, -0.006],
     side: 'r',

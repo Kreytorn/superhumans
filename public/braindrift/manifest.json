@@ -6,7 +6,7 @@
  "ids": "flight-f000..f100 = 5 frames of one held-out OASIS test brain (flight-brain); brain-small / brain-large = smallest / largest ventricles of the 40-brain test set; pvs-low / pvs-mid / pvs-high = 3 held-out HCP-Aging test people (neutral ids; no subject ids, ages or sexes shipped)",
  "licence_data": "OASIS-1 (Marcus et al. 2007) via neurite-oasis (Hoopes et al. 2021): OASIS Data Use Terms (cite; no re-identification; skull-stripped crops only). OpenNeuro ds005595 (Chai et al.): CC0, NIA U01AG052564 acknowledgement. Repeat-scan numbers: OpenNeuro ds000239 (Maclaren et al. 2014), CC0.",
  "privacy": "no faces (skull-stripped / brain-masked, axial slices above the eyes), no raw HCP T2, no OASIS orig, no ages or sexes, no subject ids, no QA overlay PNGs",
- "total_bytes": 52551867,
+ "total_bytes": 53211831,
  "files": [
   {
    "path": "models/braindrift_anat.onnx",
@@ -390,6 +390,36 @@
    "source": "generated r3 with onnxruntime 1.32 CPU (Python) from work/braindrift/out/braindrift_anat.onnx + flight frames, browser slice rule",
    "credit": "Team SuperHumans",
    "note": "parity reference only (top-surface height [176,208] float32 LE of flight f100 (-1 = none)); not needed by screens"
+  },
+  {
+   "path": "architecture.svg",
+   "role": "media",
+   "bytes": 338451,
+   "sha256": "49c34141f4af6443764b9d5e1c90447b065fae15b54dca3d0b958a2230807455",
+   "source": "work/Web/figures/braindrift/braindrift_arch_nocap.svg (built by work/Web/figures/braindrift/build.sh from braindrift_arch.tex)",
+   "credit": "Architecture diagram by team SuperHumans, drawn with an AI assistant (Claude); AI-generated diagram",
+   "licence": "MIT (diagram, project licence); embedded OASIS-1 MRI slices (Marcus et al. 2007) under the OASIS Data Use Terms; Latin Modern glyphs GUST Font License",
+   "note": "BrainDrift Model B (brain map) architecture figure, Transformer-2017 style, white background, no caption, visible 'AI-generated diagram' mark; drawn as LaTeX/TikZ (Latin Modern fonts, GUST Font License). Brain images: coronal slices 79-81 of the held-out OASIS-1 brain shipped as flight/flight_f000.u8.gz (Marcus et al. 2007, OASIS Data Use Terms, via neurite-oasis, Hoopes et al. 2021) and Model B's 6-region map of slice 80 (6 classes: background and five brain regions); volumes from the stored maps flight_f000_seg / flight_f100_seg (the after-flight scan is the simulation); same figure as architecture.png"
+  },
+  {
+   "path": "architecture.png",
+   "role": "media",
+   "bytes": 320265,
+   "sha256": "874b0076634d6c050660a60c51a6e51781694f328f71791421ed08a26eeca66e",
+   "source": "work/Web/figures/braindrift/braindrift_arch_nocap.png (300 dpi, built by work/Web/figures/braindrift/build.sh)",
+   "credit": "Architecture diagram by team SuperHumans, drawn with an AI assistant (Claude); AI-generated diagram",
+   "licence": "MIT (diagram, project licence); embedded OASIS-1 MRI slices (Marcus et al. 2007) under the OASIS Data Use Terms; Latin Modern glyphs GUST Font License",
+   "note": "BrainDrift Model B (brain map) architecture figure, Transformer-2017 style, white background, no caption, visible 'AI-generated diagram' mark; drawn as LaTeX/TikZ (Latin Modern fonts, GUST Font License). Brain images: coronal slices 79-81 of the held-out OASIS-1 brain shipped as flight/flight_f000.u8.gz (Marcus et al. 2007, OASIS Data Use Terms, via neurite-oasis, Hoopes et al. 2021) and Model B's 6-region map of slice 80 (6 classes: background and five brain regions); volumes from the stored maps flight_f000_seg / flight_f100_seg (the after-flight scan is the simulation); same figure as architecture.svg"
+  },
+  {
+   "path": "architecture.json",
+   "role": "meta",
+   "bytes": 1248,
+   "sha256": "863425d89f9b306d49eaf9f499800f7e923c3e7a9e77d4668df25e79191d2414",
+   "source": "written by work/Web/figures/braindrift/to_site.py",
+   "credit": "Architecture diagram by team SuperHumans, drawn with an AI assistant (Claude); AI-generated diagram",
+   "licence": "MIT",
+   "note": "title, caption and alt text of the architecture figure, read by the DF check page (protos/DF/arch.tsx)"
   }
  ]
 }

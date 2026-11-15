@@ -370,6 +370,12 @@ export function createChamber(canvas: HTMLCanvasElement) {
       specTex.dispose()
       mapTex.dispose()
       renderer.dispose()
+      // give the context back once the canvas has left the page: a page opened again and again (DF's checks) must not
+      // pile up WebGL contexts, or the browser drops the oldest one, which can be the DF body. A canvas still on the
+      // page (React's dev double mount) keeps it, since a new renderer takes the same context.
+      window.setTimeout(() => {
+        if (!canvas.isConnected) renderer.forceContextLoss()
+      }, 0)
     },
   }
 }

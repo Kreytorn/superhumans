@@ -1,0 +1,1633 @@
+/* Take V03 "Cutaway". Everything is scoped to .v03 */
+.v03 {
+  --ink0: #020309;
+  --ink1: #070b1e;
+  --hull: #060b26;
+  --line: #eaf8ff;
+  --line2: #8fd3ff;
+  --line3: #79b4ff;
+  --amber: #ffcf8a;
+  --soft: #cfe1ff;
+  --quiet: #93a9e2;
+  --hue: #ff4fb0;
+  --display: 'Big Shoulders Variable', 'Archivo Variable', system-ui, sans-serif;
+  --text: 'Archivo Variable', system-ui, sans-serif;
+  --mono: 'Martian Mono Variable', ui-monospace, monospace;
+  --pad: clamp(24px, 4.4vw, 68px);
+  position: relative;
+  min-height: 100svh;
+  background: var(--ink0);
+  color: #eef6ff;
+  font-family: var(--text);
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  /* clip, not hidden: a hidden overflow would make the root a scroll box and break the phone's sticky controls */
+  overflow-x: clip;
+}
+.v03,
+.v03 *,
+.v03 *::before,
+.v03 *::after {
+  box-sizing: border-box;
+}
+:where(.v03) a {
+  color: inherit;
+  text-decoration: none;
+}
+:where(.v03) :where(p, h1, h2, figure) {
+  margin: 0;
+}
+:where(.v03) button {
+  font: inherit;
+  cursor: pointer;
+}
+
+/* ------------------------------------------------------------ the sheet */
+.v03-ground {
+  /* near-black ink; one deep-blue glow behind the ship, so the ship's lines stay the brightest thing */
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 46% 54% at 54% 51%, rgba(38, 72, 210, 0.36) 0%, rgba(20, 40, 136, 0.17) 46%, rgba(8, 16, 60, 0) 100%),
+    radial-gradient(ellipse 95% 95% at 50% 50%, #070b1d 0%, #04060f 58%, #020309 100%);
+}
+.v03-ground::before {
+  /* film grain */
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.075;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.v03-ground::after {
+  /* darker corners, so the lit rooms carry the eye */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 50%, rgba(0, 0, 4, 0.7) 100%);
+}
+.v03-parallax,
+.v03-stage {
+  position: absolute;
+  inset: 0;
+}
+.v03-parallax {
+  will-change: transform;
+}
+.v03-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  fill: none;
+  stroke-linejoin: round;
+  user-select: none;
+}
+.v03-backdrop {
+  overflow: visible;
+}
+
+/* construction marks behind the ship */
+.v03-con :is(path, circle) {
+  stroke: #7d9cf0;
+  stroke-width: 1;
+  stroke-opacity: 0.13;
+}
+.v03-con .v03-con-thin {
+  stroke-width: 0.8;
+  stroke-opacity: 0.08;
+}
+.v03-con .v03-con-axis {
+  stroke-dasharray: 26 7 4 7;
+  stroke-opacity: 0.15;
+}
+.v03-con .v03-con-dash {
+  stroke-dasharray: 3 9;
+  stroke-opacity: 0.12;
+}
+.v03-con .v03-con-mark :is(path),
+.v03-con path.v03-con-mark {
+  stroke-opacity: 0.26;
+  stroke-width: 1;
+}
+.v03-con .v03-con-fill {
+  fill: #7d9cf0;
+  fill-opacity: 0.24;
+  stroke: none;
+}
+
+/* ------------------------------------------------------------ line weights: three levels and a halo */
+.v03-l0 :is(path, rect, circle, ellipse, line) {
+  stroke: #f4fcff;
+  stroke-width: 2.7;
+}
+.v03-l1 :is(path, rect, circle, ellipse, line) {
+  stroke: #dff4ff;
+  stroke-width: 1.9;
+}
+.v03-l2 :is(path, rect, circle, ellipse, line) {
+  stroke: #8fd3ff;
+  stroke-width: 1.35;
+  stroke-opacity: 0.92;
+}
+.v03-l3 :is(path, rect, circle, ellipse, line) {
+  stroke: #7db6ff;
+  stroke-width: 0.9;
+  stroke-opacity: 0.6;
+}
+/* the radiators are the largest shapes: kept as quiet cool line so they never pull the eye from the lit rooms */
+.v03-l2.v03-rad :is(path, rect) {
+  stroke: #7fb4ff;
+  stroke-opacity: 0.5;
+}
+.v03-l2 circle:not([pathLength]) {
+  fill: #8fd3ff;
+  stroke: none;
+}
+.v03-solid {
+  fill: var(--hull);
+  fill-opacity: 0.93;
+  stroke: none;
+}
+.v03-svg .v03-solidline {
+  fill: var(--hull);
+}
+.v03-halo {
+  stroke: #58c8ff;
+  stroke-width: 11;
+  stroke-opacity: 0.14;
+}
+.v03-lit rect {
+  fill: #ffc56e;
+  fill-opacity: 0.9;
+}
+
+/* the ring: far half behind the hull, near half in front, a dashed hidden line across the cut-open hull */
+.v03-ring-band {
+  fill: #0a1446;
+  fill-opacity: 0.94;
+  stroke: none;
+}
+.v03-ring-win {
+  fill: #ffc56e;
+  stroke: none;
+}
+.v03-ring-tick {
+  stroke: #dff4ff;
+  stroke-width: 4;
+}
+.v03-ring-far {
+  opacity: 0.5;
+}
+.v03-ring-far .v03-ring-win {
+  fill: #ffa94a;
+}
+.v03-ring-hid ellipse {
+  stroke: #9fdcff;
+  stroke-width: 1.3;
+  stroke-opacity: 0.55;
+  stroke-dasharray: 9 7;
+}
+
+/* a cosmic ray: a 2-unit white-cyan core in two layers of glow (no blur filter), its tail fading out */
+.v03-ray {
+  opacity: 0;
+  pointer-events: none;
+}
+.v03-ray line {
+  stroke-linecap: round;
+}
+.v03-ray-glow {
+  stroke-width: 14;
+  stroke-opacity: 0.24;
+}
+.v03-ray-mid {
+  stroke-width: 5.5;
+  stroke-opacity: 0.45;
+}
+.v03-ray-core {
+  stroke-width: 2.2;
+}
+
+/* the room a ray passes through flashes; a scan line sweeps down a lit screen now and then */
+.v03-flash {
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+.v03-room.is-hit .v03-flash {
+  animation: v03-hit-screen 760ms ease-out;
+}
+.v03-room.is-hit .v03-glow-h {
+  animation: v03-hit-glow 900ms ease-out;
+}
+.v03-room.is-hit .v03-edge {
+  animation: v03-hit-edge 760ms ease-out;
+}
+@keyframes v03-hit-screen {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.34;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes v03-hit-glow {
+  0% {
+    opacity: 0;
+  }
+  14% {
+    opacity: 1;
+  }
+}
+@keyframes v03-hit-edge {
+  0%,
+  10% {
+    stroke: #ffffff;
+    stroke-width: 3.6;
+  }
+}
+.v03-scan {
+  opacity: 0;
+  pointer-events: none;
+}
+.v03-room.is-scan .v03-scan {
+  animation: v03-scan 1600ms cubic-bezier(0.45, 0, 0.55, 1) both;
+}
+@keyframes v03-scan {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  14% {
+    opacity: 0.9;
+  }
+  84% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(var(--sh));
+  }
+}
+
+/* ------------------------------------------------------------ rooms */
+.v03-room {
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.v03-glow-a,
+.v03-glow-h,
+.v03-focus,
+.v03-sill,
+.v03-bezel,
+.v03-mullion,
+.v03-sheen {
+  pointer-events: none;
+}
+.v03-wall-h {
+  fill: var(--hue);
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+.v03-glow-h {
+  opacity: 0;
+  transition: opacity 360ms ease;
+}
+.v03-glow-a {
+  transition: opacity 360ms ease;
+}
+.v03-edge {
+  stroke: #ffdca6;
+  stroke-width: 2.3;
+  transition:
+    stroke 220ms ease,
+    stroke-width 220ms ease;
+}
+.v03-bezel {
+  stroke: #fff1d6;
+  stroke-opacity: 0.75;
+  stroke-width: 1;
+}
+.v03-mullion {
+  stroke: #ffe7c2;
+  stroke-width: 2.2;
+  stroke-opacity: 0.9;
+}
+/* the nameplate on each room's sill */
+.v03-sill-plate {
+  fill: #ffd28c;
+  stroke: none;
+  transition: fill 240ms ease;
+}
+.v03-sill-stub {
+  stroke: #ffdca6;
+  stroke-width: 1.6;
+}
+.v03-sill-text {
+  font-family: var(--display);
+  font-weight: 800;
+  /* plate units: Home sets --sill-fs so the names never fall under 13 px on screen */
+  font-size: var(--sill-fs, 18px);
+  letter-spacing: 0.07em;
+  fill: #1a0f03;
+  transition: opacity 220ms ease;
+}
+/* the nose's band is the narrowest: a little tighter, never wider than the band */
+.v03-sill-nose .v03-sill-text {
+  font-size: min(var(--sill-fs, 18px), 19px);
+  letter-spacing: 0.045em;
+}
+.v03-sill-n {
+  fill-opacity: 0.5;
+}
+.v03-svg-home .v03-room.is-on .v03-sill-plate {
+  fill: var(--hue);
+}
+.v03-focus {
+  stroke: #ffffff;
+  stroke-width: 2.6;
+  stroke-dasharray: 8 6;
+  opacity: 0;
+}
+.v03-room:focus-visible .v03-focus {
+  opacity: 1;
+}
+
+/* the room in focus carries its own colour; on hover or focus it floods and the rest of the ship falls back */
+.v03-svg-home .v03-room.is-on .v03-edge {
+  stroke: var(--hue);
+  stroke-width: 3.2;
+}
+.v03-svg-home .v03-room.is-on .v03-glow-h {
+  opacity: 0.8;
+}
+.v03-svg-home .v03-room.is-on .v03-glow-a {
+  opacity: 0.4;
+}
+.v03-home[data-dim] .v03-room.is-on .v03-wall-h {
+  opacity: 0.94;
+}
+.v03-home[data-dim] .v03-room.is-on .v03-glow-h {
+  opacity: 1;
+}
+.v03-lines,
+.v03-life,
+.v03-room,
+.v03-label {
+  transition: opacity 340ms ease;
+}
+.v03-home[data-dim] .v03-lines,
+.v03-home[data-dim] .v03-life {
+  opacity: 0.26;
+}
+.v03-shade {
+  fill: #02040c;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 340ms ease;
+}
+.v03-home[data-dim] .v03-room:not(.is-on) .v03-shade {
+  opacity: 0.7;
+}
+.v03-home[data-dim] .v03-room:not(.is-on) .v03-glow-a {
+  opacity: 0.25;
+}
+.v03-home[data-dim] .v03-room:not(.is-on) .v03-edge {
+  stroke-opacity: 0.45;
+}
+.v03-home[data-dim] .v03-label:not(.is-on) {
+  opacity: 0.28;
+}
+.v03-home[data-dim] .v03-parallax {
+  opacity: 0.55;
+}
+.v03-parallax {
+  transition: opacity 340ms ease;
+}
+
+/* names on the upright (phone) plate, each set in clear space beside its room */
+.v03-lab-name {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 36px;
+  letter-spacing: 0.05em;
+  fill: #e8f3ff;
+}
+.v03-lab-n {
+  fill: var(--hue);
+}
+.v03-label.is-on .v03-lab-name {
+  fill: #ffffff;
+}
+
+/* ------------------------------------------------------------ the ship draws itself */
+@keyframes v03-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes v03-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes v03-light {
+  0% {
+    opacity: 0;
+  }
+  14% {
+    opacity: 0.95;
+  }
+  24% {
+    opacity: 0.3;
+  }
+  42% {
+    opacity: 1;
+  }
+}
+@keyframes v03-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+/* the timings written in Ship.tsx are scaled here: the whole draw-on is over by about 1.5 s */
+.v03-home[data-intro='1'] .v03-dr :is(path, rect, circle, ellipse, line) {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: v03-draw calc(var(--dur, 1000ms) * 0.55) cubic-bezier(0.55, 0.06, 0.25, 1) calc(var(--d, 0ms) * 0.45) forwards;
+}
+.v03-home[data-intro='1'] .v03-fd {
+  animation: v03-fade calc(var(--dur, 700ms) * 0.55) ease calc(var(--d, 0ms) * 0.45) backwards;
+}
+/* the dark hull fills come in only behind their drawn outlines, never as bare slabs */
+.v03-home[data-intro='1'] .v03-solid.v03-fd,
+.v03-home[data-intro='1'] .v03-ring-band {
+  animation-delay: 380ms;
+  animation-duration: 420ms;
+}
+.v03-home[data-intro='1'] .v03-room {
+  animation: v03-light 480ms linear calc(480ms + var(--i) * 120ms) backwards;
+}
+.v03-home[data-intro='1'] .v03-label {
+  animation: v03-fade 400ms ease calc(560ms + var(--i) * 120ms) backwards;
+}
+.v03-home[data-intro='1'] .v03-con {
+  animation: v03-fade 900ms ease 0ms backwards;
+}
+.v03-home[data-intro='1'] .v03-title h1 {
+  animation: v03-rise 640ms cubic-bezier(0.2, 0.7, 0.2, 1) 80ms backwards;
+}
+.v03-home[data-intro='1'] .v03-site {
+  animation: v03-rise 640ms cubic-bezier(0.2, 0.7, 0.2, 1) 240ms backwards;
+}
+.v03-home[data-intro='1'] .v03-readout {
+  animation: v03-rise 440ms cubic-bezier(0.2, 0.7, 0.2, 1) 1060ms backwards;
+}
+.v03-home[data-intro='1'] .v03-aimark {
+  animation: v03-fade 500ms ease 1250ms backwards;
+}
+.v03-home[data-return] :is(.v03-title, .v03-readout, .v03-aimark, .v03-labels) {
+  animation: v03-fade 700ms ease 520ms backwards;
+}
+
+/* ------------------------------------------------------------ home */
+.v03-home {
+  height: 100svh;
+  min-height: 540px;
+  /* clip, not hidden: focusing a room near the edge must never scroll the scene */
+  overflow: clip;
+}
+.v03-home .v03-stage,
+.v03-home .v03-parallax {
+  overflow: clip;
+}
+.v03-title {
+  position: absolute;
+  z-index: 5;
+  left: var(--pad);
+  top: clamp(22px, 5vh, 50px);
+  pointer-events: none;
+}
+.v03-title h1 {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: min(clamp(56px, 9.6vh, 86px), 6.2vw);
+  line-height: 0.92;
+  letter-spacing: 0.008em;
+}
+.v03-t-line,
+.v03-t-fill {
+  display: block;
+}
+.v03-t-line {
+  /* the outlined word: a glass of deep blue in a clear pale line */
+  color: rgba(14, 26, 74, 0.72);
+  -webkit-text-stroke: 1.6px #cfe1ff;
+  text-shadow: 0 0 26px rgba(110, 170, 255, 0.28);
+}
+.v03-t-fill {
+  color: #f6fcff;
+  text-shadow:
+    0 0 42px rgba(110, 190, 255, 0.6),
+    0 0 4px rgba(200, 235, 255, 0.5);
+}
+.v03-site {
+  margin-top: clamp(12px, 2.2vh, 22px) !important;
+  max-width: 16.5em;
+  font-size: clamp(17px, 1.52vw, 24px);
+  line-height: 1.28;
+  font-weight: 450;
+  letter-spacing: -0.005em;
+  color: var(--soft);
+}
+
+.v03-readout {
+  position: absolute;
+  z-index: 5;
+  left: var(--pad);
+  bottom: clamp(22px, 4.6vh, 44px);
+  width: min(500px, 37vw);
+}
+.v03-ro {
+  animation: v03-ro 320ms ease both;
+}
+@keyframes v03-ro {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.v03-ro-tag,
+.v03-m-tag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+.v03-ro-tag b,
+.v03-m-tag b {
+  font-weight: 600;
+  color: var(--hue);
+}
+.v03-ro-tag i,
+.v03-m-tag i {
+  width: 28px;
+  height: 1.5px;
+  background: var(--hue);
+}
+.v03-ro-name {
+  margin-top: 6px !important;
+  font-family: var(--display);
+  font-weight: 800;
+  /* about 0.6 of the title: the brand leads, the check in focus follows */
+  font-size: clamp(44px, 6vh, 56px);
+  line-height: 0.92;
+  letter-spacing: 0.012em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.v03-ro-sentence {
+  margin-top: 10px !important;
+  max-width: 24em;
+  font-size: clamp(16.5px, 1.4vw, 21px);
+  line-height: 1.35;
+  text-wrap: balance;
+  color: #dbe8ff;
+}
+.v03-ro-act {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.v03-enter {
+  height: 50px;
+  padding: 0 18px 0 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  border: 1.5px solid var(--hue);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--hue) 18%, #070b1e);
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.005em;
+  box-shadow:
+    0 0 0 4px rgba(3, 5, 14, 0.6),
+    0 0 34px color-mix(in srgb, var(--hue) 42%, transparent);
+  transition:
+    background 160ms ease,
+    transform 160ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+.v03-enter svg {
+  transition: transform 160ms ease;
+}
+.v03-enter:hover,
+.v03-enter:focus-visible {
+  background: color-mix(in srgb, var(--hue) 34%, #070b1e);
+}
+.v03-enter:hover svg,
+.v03-enter:focus-visible svg {
+  transform: translateX(4px);
+}
+.v03-enter:active {
+  transform: scale(0.97);
+}
+.v03 :is(button, a):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.v03 a.v03-room:focus-visible {
+  outline: none;
+}
+.v03-aimark {
+  position: absolute;
+  z-index: 5;
+  right: var(--pad);
+  bottom: 22px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #93a9e2;
+  pointer-events: none;
+}
+
+/* leaving: words step aside, the drawing carries the move */
+.v03-title,
+.v03-readout,
+.v03-aimark,
+.v03-labels {
+  transition: opacity 260ms ease;
+}
+.v03-home[data-leaving] :is(.v03-title, .v03-readout, .v03-aimark, .v03-labels) {
+  opacity: 0;
+}
+.v03-home[data-leaving] .v03-room {
+  pointer-events: none;
+}
+/* the room we fly into keeps its colour at first */
+.v03-home[data-leaving] .v03-room.is-on .v03-wall-h {
+  opacity: 0.94;
+}
+/* from 60% of the move: the nameplates' words go and the room's lights go down round its screen,
+   band and walls together into the room's dark interior */
+.v03-dark {
+  fill: #120a24;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+.v03-home[data-sillfade] .v03-sill-text {
+  opacity: 0;
+}
+.v03-home[data-sillfade] .v03-room .v03-sill-plate {
+  fill: #120a24;
+}
+.v03-home[data-sillfade] .v03-room.is-on .v03-dark {
+  opacity: 1;
+}
+/* the last 250 ms: everything but the room's screen fades out, the screen stays at full brightness,
+   and the page (which puts the same picture in the same place) takes over */
+.v03-home[data-landing] :is(.v03-lines, .v03-life, .v03-parallax, .v03-room:not(.is-on), .v03-room.is-on > :not(.v03-screen, .v03-dark)) {
+  opacity: 0;
+  transition: opacity 250ms linear;
+}
+
+/* ------------------------------------------------------------ module page */
+.v03-module {
+  --hue: #ff4fb0;
+  /* where the wall screen sits (stageFrame in data.ts): header band above, controls band below */
+  --m-top: 206px;
+  --m-bot: 92px;
+}
+.v03-m-plate {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* the move ends on the room's screen alone: the plate comes back in behind the page */
+.v03-m-plate > :not(.v03-ground) {
+  animation: v03-fade 520ms ease 80ms backwards;
+}
+.v03-scrim {
+  /* the plate stays as a picture behind the room; the bands under the words are kept dark so no line runs through text */
+  position: absolute;
+  inset: 0;
+  /* present from the first frame: the home's move ends on the same dimmed plate */
+  background:
+    linear-gradient(90deg, rgba(3, 5, 14, 0.94) 0, rgba(3, 5, 14, 0.94) 40px, rgba(3, 5, 14, 0) 72px, rgba(3, 5, 14, 0) calc(100% - 72px), rgba(3, 5, 14, 0.94) calc(100% - 40px), rgba(3, 5, 14, 0.94) 100%),
+    linear-gradient(
+      180deg,
+      rgba(2, 3, 9, 0.94) 0,
+      rgba(2, 3, 9, 0.9) calc(var(--m-top) - 10px),
+      rgba(2, 3, 9, 0.35) calc(var(--m-top) + 30px),
+      rgba(2, 3, 9, 0.35) calc(100% - var(--m-bot) - 26px),
+      rgba(2, 3, 9, 0.92) calc(100% - var(--m-bot) + 6px)
+    ),
+    radial-gradient(ellipse 90% 80% at 50% 56%, rgba(2, 4, 14, 0.1) 0%, rgba(2, 3, 10, 0.5) 100%);
+}
+/* inside a room the lights are down: the walls are line, only the wall screens glow (the home's move ends dimmed, so
+   the backdrop starts in this state: no warm flash as the page arrives) */
+.v03-svg-bg .v03-wall-a {
+  fill-opacity: 0.1;
+}
+.v03-svg-bg :is(.v03-glow-a, .v03-sheen, .v03-sill) {
+  display: none;
+}
+.v03-svg-bg .v03-edge {
+  stroke: color-mix(in srgb, var(--hue) 70%, #ffe2b4);
+}
+.v03-m-page {
+  position: relative;
+  z-index: 2;
+  padding: 26px 56px 24px;
+}
+.v03-m-head {
+  height: 150px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: 40px;
+  align-items: end;
+  animation: v03-rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) 90ms backwards;
+}
+.v03-m-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 36px;
+  padding: 0 14px 0 12px;
+  border: 1px solid rgba(160, 200, 255, 0.4);
+  border-radius: 3px;
+  background: rgba(7, 11, 30, 0.82);
+  font-size: 14px;
+  font-weight: 600;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+.v03-m-back:hover {
+  background: rgba(26, 42, 110, 0.85);
+  border-color: rgba(200, 228, 255, 0.8);
+}
+.v03-m-tag {
+  margin-top: 14px !important;
+}
+.v03-m-name {
+  margin-top: 2px !important;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 76px;
+  line-height: 0.9;
+  letter-spacing: 0.012em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #fff;
+}
+.v03-m-sentence {
+  align-self: end;
+  max-width: 27em;
+  padding: 4px 0 6px 24px;
+  border-left: 1.5px solid color-mix(in srgb, var(--hue) 80%, #fff);
+  font-size: 21px;
+  line-height: 1.34;
+  color: #e2ecff;
+}
+.v03-m-loc {
+  align-self: end;
+  display: grid;
+  justify-items: end;
+  gap: 5px;
+}
+.v03-svg-mini {
+  position: relative;
+  inset: auto;
+  width: var(--loc-w, 236px);
+  height: auto;
+  aspect-ratio: 1530 / 900;
+  overflow: visible;
+}
+.v03-mini-lines :is(path, circle, ellipse) {
+  stroke: #9ec3ff;
+  stroke-width: 1px;
+  stroke-opacity: 0.72;
+  vector-effect: non-scaling-stroke;
+}
+.v03-mini-lines .v03-mini-solid {
+  fill: rgba(9, 24, 104, 0.75);
+}
+.v03-svg-mini .v03-wall-a {
+  fill: var(--hue);
+  fill-opacity: 0.4;
+}
+.v03-svg-mini .v03-edge {
+  stroke: var(--hue);
+  stroke-width: 1.2px;
+  vector-effect: non-scaling-stroke;
+}
+.v03-svg-mini .v03-room:hover .v03-wall-h,
+.v03-svg-mini .v03-room:focus-visible .v03-wall-h,
+.v03-svg-mini .v03-room.is-here .v03-wall-h {
+  opacity: 1;
+}
+.v03-svg-mini .v03-room.is-here .v03-edge {
+  stroke: #fff;
+  stroke-width: 2px;
+}
+.v03-svg-mini .v03-focus {
+  stroke-width: 1.5px;
+  stroke-dasharray: none;
+  vector-effect: non-scaling-stroke;
+}
+.v03-m-here {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--soft);
+  white-space: nowrap;
+}
+.v03-m-here b {
+  font-weight: 600;
+  color: var(--hue);
+}
+
+/* the wall screen */
+.v03-m-frame {
+  position: relative;
+  margin-top: 30px;
+  height: calc(100svh - var(--m-top) - var(--m-bot));
+  min-height: 320px;
+  border-radius: 5px;
+  background: #050818;
+  box-shadow:
+    0 0 0 1.5px color-mix(in srgb, var(--hue) 62%, #ffe2b4),
+    0 0 0 8px rgba(4, 10, 48, 0.92),
+    0 0 0 9px rgba(170, 208, 255, 0.42),
+    0 0 110px color-mix(in srgb, var(--hue) 26%, transparent),
+    0 34px 90px rgba(0, 0, 12, 0.6);
+  /* the zoom has already brought the room's screen to this place: only the frame's rings draw in round it */
+  animation: v03-ring 380ms ease-out 40ms backwards;
+}
+@keyframes v03-ring {
+  from {
+    background-color: transparent;
+    box-shadow:
+      0 0 0 0 transparent,
+      0 0 0 0 transparent,
+      0 0 0 0 transparent,
+      0 0 0 transparent,
+      0 0 0 transparent;
+  }
+}
+.v03-m-screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 4px;
+}
+.v03-m-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+/* the working stage fades in over the poster once it says it is ready */
+.v03-m-live {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: #050818;
+}
+.v03-m-live[data-on] {
+  opacity: 1;
+  animation: v03-fade 250ms ease-out backwards;
+}
+.v03-m-c {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 0 solid rgba(200, 228, 255, 0.85);
+  pointer-events: none;
+}
+.v03-m-c:nth-of-type(1) {
+  left: -17px;
+  top: -17px;
+  border-left-width: 1.5px;
+  border-top-width: 1.5px;
+}
+.v03-m-c:nth-of-type(2) {
+  right: -17px;
+  top: -17px;
+  border-right-width: 1.5px;
+  border-top-width: 1.5px;
+}
+.v03-m-c:nth-of-type(3) {
+  left: -17px;
+  bottom: -17px;
+  border-left-width: 1.5px;
+  border-bottom-width: 1.5px;
+}
+.v03-m-c:nth-of-type(4) {
+  right: -17px;
+  bottom: -17px;
+  border-right-width: 1.5px;
+  border-bottom-width: 1.5px;
+}
+.v03 .v03-m-frame .v03-fill {
+  --m-stage: #050818;
+  --m-ink: #eef6ff;
+  --m-ink-2: #8fa3d8;
+  --m-font: 'Archivo Variable', system-ui, sans-serif;
+  --m-font-mono: 'Martian Mono Variable', ui-monospace, monospace;
+}
+.v03 .v03-m-frame[data-m='garnmeter'] .v03-fill {
+  --m-mark: #8493b8;
+  --m-accent: #a995ff;
+  --m-ok: #44c08a;
+  --m-watch: #e0b040;
+  --m-alert: #ff6f5b;
+  --m-field-hi: #e6ecf7;
+  --m-field-lo: #161f44;
+}
+.v03-fill {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+}
+
+.v03-m-foot {
+  margin-top: 16px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  animation: v03-rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) 160ms backwards;
+}
+.v03-m-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.v03-m-run {
+  height: 52px;
+  padding: 0 24px 0 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--hue);
+  color: #050818;
+  font-weight: 700;
+  font-size: 17px;
+  box-shadow:
+    0 0 0 4px rgba(3, 5, 14, 0.6),
+    0 0 40px color-mix(in srgb, var(--hue) 50%, transparent);
+  transition:
+    transform 160ms ease,
+    filter 160ms ease;
+}
+.v03-m-run:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+.v03-m-run:active {
+  transform: scale(0.97);
+}
+/* while the model runs the button says so and waits */
+.v03-m-run[data-busy] {
+  cursor: progress;
+  opacity: 0.65;
+}
+.v03-m-run[data-busy]:hover {
+  filter: none;
+  transform: none;
+}
+/* VeinSqueeze's stage has its own press control (hold, or Space): the page's run button would be a second one */
+.v03-m-run[data-m='veinsqueeze'] {
+  display: none;
+}
+/* a slimmer chart under each clip, so the clips themselves are taller and show the whole vein */
+.v03 .v03-m-frame[data-m='veinsqueeze'] .v03-fill {
+  --m-chart-h: 110px;
+}
+@media (min-width: 821px) and (max-height: 799px) {
+  .v03 .v03-m-frame[data-m='veinsqueeze'] .v03-fill {
+    --m-chart-h: 96px;
+  }
+}
+.v03-m-status[data-s='wait'] i {
+  background: var(--hue);
+  opacity: 0.6;
+  animation: v03-pulse 900ms ease-in-out infinite;
+}
+.v03-m-reset {
+  height: 52px;
+  padding: 0 20px;
+  border: 1px solid rgba(160, 200, 255, 0.45);
+  border-radius: 3px;
+  background: rgba(7, 11, 30, 0.82);
+  color: #dfeaff;
+  font-weight: 600;
+  font-size: 15px;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+.v03-m-reset:hover {
+  background: rgba(26, 42, 110, 0.85);
+  border-color: rgba(200, 228, 255, 0.8);
+}
+.v03-m-status {
+  margin-left: 14px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--soft);
+}
+.v03-m-status i {
+  width: 8px;
+  height: 8px;
+  background: #6f84c4;
+}
+.v03-m-status[data-s='running'] i {
+  background: var(--hue);
+  box-shadow: 0 0 12px var(--hue);
+  animation: v03-pulse 900ms ease-in-out infinite;
+}
+.v03-m-status[data-s='result'] i {
+  background: #5fe0a4;
+  box-shadow: 0 0 12px #5fe0a4;
+}
+@keyframes v03-pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+.v03-m-pager {
+  display: flex;
+  gap: 10px;
+}
+.v03-m-go {
+  height: 52px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid rgba(160, 200, 255, 0.4);
+  border-radius: 3px;
+  background: rgba(7, 11, 30, 0.82);
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+.v03-m-go:hover {
+  background: rgba(26, 42, 110, 0.85);
+  border-color: var(--h);
+}
+.v03-m-go span {
+  display: grid;
+  gap: 1px;
+}
+.v03-m-go.is-next span {
+  text-align: right;
+}
+.v03-m-go small {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--h) 82%, #fff);
+}
+.v03-m-go b {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+/* on the module page the mark runs up the right margin, like the edge note of a drawing; it takes no room */
+.v03-aimark-m {
+  position: fixed;
+  z-index: 3;
+  right: 18px;
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%) rotate(180deg);
+  writing-mode: vertical-rl;
+  font-size: 9.5px;
+  color: #7f93cc;
+}
+
+/* SpikeCount's own stage */
+/* the photo and its reading are one centred group; the photo is as tall as the screen allows */
+.v03-m-frame[data-m='spikecount'] .v03-m-screen {
+  container-type: size;
+}
+.v03-spike {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  padding: 24px 40px;
+}
+.v03-spike-read {
+  flex: 0 0 300px;
+}
+.v03-spike-photo {
+  position: relative;
+  flex: none;
+  height: min(100cqh - 48px, 100cqw - 428px);
+  aspect-ratio: 1;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255, 240, 214, 0.5),
+    0 0 80px rgba(255, 93, 93, 0.2);
+}
+.v03-spike-photo img,
+.v03-spike-photo svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.v03-spike-photo img {
+  filter: contrast(1.12) brightness(0.92);
+}
+.v03-spike-photo polygon {
+  fill-opacity: 0.16;
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+  animation: v03-cell 420ms ease both;
+}
+@keyframes v03-cell {
+  from {
+    opacity: 0;
+    stroke-width: 7;
+  }
+}
+.v03-spike-read {
+  display: grid;
+  gap: 6px;
+  align-content: center;
+}
+.v03-spike-tag {
+  justify-self: start;
+  margin-bottom: 12px;
+  padding: 4px 9px;
+  border: 1px solid rgba(160, 200, 255, 0.4);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--soft);
+}
+.v03-spike-big {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 104px;
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+.v03-spike-big small {
+  font-size: 0.42em;
+  margin-left: 4px;
+  color: var(--quiet);
+}
+.v03-spike-cap {
+  font-size: 20px;
+  line-height: 1.35;
+  text-wrap: balance;
+  color: #e2ecff;
+}
+.v03-spike-sub {
+  font-size: 15px;
+  color: var(--quiet);
+}
+.v03-spike-key {
+  margin: 18px 0 0;
+  padding: 14px 0 0;
+  border-top: 1px solid rgba(160, 200, 255, 0.3);
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  color: #c4d3f4;
+}
+.v03-spike-key li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.v03-spike-key i {
+  width: 10px;
+  height: 10px;
+}
+
+/* TrackTrace: our own network, on a white card in a thin frame */
+.v03-m-arch {
+  margin-top: 72px;
+  animation: v03-fade 700ms ease 500ms backwards;
+}
+.v03-m-arch figure {
+  max-width: 880px;
+  margin-inline: auto;
+}
+.v03-m-arch-card {
+  padding: 28px;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 8px rgba(4, 10, 48, 0.92),
+    0 0 0 9px rgba(170, 208, 255, 0.55),
+    0 34px 90px rgba(0, 0, 12, 0.6);
+}
+.v03-m-arch-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.v03-m-arch figcaption {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 24px;
+  font-weight: 600;
+  font-size: 21px;
+  letter-spacing: -0.005em;
+  color: #e8f0ff;
+}
+.v03-m-arch figcaption small {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 10.5px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #8098d8;
+}
+.v03-m-arch {
+  padding-bottom: 64px;
+}
+
+/* ------------------------------------------------------------ narrower laptops */
+@media (max-width: 1100px) {
+  .v03-m-page {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+  .v03-m-head {
+    column-gap: 24px;
+    --loc-w: 190px;
+  }
+  .v03-m-name {
+    font-size: 60px;
+  }
+  .v03-m-sentence {
+    font-size: 18px;
+  }
+  .v03-aimark-m {
+    right: 8px;
+  }
+}
+
+/* ------------------------------------------------------------ short laptop windows (a real browser at 1440 wide is ~730 tall) */
+@media (min-width: 821px) and (max-height: 799px) {
+  .v03-ro-sentence {
+    font-size: 18px;
+  }
+  .v03-ro-act {
+    margin-top: 20px;
+  }
+  .v03-enter {
+    height: 46px;
+  }
+
+  .v03-module {
+    --m-top: 142px;
+    --m-bot: 78px;
+  }
+  .v03-m-page {
+    padding-top: 18px;
+    padding-bottom: 16px;
+  }
+  .v03-m-head {
+    height: 106px;
+    --loc-w: 150px;
+  }
+  .v03-m-id {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: 20px;
+  }
+  .v03-m-back {
+    height: 32px;
+  }
+  .v03-m-tag {
+    margin-top: 0 !important;
+  }
+  .v03-m-name {
+    grid-column: 1 / -1;
+    margin-top: 10px !important;
+    font-size: 56px;
+  }
+  .v03-m-sentence {
+    font-size: 17px;
+  }
+  .v03-m-frame {
+    margin-top: 18px;
+  }
+  /* Garn Meter lays itself out from its own box: under 560 px tall its channel names crowd, so this one check may scroll a little */
+  .v03-m-frame[data-m='garnmeter'] {
+    min-height: 560px;
+  }
+  .v03-m-foot {
+    margin-top: 14px;
+    height: 48px;
+  }
+  .v03-m-run,
+  .v03-m-reset,
+  .v03-m-go {
+    height: 48px;
+  }
+}
+
+/* ------------------------------------------------------------ phones: the plate stands upright */
+@media (max-width: 820px) {
+  .v03-title {
+    left: 18px;
+    right: 18px;
+    top: 16px;
+  }
+  .v03-title h1 {
+    font-size: min(11.6vw, 7vh);
+    line-height: 0.92;
+    white-space: nowrap;
+  }
+  .v03-t-line,
+  .v03-t-fill {
+    display: inline;
+  }
+  .v03-site {
+    margin-top: 6px !important;
+    max-width: 19em;
+    font-size: 15px;
+    line-height: 1.25;
+  }
+  .v03-readout {
+    left: 12px;
+    right: 12px;
+    bottom: 30px;
+    width: auto;
+    padding: 12px 14px 14px;
+    border: 1px solid color-mix(in srgb, var(--hue) 55%, rgba(160, 200, 255, 0.4));
+    border-radius: 4px;
+    /* solid enough that no line of the ship shows through the words */
+    background: rgba(6, 10, 28, 0.96);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 40px color-mix(in srgb, var(--hue) 22%, transparent);
+  }
+  .v03-ro-tag {
+    font-size: 10.5px;
+  }
+  .v03-ro-name {
+    margin-top: 2px !important;
+    font-size: 34px;
+  }
+  .v03-ro-sentence {
+    margin-top: 4px !important;
+    min-height: 2.6em;
+    font-size: 14.5px;
+    line-height: 1.3;
+  }
+  .v03-ro-act {
+    margin-top: 10px;
+  }
+  .v03-enter {
+    width: 100%;
+    height: 46px;
+    justify-content: space-between;
+    box-shadow: none;
+  }
+  .v03-aimark {
+    left: 0;
+    right: 0;
+    bottom: 9px;
+    text-align: center;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+  }
+
+  .v03-m-page {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 12px 18px;
+  }
+  .v03-m-head {
+    display: contents;
+  }
+  .v03-m-id {
+    order: 1;
+  }
+  .v03-m-tag {
+    margin-top: 12px !important;
+    font-size: 10.5px;
+  }
+  .v03-m-name {
+    font-size: 50px;
+    white-space: normal;
+  }
+  .v03-m-sentence {
+    order: 2;
+    align-self: stretch;
+    max-width: none;
+    margin-top: 8px !important;
+    padding: 0 0 0 12px;
+    font-size: 16.5px;
+  }
+  /* the wall screen runs the full width of the phone: no frame rings or corner marks eating into the stage */
+  .v03-m-frame {
+    order: 3;
+    height: 62svh;
+    min-height: 420px;
+    margin: 30px -12px 0;
+    border-radius: 0;
+    box-shadow:
+      0 0 0 1.5px color-mix(in srgb, var(--hue) 62%, #ffe2b4),
+      0 0 70px color-mix(in srgb, var(--hue) 22%, transparent);
+  }
+  .v03-m-frame[data-m='bubblegrade'] {
+    min-height: 620px;
+  }
+  /* VeinSqueeze: a taller screen and the slimmest chart the stage allows, so the clips are as tall as they can be */
+  .v03-m-frame[data-m='veinsqueeze'] {
+    height: 76svh;
+  }
+  /* its press control is inside the stage: the row with Reset stays in place instead of riding over it */
+  .v03-m-actions:has(.v03-m-run[data-m='veinsqueeze']) {
+    position: static;
+  }
+  .v03 .v03-m-frame[data-m='veinsqueeze'] .v03-fill {
+    --m-chart-h: 72px;
+  }
+  /* Garn Meter lays itself out from its own box: on a phone it needs this much height to keep its traces off its titles */
+  .v03-m-frame[data-m='garnmeter'] {
+    height: auto;
+    min-height: 980px;
+  }
+  .v03-m-screen {
+    border-radius: 0;
+  }
+  .v03-m-c {
+    display: none;
+  }
+  /* the plate is only a hint behind a phone page */
+  .v03-scrim {
+    background: rgba(3, 5, 14, 0.92);
+  }
+  /* the run controls ride along the bottom of the screen while the stage is taller than the phone */
+  .v03-m-foot {
+    display: contents;
+  }
+  .v03-m-actions {
+    order: 4;
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
+    margin: 0 -12px;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #070a1c;
+    border-top: 1px solid color-mix(in srgb, var(--hue) 45%, rgba(160, 200, 255, 0.3));
+    animation: v03-rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) 160ms backwards;
+  }
+  .v03-m-run {
+    flex: 1;
+    justify-content: center;
+  }
+  .v03-m-actions:has(.v03-m-run[data-m='veinsqueeze']) .v03-m-reset {
+    flex: 1;
+  }
+  .v03-m-status {
+    width: 100%;
+    margin: 0 !important;
+    font-size: 11px;
+  }
+  .v03-m-pager {
+    order: 5;
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .v03-m-go {
+    padding: 0 10px;
+    gap: 8px;
+    justify-content: space-between;
+    min-width: 0;
+  }
+  .v03-m-go b {
+    font-size: 18px;
+  }
+  .v03-m-go small {
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+  .v03-m-loc {
+    --loc-w: 100%;
+    justify-items: stretch;
+    align-self: stretch;
+    order: 6;
+    margin-top: 22px;
+    padding: 12px;
+    border: 1px solid rgba(160, 200, 255, 0.3);
+    border-radius: 4px;
+    background: rgba(3, 8, 40, 0.7);
+  }
+  .v03-m-arch {
+    order: 7;
+    margin-top: 28px;
+  }
+  .v03-m-arch-card {
+    padding: 10px;
+  }
+  .v03-m-arch figcaption {
+    font-size: 18px;
+  }
+  .v03-aimark-m {
+    position: relative;
+    padding: 0 12px 14px;
+    writing-mode: horizontal-tb;
+    transform: none;
+    top: auto;
+    right: auto;
+    text-align: center;
+    font-size: 9px;
+  }
+  .v03-spike {
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 16px;
+  }
+  .v03-spike-read {
+    flex: none;
+    width: min(100%, 340px);
+  }
+  .v03-spike-photo {
+    height: auto;
+    width: min(100cqw - 32px, 100cqh - 190px, 360px);
+  }
+  .v03-spike-big {
+    font-size: 60px;
+  }
+  .v03-spike-key {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v03 *,
+  .v03 *::before,
+  .v03 *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

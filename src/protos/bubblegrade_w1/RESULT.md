@@ -6,5 +6,6 @@ Scroll: 01 problem (ISS sunrise photo, animated airlock-to-heart diagram), 02 si
 Every number comes from the engine (replay/analyze/act) or meta.json / dive_curve.json at run time. Phones use replay() and say REPLAY.
 Extra material: `earth_sunrise_iss074e0409626.jpg` (copied from protos/DF), NASA ISS crew photograph iss074e0409626, public domain (NASA imagery). The heart-and-vein SVG carries the "AI-generated illustration" mark.
 Clips: Blogg et al. 2026 (Zenodo 16877955), GPL-3.0-or-later, credited on the page.
-Unfinished: the live model can take 4-10 s to load on a busy machine (until then the tag reads LOADING/STARTING MODEL and the stored outputs drive the reveal). The diagram scrolls sideways on phones. Not tried on a real phone. qa/gate.mjs was not run.
+Unfinished: the live model can take 4-10 s to load on a busy machine (until then the tag reads LOADING/STARTING MODEL and the stored outputs drive the reveal). Not tried on a real phone. qa/gate.mjs was not run.
 Dev-only: `_shots.mjs` (modes all | run | final | pin | scroll).
+r4: the first screen moved to `chamber.tsx` (ListeningChamber) and section 01 to `story.tsx` (Problem), so DF's BubbleGrade page (`protos/DF/pages/bubblegrade.tsx`) reuses both; this route is unchanged. The airlock drawing now keeps the full width on phones (fewer, larger labels; no sideways scroll). The clip picker is a radio group (arrow keys move it), the cue is a button, and the WebGL context is released when the page leaves.

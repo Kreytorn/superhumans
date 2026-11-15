@@ -522,6 +522,8 @@ export function createScene(canvas: HTMLCanvasElement, opts: { reduced: boolean 
       removeEventListener('pointermove', onMove)
       for (const d of disposables) d.dispose()
       renderer.dispose()
+      // hand the context back now (a page opened many times must not use up the browser's WebGL contexts)
+      renderer.forceContextLoss()
     },
   }
 }

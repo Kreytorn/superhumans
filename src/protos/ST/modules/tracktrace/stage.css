@@ -1,0 +1,282 @@
+/* Station / TrackTrace, the panel body. Scoped under .stt.
+   Laptop panel (data-cols=1): the moment and, in its own column, the IonScan figure on a white card in a thin
+   frame with its caption; the card opens the figure large over the stage.
+   Phone sheet or narrow panel (data-cols=0): the figure follows the moment and the body scrolls; on a side
+   panel the caption row is kept in the first view under the moment. */
+.stt {
+  --stt-cap: 56px;
+  --stt-pad: var(--st-5);
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.stt-moment {
+  position: relative;
+  height: calc(100% - var(--stt-cap));
+  min-height: 240px;
+}
+.stt[data-layout='sheet'] {
+  --stt-pad: var(--st-4);
+}
+.stt[data-layout='sheet'] .stt-moment {
+  height: 100%;
+}
+
+/* ================================================================== the figure beside the moment (laptop) */
+.stt[data-cols='1'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--stt-figw, 300px);
+}
+.stt[data-cols='1'] .stt-moment {
+  height: 100%;
+  align-self: center;
+}
+.stt[data-cols='1'] .stt-fig {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0;
+  padding: var(--st-5) var(--st-5) var(--st-5) var(--st-5);
+  border-left: 1px solid var(--st-hair-2);
+}
+.stt[data-cols='1'] .stt-cap {
+  margin-top: var(--st-4);
+}
+
+/* the card is the button that shows the figure large */
+.stt-card-go {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  cursor: zoom-in;
+  touch-action: manipulation;
+}
+.stt-card-go .stt-frame {
+  display: block;
+  padding: 6px;
+  transition: border-color 0.2s linear;
+}
+.stt-card-go .stt-card {
+  display: block;
+  padding: 10px;
+}
+.stt-card-hint {
+  position: absolute;
+  right: 13px;
+  bottom: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 2px;
+  background: rgba(5, 7, 10, 0.78);
+  color: var(--st-ink);
+  transition:
+    background-color 0.2s linear,
+    color 0.2s linear;
+}
+.stt-card-hint svg {
+  width: 15px;
+  height: 15px;
+}
+.stt-card-go:focus-visible {
+  outline: 1.5px solid var(--st-ink);
+  outline-offset: 4px;
+}
+@media (hover: hover) {
+  .stt-card-go:hover .stt-frame {
+    border-color: var(--st-ink-3);
+  }
+  .stt-card-go:hover .stt-card-hint {
+    background: var(--st-amber);
+    color: var(--st-amber-ink);
+  }
+}
+.stt-card-go:active .stt-card-hint {
+  background: var(--st-amber);
+  color: var(--st-amber-ink);
+}
+
+/* ============================================================ the figure after the moment (phone, narrow) */
+.stt[data-cols='0'] .stt-fig {
+  margin: 0;
+  padding: 0 var(--stt-pad) var(--st-6);
+}
+.stt[data-layout='sheet'] .stt-fig {
+  padding-bottom: var(--st-5);
+}
+.stt[data-cols='0'] .stt-cap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--st-4);
+  height: var(--stt-cap);
+}
+/* the divider runs the full width of the body, where the moment's picture ends */
+.stt[data-cols='0'] .stt-cap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: calc(-1 * var(--stt-pad));
+  right: calc(-1 * var(--stt-pad));
+  height: 1px;
+  background: var(--st-hair-2);
+}
+
+/* the arrow: it scrolls the figure in, and back up to the nucleus; the whole row is its target */
+.stt-cap-go {
+  position: static;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 -10px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: none;
+  color: var(--st-ink-2);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: color 0.18s linear;
+}
+.stt-cap-go::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.stt-cap-go svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.35s var(--st-ease);
+}
+.stt-cap-go[data-up='1'] svg {
+  transform: rotate(180deg);
+}
+.stt-cap-go:focus-visible {
+  outline: 1.5px solid var(--st-ink);
+  outline-offset: -4px;
+  color: #fff;
+}
+@media (hover: hover) {
+  .stt-cap:hover .stt-cap-go {
+    color: var(--st-amber);
+  }
+  .stt-cap:hover .stt-cap-go[data-up='0'] svg {
+    transform: translate3d(0, 3px, 0);
+  }
+  .stt-cap:hover .stt-cap-go[data-up='1'] svg {
+    transform: rotate(180deg) translate3d(0, 3px, 0);
+  }
+  .stt-cap:hover .stt-cap-text {
+    color: var(--st-ink);
+  }
+}
+.stt-cap-go:active {
+  color: var(--st-amber);
+}
+
+/* ============================================================================ card, frame and caption */
+.stt-frame {
+  padding: 7px;
+  border: 1px solid var(--st-hair);
+}
+.stt-card {
+  padding: clamp(12px, 3.2%, 28px);
+  background: #fff;
+}
+.stt-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.stt-cap-text {
+  display: block;
+  min-width: 0;
+  font: 400 var(--st-t-small) / 1.35 var(--st-font-body);
+  letter-spacing: 0.005em;
+  color: var(--st-ink-2);
+  text-wrap: balance;
+}
+.stt-cap-text b {
+  font-weight: 600;
+  color: var(--st-ink);
+}
+.stt-nb {
+  white-space: nowrap;
+}
+
+/* ======================================================================= the figure large, over the stage */
+.stt-zoom {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  padding: var(--st-5) var(--st-5) var(--st-4);
+  background: #fff;
+  animation: stt-zoom-in 0.3s var(--st-ease) both;
+}
+.stt-zoom img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  -webkit-user-select: none;
+  user-select: none;
+}
+@keyframes stt-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+}
+.stt-zoom-close {
+  position: absolute;
+  top: var(--st-3);
+  right: var(--st-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  margin: 0;
+  padding: 0 16px 0 13px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--st-well);
+  color: var(--st-ink);
+  font: 600 14px/1 var(--st-font-body);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 0.18s linear;
+}
+.stt-zoom-close svg {
+  width: 15px;
+  height: 15px;
+}
+.stt-zoom-close:focus-visible {
+  outline: 2px solid var(--st-amber);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .stt-zoom-close:hover {
+    background: #1a2028;
+  }
+}
+
+.st[data-motion='reduced'] .stt-cap-go svg,
+.st[data-motion='reduced'] .stt-card-go .stt-frame {
+  transition: none;
+}
+.st[data-motion='reduced'] .stt-zoom {
+  animation: none;
+}

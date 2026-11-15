@@ -1,7 +1,11 @@
-// App shell (r3): a hash router that lazy-loads each prototype and each module moment from its own folder.
+// App shell (r4): a hash router that lazy-loads each prototype and each module moment from its own folder.
+//   #/ or no hash        -> the website: the DF take's home (src/protos/DF), the same tree as #/proto/DF/home,
+//                           so a body spot opened from the front page still flies into its check
 //   #/proto/<X>/<view>   -> src/protos/<X>/index.tsx     (default export, props { view, params })
 //   #/moment/<module>    -> src/moments/<module>/harness.tsx (default export, props { params })
+//   #/dev                -> the developer build index (every prototype and moment)
 //   #/r2                 -> the r2 prototype screen, #/selftest -> the engine self-test
+//   any other address    -> the website's front page too (a mistyped or old link never shows the developer index)
 // A folder appears here as soon as its entry file exists; nobody edits this file to register one.
 import { Component, createElement, lazy, Suspense, type ComponentType, type ReactNode } from 'react'
 import { useRoute } from './lib/route'
@@ -14,6 +18,11 @@ export interface ProtoProps {
 export interface HarnessProps {
   params: URLSearchParams
 }
+
+/** The take that is the website (the owner's pick in r3). The front page renders its home. */
+const SITE = 'DF'
+/** First route segments that lead somewhere other than the front page. */
+const ROUTES = new Set(['proto', 'moment', 'dev', 'r2', 'selftest'])
 
 const protoLoaders = import.meta.glob<{ default: ComponentType<ProtoProps> }>('./protos/*/index.tsx')
 const momentLoaders = import.meta.glob<{ default: ComponentType<HarnessProps> }>('./moments/*/harness.tsx')
@@ -54,8 +63,9 @@ function DevIndex() {
     </p>
   )
   return (
-    <main style={{ padding: 24, font: '16px system-ui, sans-serif', lineHeight: 1.6 }}>
+    <main style={{ padding: 24, font: '16px system-ui, sans-serif', lineHeight: 1.6, overflowWrap: 'anywhere' }}>
       <h1 style={{ fontSize: 20 }}>SuperHumans, build index</h1>
+      {row('Website:', [['front page', '#/'], [`${SITE} credits`, `#/proto/${SITE}/credits`], [`${SITE} QR end screen`, `#/proto/${SITE}/qr`]])}
       {row('Prototypes:', ids(Object.keys(protoLoaders)).flatMap((x) => [[`${x} home`, `#/proto/${x}/home`], [`${x} spikecount`, `#/proto/${x}/spikecount`]] as [string, string][]))}
       {row('Moments:', ids(Object.keys(momentLoaders)).map((m) => [m, `#/moment/${m}`] as [string, string]))}
       {row('Other:', [['r2 prototype', '#/r2'], ['engine self-test', '#/selftest']])}
@@ -68,11 +78,14 @@ export default function App() {
   const seg = path.split('/').filter(Boolean)
   let node: ReactNode
   let name = path
-  if (seg[0] === 'proto' && seg[1]) {
-    const key = `./protos/${seg[1]}/index.tsx`
+  // The front page ("#/", "#/home" or no hash; parseHash calls all three "home") is the site's home. It gets the
+  // same name and component as #/proto/<SITE>/..., so moving between them never remounts the page.
+  const proto = seg[0] === 'proto' && seg[1] ? { id: seg[1], view: seg.slice(2).join('/') || 'home' } : !ROUTES.has(seg[0] ?? '') ? { id: SITE, view: 'home' } : null
+  if (proto) {
+    const key = `./protos/${proto.id}/index.tsx`
     const loader = protoLoaders[key]
-    name = `prototype ${seg[1]}`
-    node = loader ? createElement(lazyFrom(key, loader), { view: seg.slice(2).join('/') || 'home', params }) : <DevIndex />
+    name = `prototype ${proto.id}`
+    node = loader ? createElement(lazyFrom(key, loader), { view: proto.view, params }) : <DevIndex />
   } else if (seg[0] === 'moment' && seg[1]) {
     const key = `./moments/${seg[1]}/harness.tsx`
     const loader = momentLoaders[key]

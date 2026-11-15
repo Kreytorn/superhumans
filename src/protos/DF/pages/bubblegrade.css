@@ -1,0 +1,24 @@
+/* DF's BubbleGrade page: W1's chamber and problem section inside DF's page layer, then the architecture and NextNav.
+   The root is a .df-check (DF's scroll container and its tokens); the W1 parts sit in a .bgw1 wrapper (W1's tokens). */
+.df-check.dfbg{background:#02070c}
+.df-check.dfbg::before{display:none}
+
+/* W1's root is a fixed, scrolling screen of its own; here it is a plain block inside DF's page */
+.dfbg .bgw1.bgw1-embed{position:relative;inset:auto;overflow:visible;overflow-x:clip;background:#02070c}
+
+/* DF's Back control in W1's header (the header's small mono caps must not reach it) */
+.dfbg .bgw1-top .df-back{flex:none;font:600 18px/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:0;text-transform:none;color:#F1F4FF;border-color:#3A4266;
+  background:rgba(11,15,31,.72);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.dfbg .bgw1-top .df-back:hover{border-color:var(--cyan)}
+
+/* the problem is no longer the last section: less air under it */
+.dfbg .bgw1-story .bgw1-sec:last-child{padding-bottom:24px}
+
+/* the architecture page and the way on */
+.dfbg .dfbg-tail{position:relative;max-width:1296px;margin:0 auto;padding:24px 48px 48px;display:flex;flex-direction:column;gap:24px}
+@media (max-width:700px){
+  .dfbg .bgw1-top .df-back{min-height:44px;padding:0 16px 0 10px;font-size:16px}
+  /* the symptom chips wrap inside the card instead of running off its edge half cut */
+  .dfbg .bgw1-symptoms{flex-wrap:wrap;overflow-x:visible;margin-right:0;padding-right:0}
+  .dfbg .dfbg-tail{padding:16px 16px 32px}
+}

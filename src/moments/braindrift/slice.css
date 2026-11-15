@@ -1,0 +1,461 @@
+/* BrainDrift moment, slice view: the mockup-A scanner window. Scoped under .bds (on the same root as .bdm, whose
+   slider, tags and error styles it keeps). Positions come from layout() in slice.tsx as custom properties. */
+.bds {
+  /* a neutral grey MRI, as in the mockup */
+  --m-scan: #f1f3f6;
+  --m-well: #000105;
+}
+.bds .bds-atmo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(calc(var(--ws, 500px) * 0.62) calc(var(--ws, 500px) * 0.62) at calc(var(--wx, 0px) + var(--ws, 500px) / 2) calc(var(--wy, 0px) + var(--ws, 500px) / 2), color-mix(in srgb, var(--m-mark) 11%, transparent), transparent 72%),
+    radial-gradient(60% 55% at 86% 12%, rgba(70, 60, 170, 0.16), transparent 70%);
+}
+
+/* the window: a real slice in a black well, ringed and lit in the mark colour */
+.bds .bds-well {
+  position: absolute;
+  left: var(--wx, 0px);
+  top: var(--wy, 0px);
+  width: var(--ws, 300px);
+  height: var(--ws, 300px);
+  margin: 0;
+  border-radius: 16px;
+  background: var(--m-well);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--m-mark) 28%, transparent),
+    0 36px 80px rgba(0, 0, 0, 0.6),
+    0 0 120px color-mix(in srgb, var(--m-mark) 12%, transparent);
+}
+.bds .bds-well-in {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+}
+.bds .bds-canvas,
+.bds .bds-ov {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.bds .bds-canvas {
+  opacity: 0;
+  transition: opacity 260ms ease-out;
+}
+.bds[data-ready='1'] .bds-canvas {
+  opacity: 1;
+}
+/* fluid here now, not before: the model's gained voxels on this slice, in light */
+.bds .bds-gain {
+  fill: var(--m-mark-2);
+  fill-rule: evenodd;
+  stroke: var(--m-mark-2);
+  stroke-width: 1px;
+  stroke-linejoin: round;
+  opacity: var(--gain, 0);
+  filter: drop-shadow(0 0 3px var(--m-mark-2)) drop-shadow(0 0 8px color-mix(in srgb, var(--m-mark-2) 70%, transparent));
+}
+.bds .bds-ov {
+  overflow: visible;
+  pointer-events: none;
+}
+.bds .bds-ov path {
+  vector-effect: non-scaling-stroke;
+}
+.bds .bds-vent {
+  opacity: var(--vent, 1);
+}
+.bds .bds-v-glow {
+  fill: none;
+  stroke: var(--m-mark);
+  stroke-width: calc(13px + 16px * var(--flare, 0));
+  stroke-opacity: calc(0.3 + 0.42 * var(--flare, 0));
+  stroke-linejoin: round;
+  filter: blur(6px);
+}
+.bds .bds-v-fill {
+  fill: var(--m-mark);
+  fill-opacity: calc(0.42 * var(--fill, 1));
+  fill-rule: evenodd;
+}
+.bds .bds-v-line {
+  fill: none;
+  stroke: var(--m-mark);
+  stroke-width: 2.6px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: var(--draw, 0);
+}
+/* before flight: a quiet dashed reference that stays put while the brain flies */
+.bds .bds-ref {
+  opacity: var(--ref, 0);
+  transition: opacity 160ms ease-out;
+}
+.bds .bds-ref path {
+  fill: none;
+  stroke: var(--m-ink);
+  stroke-opacity: 0.8;
+  stroke-width: 1.3px;
+  stroke-dasharray: 4 4;
+  stroke-linecap: round;
+}
+/* the measured rise: the after-flight top of the brain and the sliver it rose */
+.bds .bds-top {
+  opacity: var(--top, 0);
+}
+.bds .bds-band {
+  fill: var(--m-mark-2);
+  fill-opacity: 0.3;
+}
+.bds .bds-top-line {
+  fill: none;
+  stroke: var(--m-mark-2);
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--top, 0));
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--m-mark-2) 70%, transparent));
+}
+
+/* the two labels in the window, as on a scanner screen */
+.bds .bds-chips {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.bds .bds-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(0, 1, 5, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--m-ink);
+  white-space: nowrap;
+}
+.bds .bds-chip-mono {
+  font-family: var(--m-font-mono);
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+}
+/* lit corner brackets */
+.bds .bds-tick {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--m-mark);
+  filter: drop-shadow(0 0 6px var(--m-mark));
+  pointer-events: none;
+}
+.bds .bds-tl {
+  left: -12px;
+  top: -12px;
+  border-right: 0;
+  border-bottom: 0;
+  border-top-left-radius: 8px;
+}
+.bds .bds-tr {
+  right: -12px;
+  top: -12px;
+  border-left: 0;
+  border-bottom: 0;
+  border-top-right-radius: 8px;
+}
+.bds .bds-bl {
+  left: -12px;
+  bottom: -12px;
+  border-right: 0;
+  border-top: 0;
+  border-bottom-left-radius: 8px;
+}
+.bds .bds-br {
+  right: -12px;
+  bottom: -12px;
+  border-left: 0;
+  border-top: 0;
+  border-bottom-right-radius: 8px;
+}
+
+/* the column beside the window: legend, then the reading line or the numbers */
+.bds .bds-side {
+  position: absolute;
+  left: var(--sx, 0px);
+  top: var(--sy, 0px);
+  width: var(--sw, 240px);
+  height: var(--sh, 200px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 34px;
+  pointer-events: none;
+}
+.bds .bds-legend {
+  display: grid;
+  gap: 12px;
+}
+.bds .bds-key {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  line-height: 1.3;
+  color: var(--m-ink-2);
+  transition: opacity 180ms ease-out;
+}
+.bds .bds-key b {
+  font-weight: 600;
+  color: var(--m-ink);
+}
+.bds .bds-key i {
+  flex: none;
+  display: block;
+}
+.bds .bds-sw-vent {
+  width: 22px;
+  height: 14px;
+  border-radius: 4px;
+  border: 2px solid var(--m-mark);
+  background: color-mix(in srgb, var(--m-mark) 42%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--m-mark) 60%, transparent);
+}
+.bds .bds-sw-ref {
+  width: 22px;
+  height: 0;
+  border-top: 2px dashed color-mix(in srgb, var(--m-ink) 80%, transparent);
+}
+.bds .bds-sw-gain {
+  width: 22px;
+  height: 14px;
+  border-radius: 4px;
+  background: var(--m-mark-2);
+  box-shadow: 0 0 9px color-mix(in srgb, var(--m-mark-2) 75%, transparent);
+}
+.bds .bds-key-ref {
+  opacity: 0;
+}
+.bds[data-ref] .bds-key-ref {
+  opacity: 1;
+}
+.bds .bds-legend .bds-key-gain {
+  opacity: var(--b, 0);
+}
+.bds .bds-key-inline {
+  display: none;
+}
+
+.bds .bds-read {
+  display: grid;
+  gap: 10px;
+}
+.bds .bds-status {
+  position: static;
+  min-height: 22px;
+}
+.bds .bds-status:not([data-on]) {
+  display: none;
+}
+.bds .bds-status[data-empty] {
+  visibility: hidden;
+}
+.bds .bds-status .bdm-status-text {
+  font-size: 16px;
+  color: var(--m-ink);
+}
+.bds .bds-read[data-labels='0'] .bds-status {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.bds .bds-nums {
+  display: grid;
+  gap: 26px;
+  opacity: var(--b, 0);
+  font-variant-numeric: tabular-nums;
+}
+.bds .bds-num {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+.bds .bds-big {
+  font-size: clamp(44px, 4.6vw, 66px);
+  font-weight: 620;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--m-mark);
+  text-shadow: 0 0 30px color-mix(in srgb, var(--m-mark) 45%, transparent);
+}
+.bds .bds-mid {
+  font-size: clamp(30px, 3vw, 42px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--m-ink);
+}
+.bds .bds-cap {
+  font-size: 15px;
+  color: var(--m-ink);
+}
+.bds .bds-cap .bdm-tag {
+  margin-left: 8px;
+  vertical-align: 2px;
+  pointer-events: auto;
+}
+.bds .bds-sub {
+  font-size: 15px;
+  color: var(--m-ink-2);
+}
+
+/* the slider stands under the window */
+.bds .bds-flight {
+  left: var(--fx, 50%);
+  width: var(--fw, 520px);
+}
+.bds .bdm-end {
+  font-size: 15px;
+}
+
+/* a small window on a wide stage (a narrow laptop window): the chips as on a phone, the slice number in the free
+   bottom-right corner, so it never runs past the window into the legend */
+.bds[data-small] .bds-chip {
+  height: 26px;
+  padding: 0 9px;
+  font-size: 12.5px;
+}
+.bds[data-small] .bds-chip-mono {
+  position: absolute;
+  right: 0;
+  top: calc(var(--ws, 300px) - 46px);
+  font-size: 11.5px;
+}
+
+/* a tiny window (a small phone): only the scan's own chip stays, smaller, so it never covers the brain */
+.bdm.bds[data-tiny] .bds-chips {
+  left: 8px;
+  right: 8px;
+  top: 8px;
+}
+.bdm.bds[data-tiny] .bds-chip {
+  height: 22px;
+  padding: 0 7px;
+  font-size: 11px;
+}
+.bdm.bds[data-tiny] .bds-chip-mono {
+  display: none;
+}
+
+/* upright stage (a phone): window on top, then one compact row under it */
+.bds[data-shape='tall'] .bds-chips {
+  left: 10px;
+  right: 10px;
+  top: 10px;
+}
+.bds[data-shape='tall'] .bds-chip {
+  height: 26px;
+  padding: 0 9px;
+  font-size: 12.5px;
+}
+.bds[data-shape='tall'] .bds-chip-mono {
+  /* no room for both chips across a phone-sized window: the slice number sits in the free bottom-right corner */
+  position: absolute;
+  right: 0;
+  top: calc(var(--ws, 300px) - 46px);
+  font-size: 11.5px;
+}
+.bds[data-shape='tall'] .bds-tick {
+  width: 20px;
+  height: 20px;
+}
+.bds[data-shape='tall'] .bds-tl,
+.bds[data-shape='tall'] .bds-bl {
+  left: -8px;
+}
+.bds[data-shape='tall'] .bds-tr,
+.bds[data-shape='tall'] .bds-br {
+  right: -8px;
+}
+.bds[data-shape='tall'] .bds-tl,
+.bds[data-shape='tall'] .bds-tr {
+  top: -8px;
+}
+.bds[data-shape='tall'] .bds-bl,
+.bds[data-shape='tall'] .bds-br {
+  bottom: -8px;
+}
+.bds[data-shape='tall'] .bds-side {
+  justify-content: flex-start;
+  gap: 0;
+}
+.bds[data-shape='tall'] .bds-legend {
+  gap: 6px;
+}
+.bds[data-shape='tall'] .bds-key {
+  font-size: 14px;
+}
+.bds[data-shape='tall'] .bds-legend .bds-key-gain {
+  display: none;
+}
+.bds[data-shape='tall'][data-state='running'] .bds-legend,
+.bds[data-shape='tall'][data-state='result'] .bds-legend {
+  display: none;
+}
+.bds[data-shape='tall'] .bds-status .bdm-status-text {
+  font-size: 14px;
+}
+.bds[data-shape='tall'] .bds-nums {
+  grid-template-columns: 1fr 1fr;
+  column-gap: 14px;
+  row-gap: 8px;
+}
+.bds[data-shape='tall'] .bds-num {
+  gap: 3px;
+}
+.bds[data-shape='tall'] .bds-big {
+  font-size: 32px;
+}
+.bds[data-shape='tall'] .bds-mid {
+  font-size: 32px;
+  line-height: 0.95;
+}
+.bds[data-shape='tall'] .bds-cap,
+.bds[data-shape='tall'] .bds-sub {
+  font-size: 12px;
+  line-height: 1.28;
+}
+.bds[data-shape='tall'] .bds-cap .bdm-tag {
+  margin-left: 5px;
+}
+.bds[data-shape='tall'] .bds-key-inline {
+  display: flex;
+  grid-column: 1 / -1;
+  font-size: 12.5px;
+}
+.bds[data-shape='tall'] .bds-key-inline i {
+  width: 16px;
+  height: 9px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bds .bds-canvas,
+  .bds .bds-ref,
+  .bds .bds-key {
+    transition: none;
+  }
+}

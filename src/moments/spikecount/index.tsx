@@ -639,7 +639,8 @@ export default function SpikeCountMoment(props: SpikeCountMomentProps) {
     cells.forEach((pc, i) => {
       const [cx, cy] = pc.c.center
       const edge = pc.c.border || cx < 48 || cy < 48 || cx > FIELD - 48 || cy > FIELD - 48
-      const v = (isSpiky(pc.c.cls) ? 10 : 0) + pc.c.severity + pc.c.confidence * 0.01 - (edge ? 0.5 : 0)
+      // a cell cut by the photo's edge is a poor picture in the lens: any whole spiky cell goes first (r4)
+      const v = (isSpiky(pc.c.cls) ? 10 : 0) + pc.c.severity + pc.c.confidence * 0.01 - (pc.c.border ? 8 : edge ? 0.5 : 0)
       if (v > best) {
         best = v
         bi = i
@@ -676,6 +677,8 @@ export default function SpikeCountMoment(props: SpikeCountMomentProps) {
     ctx.stroke(pc.path)
   }, [focus, cells, data, colours, dpr, lensOn, lay.sq])
   const focusCell = focus !== null ? (cells[focus] ?? null) : null
+  // "Highest grade found" only when the lens cell is of the highest spiky grade in the photo
+  const topSpiky = useMemo(() => cells.reduce((t, pc) => (isSpiky(pc.c.cls) && pc.c.cls > t ? pc.c.cls : t), 0), [cells])
 
   // ---- words
   const res = data?.res
@@ -691,6 +694,11 @@ export default function SpikeCountMoment(props: SpikeCountMomentProps) {
     return s.charAt(0).toUpperCase() + s.slice(1)
   }
 
+  // Before the reading: idle, or still loading the two models (live run, line not moving yet). The panel keeps its
+  // idle look then, so a judge never sees a big "0" and a row of zero counts while the models load (r4).
+  const pre = st === 'idle' || (st === 'running' && wait !== null && prog.phase === 0)
+  // phone, idle, no promise line (DF passes promise=""): the idle "looking for" cell takes the number's empty place
+  const idleLensNarrow = !bare && !failed && lay.narrow && pre && !promise
   const vars = { '--lens': `${Math.round(clamp(lay.sq * 0.24, 96, 140))}px`, '--sq': `${lay.sq}px`, '--cell': `${lay.cell}px`, '--pad': `${lay.pad}px`, '--gap': `${lay.gap}px` } as CSSProperties
 
   return (
@@ -707,6 +715,7 @@ export default function SpikeCountMoment(props: SpikeCountMomentProps) {
       data-spiky={prog.spiky}
       data-source={res?.source ?? ''}
       data-pick={pick === null ? '' : CLASSES[pick]}
+      data-pre={pre ? '1' : '0'}
     >
       <div className="scm-main" data-qa="hero">
         <figure className="scm-pane scm-pane-a" onPointerMove={onMove} onPointerLeave={() => setHover(null)} onPointerDown={onDown}>
@@ -750,42 +759,44 @@ export default function SpikeCountMoment(props: SpikeCountMomentProps) {
 
         {!bare && (
           <div className="scm-read" aria-live="polite">
-            <div className="scm-num">
-              <span className="scm-label">Spiky cells</span>
-              {st === 'idle' || !m ? (
-                <p className="scm-promise">{failed ? 'The stored outlines could not be loaded.' : promise}</p>
-              ) : done ? (
-                <p className="scm-hero is-final" key="final">
-                  {m.spikyPct.toFixed(1)}
-                  <sup>%</sup>
-                </p>
-              ) : (
-                <p className="scm-hero" key="count">
-                  {prog.spiky}
-                </p>
-              )}
-              {st !== 'idle' && m && <span className="scm-sub">{done ? `${spikyAll} of ${total} cells` : wait ? 'waiting for the models' : `of ${prog.landed} cells so far`}</span>}
-              {st !== 'idle' && m && (
-                <div className="scm-bar" aria-hidden="true">
-                  {CLASSES.map((c, i) => (
-                    <i key={c} style={{ flexGrow: prog.counts[i], background: colours.cls[i] }} />
-                  ))}
-                  <i className="scm-bar-rest" style={{ flexGrow: Math.max(0, total - prog.landed) }} />
-                </div>
-              )}
-            </div>
+            {!idleLensNarrow && (
+              <div className="scm-num">
+                <span className="scm-label">Spiky cells</span>
+                {pre || !m ? (
+                  <p className="scm-promise">{failed ? 'The stored outlines could not be loaded.' : promise}</p>
+                ) : done ? (
+                  <p className="scm-hero is-final" key="final">
+                    {m.spikyPct.toFixed(1)}
+                    <sup>%</sup>
+                  </p>
+                ) : (
+                  <p className="scm-hero" key="count">
+                    {prog.spiky}
+                  </p>
+                )}
+                {!pre && m && <span className="scm-sub">{done ? `${spikyAll} of ${total} cells` : `of ${prog.landed} cells so far`}</span>}
+                {!pre && m && (
+                  <div className="scm-bar" aria-hidden="true">
+                    {CLASSES.map((c, i) => (
+                      <i key={c} style={{ flexGrow: prog.counts[i], background: colours.cls[i] }} />
+                    ))}
+                    <i className="scm-bar-rest" style={{ flexGrow: Math.max(0, total - prog.landed) }} />
+                  </div>
+                )}
+              </div>
+            )}
             {lensOn && (
               <div className="scm-lens" data-show={focusCell ? '1' : '0'} style={{ '--c': focusCell ? colours.cls[focusCell.c.cls] : 'transparent' } as CSSProperties}>
                 <canvas ref={lensRef} aria-hidden="true" />
                 <div className="scm-lens-text">
-                  <span className="scm-label">{hover !== null ? 'This cell' : prog.phase === 1 ? 'Grading now' : focusCell && isSpiky(focusCell.c.cls) ? 'Highest grade found' : 'Point at any cell'}</span>
+                  <span className="scm-label">{hover !== null ? 'This cell' : prog.phase === 1 ? 'Grading now' : focusCell && isSpiky(focusCell.c.cls) ? (focusCell.c.cls === topSpiky ? 'Highest grade found' : 'Spiky cell found') : 'Point at any cell'}</span>
                   <b>{focusCell ? EXAMPLES[focusCell.c.cls].title : ''}</b>
                   {focusCell && <i>{EXAMPLES[focusCell.c.cls].note}</i>}
                   <em>{focusCell ? `${Math.round(focusCell.c.confidence * 100)}% sure` : ''}</em>
                 </div>
               </div>
             )}
-            {st === 'idle' && lensOn && !failed && (
+            {pre && (lensOn || idleLensNarrow) && !failed && (
               <div className="scm-lens scm-lens-idle" style={{ '--c': colours.cls[3] } as CSSProperties}>
                 <img src={spike.ASSETS.url('gallery/E3_05.png')} alt="A real spiky red blood cell, grade 3, from the graded lab set" draggable={false} />
                 <div className="scm-lens-text">
@@ -795,7 +806,7 @@ export default function SpikeCountMoment(props: SpikeCountMomentProps) {
                 </div>
               </div>
             )}
-            {st === 'idle' && !lay.narrow && !failed && (
+            {pre && !lay.narrow && !failed && (
               <div className="scm-how">
                 <span className="scm-label">Two neural networks</span>
                 <p>
@@ -845,7 +856,8 @@ export default function SpikeCountMoment(props: SpikeCountMomentProps) {
                 data-hot={hotCls === i ? '1' : '0'}
                 data-qa-skip={st !== 'result' ? '1' : undefined}
                 disabled={st !== 'result'}
-                aria-label={`${spike.CLASS_PLAIN[g.cls]}: ${st === 'idle' ? '' : `${prog.counts[i]} in this photo. `}Show only these cells`}
+                // the visible words first, as they read (title, note, count), so the spoken name matches what is seen
+                aria-label={`${g.title} ${g.note}${pre ? '' : ` ${prog.counts[i]}, in this photo`}. Show only these cells`}
                 onClick={() => setPick((p) => (p === i ? null : i))}
               >
                 <span className="scm-g-cells">
@@ -854,9 +866,10 @@ export default function SpikeCountMoment(props: SpikeCountMomentProps) {
                   ))}
                 </span>
                 <span className="scm-g-text">
-                  <b>{g.title}</b>
-                  <em>{g.note}</em>
-                  {st !== 'idle' && (
+                  {/* the spaces keep the words apart in the text a screen reader hears (flex ignores them on screen) */}
+                  <b>{g.title}</b>{' '}
+                  <em>{g.note}</em>{' '}
+                  {!pre && (
                     <span className="scm-g-n" key={prog.counts[i]}>
                       {prog.counts[i]}
                     </span>

@@ -9,6 +9,7 @@
 .df-check .df-story-kicker{display:flex;align-items:center;gap:12px;margin:0 0 18px;font:600 15px/1 var(--m-font-mono,"JetBrains Mono",ui-monospace,monospace);letter-spacing:.16em;text-transform:uppercase;color:var(--mc)}
 .df-check .df-story-kicker::before{content:"";width:28px;height:2px;background:var(--mc);box-shadow:0 0 12px var(--mc)}
 .df-check .df-story-h{margin:0 0 26px;max-width:17em;font:700 54px/1.06 var(--sans);letter-spacing:-.035em;color:var(--text-1);text-wrap:balance}
+.df-check .df-story-h:focus{outline:none}
 .df-check .df-story-p{margin:0 0 18px;max-width:31em;font:500 22px/1.45 var(--sans);color:var(--text-2);text-wrap:pretty}
 .df-check .df-story-src{margin:26px 0 0;max-width:36em;padding-top:16px;border-top:1px solid var(--line-hair);font:500 15px/1.5 var(--sans);color:var(--text-3)}
 

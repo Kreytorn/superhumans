@@ -1,5 +1,5 @@
-// Canvas drawing for the Garn Meter stage. Everything drawn here is the recording, a measurement, a model output or
-// the check-in. Two instruments stand next to the traces: the scalp map (measured theta) and the Garn dial (check-in).
+// Canvas drawing for the Garn Meter stage. Everything drawn here is the recording, a measurement or a model output.
+// Two instruments stand next to the traces: the scalp map (measured theta) and the Garn gauge (the model's reading).
 import type { Frame, StageData } from './timeline'
 
 export interface Rect {
@@ -31,7 +31,7 @@ export interface Layout {
   tracesIdle: Rect
   /** Top-left corner of the row above the traces: their name and time scale, and at idle the one sentence. */
   head: { x: number; y: number }
-  /** Font size of the two big lines: the idle sentence and the line above the rail. */
+  /** Font size of the idle sentence. */
   big: number
   /** Top of the row under the traces, where the 4 s window is named. */
   under: number
@@ -42,9 +42,6 @@ export interface Layout {
   ribbon: { y: number; h: number }
   /** Where the legend row sits (between the traces and the strip); h is 0 when notes are off. */
   legend: Rect
-  rail: { x0: number; x1: number; y: number }
-  /** Tops of the two rows above the rail: the big line (question, then verdict) and the status word. */
-  rows: { big: number; status: number }
   /** The two instrument panels. `yIdle` is the panel's top before the session strip is on stage. */
   scalp: Rect & { yIdle: number; hIdle: number }
   dial: Rect & { yIdle: number; hIdle: number }
@@ -65,6 +62,8 @@ export interface Palette {
   stageRgb: [number, number, number]
   inkRgb: [number, number, number]
   glowRgb: [number, number, number]
+  /** The model's reading (the strip's line and the gauge's arc), as rgb for gradients. */
+  accentRgb: [number, number, number]
   fieldHi: [number, number, number]
   fieldLo: [number, number, number]
   /** Scalp map at the baseline (no change): a middle tone, so a drop shows as clearly as a rise. */
@@ -81,20 +80,6 @@ export interface Signal {
   channels: string[]
   electrodes: Record<string, [number, number]>
 }
-/** What the rail and the dial show besides the model's tick. Stops are the 1-7 check-in scale; Garn = (stop - 1) / 6. */
-export interface RailUi {
-  /** Handle position in stops (1-7), fractional while it travels. Null = no check-in on screen. */
-  handle: number | null
-  /** The rating recorded in the study for the scene in view (drawn as a hollow ring when the handle left it). */
-  recorded: number | null
-  /** Zone of the check-in the handle shows: 0 green, 1 yellow, 2 red. */
-  zone: 0 | 1 | 2 | null
-  /** What the dial prints for that check-in: the Garn value, whose answer it is, and the status word. */
-  said?: { value: string; who: string; word: string } | null
-  /** 0-1: a ring that leaves the handle right after an answer. */
-  ripple?: number
-}
-
 const clamp = (v: number, a: number, b: number) => (v < a ? a : v > b ? b : v)
 /** Soft limiter for big artifacts (blinks): linear near zero, bends towards +-lim. Display only. */
 const soft = (v: number, lim: number) => lim * Math.tanh(v / lim)
@@ -108,29 +93,24 @@ export function layoutFor(w: number, h: number, notes = true): Layout {
   const wide = w >= 860 && !portrait
   const u = notes ? clamp(w / 900, 1, 1.75) : 1
   const gap = Math.round(pad * 0.9)
-  const side = wide ? Math.round(clamp(w * 0.265, 236, 400)) : 0
+  const side = wide ? Math.round(clamp(w * 0.3, 236, 440)) : 0
   const col = { x: pad, w: w - pad * 2 - (wide ? side + gap : 0) }
   const big = narrow ? clamp(Math.round(w * 0.05), 17, 20) : Math.round(19 * u)
   const bigLine = Math.round(big * 1.2)
-  // The rail block, bottom up: scale words, numerals, the rail, then (with notes) two rows above it:
-  // the status word over the handle, and the big line (the question at idle, the verdict at the result).
-  const above = notes ? Math.round(47 * u) + 6 + bigLine * (narrow ? 2 : 1) : 0
-  const below = notes ? 8 + Math.round(46 * u) : 0
-  const railH = notes ? above + below : clamp(h * 0.13, 80, 112)
-  const railTop = h - pad - railH
-  const railY = notes ? railTop + above : railTop + railH * 0.5
+  // r4: no check-in rail. The column ends with the session strip: the model's reading over the whole recording.
+  const bottom = h - pad
   // the strip: the Garn plot, then the ribbon of the whole recording, then (with notes) what each block of scenes varied
   const ribbonH = Math.round(clamp(h * 0.03, 13, 26))
   const cueH = notes ? Math.round(12 * u) + 4 : 0
-  const stripH = Math.round(clamp(h * (portrait ? 0.17 : 0.2), 104, 200))
-  const stripY = railTop - gap - stripH
-  const legendRows = narrow ? 3 : col.w < 700 * u ? 2 : 1
+  const stripH = Math.round(clamp(h * (portrait ? 0.24 : 0.32), 120, 320))
+  const stripY = bottom - stripH
+  const legendRows = narrow ? 2 : 1
   const legendH = notes ? Math.round(16 * u) * legendRows + 2 : 0
   const legend = { x: col.x, y: stripY - 8 - legendH, w: col.w, h: legendH }
-  // not wide: the two instruments share a row between the traces and the legend (at idle: right above the rail block)
-  const instH = wide ? 0 : Math.round(clamp(h * 0.2, 112, 200))
+  // not wide: the two instruments share a row between the traces and the legend (at idle: at the foot of the stage)
+  const instH = wide ? 0 : Math.round(clamp(h * 0.27, 120, 240))
   const instY = legend.y - instH - 8
-  const instIdleY = railTop - gap - instH
+  const instIdleY = bottom - instH
   const underRow = notes ? Math.round(14 * u) + 8 : 0
   const under = (wide ? legend.y : instY) - underRow
   const tracesBottom = notes ? under - 8 : (wide ? stripY : instY) - gap
@@ -138,11 +118,13 @@ export function layoutFor(w: number, h: number, notes = true): Layout {
   const head = { x: col.x, y: pad }
   const ty = pad + (notes ? Math.round(15 * u) + 8 : 0)
   const traces = { x: col.x + gutter, y: ty, w: col.w - gutter, h: Math.max(40, tracesBottom - ty) }
-  // idle: one sentence (two lines on a phone), then the traces down to the rail block
+  // idle: one sentence (two lines on a phone), then the traces down to the foot of the stage (or the instruments)
   // (the sentence is 64 characters at about 0.52 em each: that gives its line count at this width)
   const sayLines = Math.ceil((64 * big * 0.52) / col.w + 0.15)
-  const iy = pad + (notes ? bigLine * sayLines + 14 : 0)
-  const idleBottom = wide ? railTop - gap : instIdleY - gap
+  const iy0 = pad + (notes ? bigLine * sayLines + 14 : 0)
+  const idleBottom = wide ? bottom : instIdleY - gap
+  // a big swing on the top trace may reach most of a row above it: keep that clear of the sentence
+  const iy = iy0 + (notes ? Math.round(((idleBottom - iy0) / 14) * 0.55) : 0)
   const tracesIdle = { x: traces.x, y: iy, w: traces.w, h: Math.max(40, idleBottom - iy) }
   // the strip spans the same width as the traces' column: with the whole session in view, a moment sits at the same x in both
   const strip = { x: traces.x, y: stripY, w: traces.w, h: stripH }
@@ -150,14 +132,12 @@ export function layoutFor(w: number, h: number, notes = true): Layout {
   const ribbonY = stripY + stripH - cueH - ribbonH
   const plot = { top: plotTop, base: ribbonY - 7 }
   const ribbon = { y: ribbonY, h: ribbonH }
-  const inset = clamp(col.w * 0.045, 24, 64)
-  const rail = { x0: col.x + inset, x1: col.x + col.w - inset, y: railY }
-  const rows = { big: railY - above, status: railY - Math.round(47 * u) }
   let scalp: Layout['scalp']
   let dial: Layout['dial']
   if (wide) {
+    // the gauge is the hero instrument: it takes about half the height, the scalp map the rest
     const sx = col.x + col.w + gap
-    const dialH = Math.round(clamp(h * 0.39, 190, 340))
+    const dialH = Math.round(clamp(h * 0.52, 220, 460))
     dial = { x: sx, y: h - pad - dialH, w: side, h: dialH, yIdle: h - pad - dialH, hIdle: dialH }
     const sh = dial.y - gap - pad
     scalp = { x: sx, y: pad, w: side, h: sh, yIdle: pad, hIdle: sh }
@@ -166,11 +146,9 @@ export function layoutFor(w: number, h: number, notes = true): Layout {
     scalp = { x: pad, y: instY, w: half, h: instH, yIdle: instIdleY, hIdle: instH }
     dial = { x: pad + half + gap, y: instY, w: half, h: instH, yIdle: instIdleY, hIdle: instH }
   }
-  return { w, h, portrait, narrow, wide, pad, notes, u, col, gutter, traces, tracesIdle, head, big, under, strip, plot, ribbon, legend, rail, rows, scalp, dial }
+  return { w, h, portrait, narrow, wide, pad, notes, u, col, gutter, traces, tracesIdle, head, big, under, strip, plot, ribbon, legend, scalp, dial }
 }
 
-export const stopX = (L: Layout, stop: number) => L.rail.x0 + ((stop - 1) / 6) * (L.rail.x1 - L.rail.x0)
-export const garnX = (L: Layout, g: number) => L.rail.x0 + clamp(g, 0, 1) * (L.rail.x1 - L.rail.x0)
 /** y of a Garn value inside the session strip. */
 export const stripGarnY = (L: Layout, g: number) => L.plot.base - clamp(g, 0, 1) * (L.plot.base - L.plot.top)
 /** x of a sample inside the session strip (the strip always spans the whole recording). */
@@ -219,21 +197,6 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   ctx.arcTo(x, y, x + w, y, k)
   ctx.closePath()
 }
-function zoneColor(pal: Palette, z: 0 | 1 | 2 | null) {
-  return z === 2 ? pal.alert : z === 1 ? pal.watch : z === 0 ? pal.ok : pal.ink2
-}
-/** The status mark of a zone (ring, triangle, square), so the zone never rests on colour alone. */
-function zoneShape(ctx: CanvasRenderingContext2D, z: 0 | 1 | 2 | null, x: number, y: number, k: number) {
-  ctx.beginPath()
-  if (z === 2) ctx.rect(x - 4.5 * k, y - 4.5 * k, 9 * k, 9 * k)
-  else if (z === 1) {
-    ctx.moveTo(x, y - 6 * k)
-    ctx.lineTo(x + 5.8 * k, y + 4.2 * k)
-    ctx.lineTo(x - 5.8 * k, y + 4.2 * k)
-    ctx.closePath()
-  } else ctx.arc(x, y, 4.6 * k, 0, TAU)
-}
-
 // ---------------------------------------------------------------- scalp field (measured theta, interpolated)
 const G = 64
 const HEAD = 1.18 // head radius in electrode units (farthest electrode sits at 1.0)
@@ -396,7 +359,8 @@ function drawTraces(ctx: CanvasRenderingContext2D, r: Rect, L: Layout, pal: Pale
   const zoomed = spp <= 1.5
   let hot: { from: number; to: number; alpha: number; tail: boolean } | null = null
   if (zoomed && fr.scan && fr.scan.alpha > 0.01) hot = { from: fr.scan.start, to: fr.scan.end, alpha: fr.scan.alpha, tail: false }
-  else if (zoomed && fr.beat === 'idle' && fr.now !== undefined) hot = { from: fr.now - 1.6 * sig.fs, to: fr.now, alpha: 1, tail: true }
+  // (calibrate has a playhead only while a run waits for the model: the recording keeps playing as at idle)
+  else if (zoomed && (fr.beat === 'idle' || fr.beat === 'calibrate') && fr.now !== undefined) hot = { from: fr.now - 1.6 * sig.fs, to: fr.now, alpha: 1, tail: true }
 
   const path = (from: number, to: number) => {
     ctx.beginPath()
@@ -588,7 +552,7 @@ function drawTraces(ctx: CanvasRenderingContext2D, r: Rect, L: Layout, pal: Pale
   if (zoomed && fr.now !== undefined && fr.now >= s0 && fr.now <= s1 && fr.now <= fr.inked + 1) {
     const x = xOf(fr.now)
     const a = fr.scan ? fr.scan.alpha : 1
-    if (fr.beat === 'idle') {
+    if (fr.beat === 'idle' || fr.beat === 'calibrate') {
       ctx.globalAlpha = 0.3
       ctx.strokeStyle = pal.ink
       ctx.lineWidth = 1
@@ -643,7 +607,7 @@ function drawTraces(ctx: CanvasRenderingContext2D, r: Rect, L: Layout, pal: Pale
   }
 }
 
-// ---------------------------------------------------------------- the session strip: own ratings, the model's thread, the recording as a ribbon
+// ---------------------------------------------------------------- the session strip: the model's reading over time, the recording as a ribbon
 /** The whole recording as one bar per 2 px: the channels' mean peak-to-peak swing in that slice, in units of each channel's
  *  spread at rest. A view of the recording, kept per signal and width. */
 let ribbonCache: { eeg: Float32Array; cols: number; env: Float32Array } | null = null
@@ -694,7 +658,7 @@ function drawStrip(ctx: CanvasRenderingContext2D, L: Layout, pal: Palette, sig: 
   })
   ctx.globalAlpha = 1
 
-  // axes: 0 Garn and a faint line at 1 Garn
+  // axes: 0 Garn, and faint lines at 0.5 and 1 Garn
   ctx.strokeStyle = pal.ink2
   ctx.lineWidth = 1
   ctx.globalAlpha = 0.3
@@ -702,6 +666,9 @@ function drawStrip(ctx: CanvasRenderingContext2D, L: Layout, pal: Palette, sig: 
   ctx.beginPath()
   ctx.moveTo(r.x, Math.round(y1) + 0.5)
   ctx.lineTo(r.x + r.w, Math.round(y1) + 0.5)
+  ctx.globalAlpha = 0.2
+  ctx.moveTo(r.x, Math.round(yOf(0.5)) + 0.5)
+  ctx.lineTo(r.x + r.w, Math.round(yOf(0.5)) + 0.5)
   ctx.stroke()
   ctx.setLineDash([])
   ctx.globalAlpha = 0.5
@@ -773,220 +740,101 @@ function drawStrip(ctx: CanvasRenderingContext2D, L: Layout, pal: Palette, sig: 
     ctx.globalAlpha = 1
   }
 
-  // the model's estimate, one point per 4 s window (raw output, not smoothed)
+  // the model's reading, one point per 4 s window (raw output, not smoothed): a lit line with a soft fill under it
   if (fr.thread > 0) {
-    ctx.strokeStyle = pal.mark
-    ctx.lineWidth = 1.25 * lw
+    const n = Math.min(fr.thread, d.windows.length)
+    const line = () => {
+      ctx.beginPath()
+      for (let i = 0; i < n; i++) {
+        const w = d.windows[i]
+        if (i === 0) ctx.moveTo(xOf(w.end), yOf(w.garn))
+        else ctx.lineTo(xOf(w.end), yOf(w.garn))
+      }
+    }
+    const xa = xOf(d.windows[0].end)
+    const xb = xOf(d.windows[n - 1].end)
+    line()
+    ctx.lineTo(xb, y0)
+    ctx.lineTo(xa, y0)
+    ctx.closePath()
+    const fill = ctx.createLinearGradient(0, y1, 0, y0)
+    fill.addColorStop(0, rgba(pal.accentRgb, 0.3))
+    fill.addColorStop(1, rgba(pal.accentRgb, 0.02))
+    ctx.fillStyle = fill
+    ctx.fill()
     ctx.lineJoin = 'round'
-    ctx.beginPath()
-    for (let i = 0; i < fr.thread; i++) {
-      const w = d.windows[i]
+    ctx.lineCap = 'round'
+    line()
+    ctx.strokeStyle = pal.accent
+    ctx.globalAlpha = 0.22
+    ctx.lineWidth = 6 * lw
+    ctx.stroke()
+    ctx.globalAlpha = 1
+    ctx.lineWidth = 1.6 * lw
+    ctx.stroke()
+    // while the session plays, a light rides the head of the line
+    if (fr.beat === 'session' && n < d.windows.length) {
+      const w = d.windows[n - 1]
       const x = xOf(w.end)
       const y = yOf(w.garn)
-      if (i === 0) ctx.moveTo(x, y)
-      else ctx.lineTo(x, y)
+      const g = ctx.createRadialGradient(x, y, 0, x, y, 14 * lw)
+      g.addColorStop(0, rgba(pal.accentRgb, 0.55))
+      g.addColorStop(1, rgba(pal.accentRgb, 0))
+      ctx.fillStyle = g
+      ctx.beginPath()
+      ctx.arc(x, y, 14 * lw, 0, TAU)
+      ctx.fill()
+      ctx.fillStyle = pal.ink
+      ctx.beginPath()
+      ctx.arc(x, y, 2.6 * lw, 0, TAU)
+      ctx.fill()
     }
-    ctx.stroke()
   }
 
-  // the person's own rating after each scene; it stands until the next one. Each dot carries its check-in zone.
-  const shown = d.trials.filter((t) => t.start + t.length <= fr.inked + 0.5)
-  if (shown.length) {
-    ctx.strokeStyle = pal.accent
-    ctx.lineWidth = 2 * lw
-    ctx.lineJoin = 'miter'
+  // the scene in view: its stretch of the line lit in ink (up to where the model's window has read), and once settled its mean
+  const f = d.focus
+  if (fr.focusMark > 0.5 && f.w1 > f.w0) {
+    const reach = fr.beat === 'result' || fr.beat === 'settle' || !fr.scan ? Infinity : fr.scan.end + 1
+    // the line enters the scene from the window before it, so the lit stretch joins the line
+    const i0 = Math.max(0, f.w0 - 1)
     ctx.beginPath()
-    shown.forEach((t, i) => {
-      const x = xOf(t.start + t.length)
-      const y = yOf(t.garnReported)
-      if (i === 0) ctx.moveTo(x, y)
+    let k = 0
+    for (let i = i0; i < f.w1; i++) {
+      const w = d.windows[i]
+      if (i >= f.w0 && w.end > reach) break
+      const x = i < f.w0 ? xOf(f.start) : xOf(w.end)
+      const y = i < f.w0 ? yOf(w.garn + (d.windows[f.w0].garn - w.garn) * ((f.start - w.end) / Math.max(1, d.windows[f.w0].end - w.end))) : yOf(w.garn)
+      if (k++ === 0) ctx.moveTo(x, y)
       else ctx.lineTo(x, y)
-      const next = d.trials[d.trials.indexOf(t) + 1]
-      const xe = next ? Math.min(xOf(next.start + next.length), xOf(Math.max(fr.inked, t.start + t.length))) : x
-      ctx.lineTo(xe, y)
-    })
-    ctx.globalAlpha = 0.16
-    ctx.lineWidth = 7 * lw
-    ctx.stroke()
-    ctx.globalAlpha = 1
-    ctx.lineWidth = 2 * lw
-    ctx.stroke()
-    const rad = clamp(r.w / 250, 2.2, 3.6) * lw
-    for (const t of shown) {
-      const isFocus = t.index === d.focus.index && fr.focusMark > 0.5
-      const x = xOf(t.start + t.length)
-      const y = yOf(t.garnReported)
-      const R = isFocus ? rad + 2 : rad
-      ctx.fillStyle = zoneColor(pal, t.zone)
-      ctx.globalAlpha = 0.25
+    }
+    if (k > 1) {
+      ctx.lineJoin = 'round'
+      ctx.lineCap = 'round'
+      ctx.strokeStyle = pal.ink
+      ctx.lineWidth = 2.2 * lw
+      ctx.stroke()
+    }
+    const mean = f.modelGarnMean
+    if (fr.mean > 0.01 && mean !== null) {
+      const a = xOf(f.start)
+      const b = xOf(f.start + f.length)
+      const y = Math.round(yOf(mean)) + 0.5
+      const mid = (a + b) / 2
+      const half = ((b - a) / 2 + 5 * lw) * fr.mean
+      ctx.strokeStyle = pal.accent
+      ctx.lineCap = 'round'
+      ctx.globalAlpha = 0.3 * fr.mean
+      ctx.lineWidth = 8 * lw
       ctx.beginPath()
-      ctx.arc(x, y, R + 3.5 * lw, 0, TAU)
-      ctx.fill()
+      ctx.moveTo(mid - half, y)
+      ctx.lineTo(mid + half, y)
+      ctx.stroke()
+      ctx.globalAlpha = fr.mean
+      ctx.lineWidth = 3 * lw
+      ctx.stroke()
       ctx.globalAlpha = 1
-      ctx.fillStyle = pal.stage
-      ctx.beginPath()
-      ctx.arc(x, y, R + 1.2, 0, TAU)
-      ctx.fill()
-      ctx.fillStyle = zoneColor(pal, t.zone)
-      ctx.beginPath()
-      ctx.arc(x, y, R, 0, TAU)
-      ctx.fill()
+      ctx.lineCap = 'butt'
     }
-  }
-}
-
-// ---------------------------------------------------------------- the Garn rail: check-in scale, handle, model tick, gap
-function drawRail(ctx: CanvasRenderingContext2D, L: Layout, pal: Palette, fr: Frame, ui: RailUi) {
-  const { x0, x1, y } = L.rail
-  const m = L.u
-  const yy = Math.round(y) + 0.5
-  const seg = (x1 - x0) / 6
-  // the track: a groove with the three zones of the check-in scale in it: stop 1, stops 2-3, stops 4-7
-  // (tier C: only the check-in sets the zone)
-  ctx.lineCap = 'round'
-  ctx.strokeStyle = pal.ink
-  ctx.globalAlpha = 0.07
-  ctx.lineWidth = 11 * m
-  ctx.beginPath()
-  ctx.moveTo(x0 - 9 * m, yy)
-  ctx.lineTo(x1 + 9 * m, yy)
-  ctx.stroke()
-  const zones: [number, number, 0 | 1 | 2][] = [
-    [x0 - 9 * m, x0 + seg * 0.5 - 5 * m, 0],
-    [x0 + seg * 0.5 + 5 * m, x0 + seg * 2.5 - 5 * m, 1],
-    [x0 + seg * 2.5 + 5 * m, x1 + 9 * m, 2],
-  ]
-  for (const [a, b, z] of zones) {
-    const on = ui.zone === z && fr.checkin > 0
-    ctx.strokeStyle = zoneColor(pal, z)
-    if (on) {
-      ctx.globalAlpha = 0.2 * fr.checkin
-      ctx.lineWidth = 13 * m
-      ctx.beginPath()
-      ctx.moveTo(a, yy)
-      ctx.lineTo(b, yy)
-      ctx.stroke()
-    }
-    ctx.globalAlpha = on ? 0.4 + 0.6 * fr.checkin : 0.4
-    ctx.lineWidth = (on ? 4.5 : 2.5) * m
-    ctx.beginPath()
-    ctx.moveTo(a, yy)
-    ctx.lineTo(b, yy)
-    ctx.stroke()
-  }
-  ctx.globalAlpha = 1
-  ctx.lineCap = 'butt'
-  // stops
-  for (let s = 1; s <= 7; s++) {
-    ctx.fillStyle = pal.stage
-    ctx.beginPath()
-    ctx.arc(stopX(L, s), yy, 4.6 * m, 0, TAU)
-    ctx.fill()
-    ctx.fillStyle = pal.ink2
-    ctx.beginPath()
-    ctx.arc(stopX(L, s), yy, 2.8 * m, 0, TAU)
-    ctx.fill()
-  }
-  const hx = ui.handle !== null ? stopX(L, ui.handle) : null
-  const top = yy - 25 * m
-
-  // before any answer: a handle at rest in the middle of the rail, hollow and with no zone colour, so the rail reads as something to press
-  if (hx === null && fr.beat === 'idle' && L.notes) {
-    ctx.fillStyle = pal.stage
-    ctx.strokeStyle = pal.ink
-    ctx.lineWidth = 2 * m
-    ctx.beginPath()
-    ctx.arc(stopX(L, 4), yy, 13 * m, 0, TAU)
-    ctx.fill()
-    ctx.stroke()
-    ctx.globalAlpha = 0.25
-    ctx.lineWidth = 1 * m
-    ctx.beginPath()
-    ctx.arc(stopX(L, 4), yy, 19 * m, 0, TAU)
-    ctx.stroke()
-    ctx.globalAlpha = 1
-  }
-
-  // the gap between the model's estimate and the check-in
-  if (fr.estimate && hx !== null && fr.gap > 0.01) {
-    const ex = garnX(L, fr.estimate.garn)
-    const end = ex + (hx - ex) * fr.gap
-    ctx.strokeStyle = pal.mark
-    ctx.lineWidth = 1.5 * m
-    ctx.setLineDash([4 * m, 4 * m])
-    ctx.beginPath()
-    ctx.moveTo(ex, top + 0.5)
-    ctx.lineTo(end, top + 0.5)
-    ctx.stroke()
-    ctx.setLineDash([])
-    if (fr.gap > 0.98 && Math.abs(hx - ex) > 4) {
-      ctx.beginPath()
-      ctx.moveTo(hx, top - 4 * m)
-      ctx.lineTo(hx, top + 5 * m)
-      ctx.stroke()
-    }
-  }
-  // the model's estimate: a grey tick (same grey as the thread)
-  if (fr.estimate && fr.estimate.alpha > 0.01) {
-    const ex = garnX(L, fr.estimate.garn)
-    ctx.globalAlpha = fr.estimate.alpha
-    ctx.strokeStyle = pal.mark
-    ctx.fillStyle = pal.mark
-    ctx.lineWidth = 2 * m
-    ctx.beginPath()
-    ctx.moveTo(ex, top - 4 * m)
-    ctx.lineTo(ex, yy + 9 * m)
-    ctx.stroke()
-    ctx.beginPath()
-    ctx.moveTo(ex - 5.5 * m, top - 4 * m)
-    ctx.lineTo(ex + 5.5 * m, top - 4 * m)
-    ctx.lineTo(ex, top + 4 * m)
-    ctx.closePath()
-    ctx.fill()
-    ctx.globalAlpha = 1
-  }
-  // where the study's own rating was, once the handle has left it
-  if (ui.recorded !== null && ui.handle !== null && Math.abs(ui.handle - ui.recorded) > 0.05 && fr.checkin > 0.5) {
-    ctx.strokeStyle = pal.accent
-    ctx.lineWidth = 2 * m
-    ctx.beginPath()
-    ctx.arc(stopX(L, ui.recorded), yy, 9 * m, 0, TAU)
-    ctx.stroke()
-  }
-  // the check-in handle: zone colour, a halo, and a shape per zone (ring, triangle, square)
-  if (hx !== null && fr.checkin > 0.01) {
-    const k = (0.9 + 0.1 * fr.checkin) * m
-    const R = 15 * k
-    const col = zoneColor(pal, ui.zone)
-    const rip = ui.ripple ?? 0
-    if (rip > 0.01 && rip < 1) {
-      ctx.globalAlpha = (1 - rip) * 0.7
-      ctx.strokeStyle = col
-      ctx.lineWidth = 2 * m
-      ctx.beginPath()
-      ctx.arc(hx, yy, R + rip * 30 * m, 0, TAU)
-      ctx.stroke()
-    }
-    ctx.fillStyle = col
-    ctx.globalAlpha = 0.16 * fr.checkin
-    ctx.beginPath()
-    ctx.arc(hx, yy, R + 9 * m, 0, TAU)
-    ctx.fill()
-    ctx.globalAlpha = 0.22 * fr.checkin
-    ctx.beginPath()
-    ctx.arc(hx, yy, R + 4 * m, 0, TAU)
-    ctx.fill()
-    ctx.globalAlpha = fr.checkin
-    ctx.beginPath()
-    ctx.arc(hx, yy, R, 0, TAU)
-    ctx.fill()
-    ctx.fillStyle = pal.stage
-    ctx.strokeStyle = pal.stage
-    ctx.lineWidth = 2 * m
-    zoneShape(ctx, ui.zone, hx, yy, k)
-    if (ui.zone === 0) ctx.stroke()
-    else ctx.fill()
-    ctx.globalAlpha = 1
   }
 }
 
@@ -1070,7 +918,7 @@ function drawScalpPanel(ctx: CanvasRenderingContext2D, L: Layout, pal: Palette, 
   if (!L.notes) return
   const px = b.x + clamp(b.w * 0.06, 8, 20)
   word(ctx, pal, small ? 'THETA VS REST' : 'THETA POWER', px, b.y + tp + titlePx, titlePx, { weight: 600, track: 0.08, color: pal.ink, alpha: 0.9 })
-  if (!small) word(ctx, pal, values && d ? `scene ${d.focus.index}` : 'at rest', b.x + b.w - (px - b.x), b.y + tp + titlePx, titlePx, { align: 'right', weight: 500 })
+  if (!small) word(ctx, pal, values && d ? (fr.beat === 'session' ? 'whole session' : `scene ${d.focus.index}`) : 'at rest', b.x + b.w - (px - b.x), b.y + tp + titlePx, titlePx, { align: 'right', weight: 500 })
   // key: less ... more than at rest, then what kind of thing this is
   const by = b.y + b.h - tp
   if (small) {
@@ -1102,21 +950,23 @@ function drawScalpPanel(ctx: CanvasRenderingContext2D, L: Layout, pal: Palette, 
 const A0 = (150 * Math.PI) / 180
 const SWEEP = (240 * Math.PI) / 180
 
-/** The Garn dial: the check-in as a needle-less meter. The lit arc and the knob are the check-in on the rail; the grey
- *  triangle is the model's estimate (the same tick as on the rail). The number is (check-in - 1) / 6. */
-function drawDial(ctx: CanvasRenderingContext2D, L: Layout, pal: Palette, fr: Frame, ui: RailUi) {
+/** The Garn gauge: the model's own reading as a lit arc from 0 to its value, with a knob at its end. The number is
+ *  always an engine value: the smoothed reading while the session plays, one window's reading while the model's window
+ *  slides over the scene in view, then the scene's mean. */
+function drawDial(ctx: CanvasRenderingContext2D, L: Layout, pal: Palette, d: StageData | null, fr: Frame) {
   const b = panelRect(L.dial, fr.open)
   const u = L.u
   const small = b.h < 170
   const tp = clamp(b.h * 0.05, 9, 18)
   const titlePx = small ? 10.5 : 11 * u
   const topRow = L.notes ? tp + titlePx + 8 : tp
-  // the arc spans 240 degrees: it is r tall above the centre and r / 2 below it
+  // the arc spans 240 degrees: it is r tall above the centre and r / 2 below it; under it, one line says what the number is
+  const capRow = L.notes && !small ? clamp(b.h * 0.07, 14, 30) : 0
   const th0 = clamp(b.h * 0.05, 6, 16)
-  const r = Math.max(20, Math.min(b.w * 0.37, (b.h - topRow - tp - th0 * 2.4) / 1.6))
+  const r = Math.max(20, Math.min(b.w * 0.41, (b.h - topRow - tp - capRow - th0 * 2.4) / 1.6))
   const th = clamp(r * 0.11, 5, 16)
   const cx = b.x + b.w / 2
-  const cy = b.y + topRow + th * 1.2 + r + (b.h - topRow - tp - th * 2.4 - r * 1.5) / 2
+  const cy = b.y + topRow + th * 1.2 + r + (b.h - topRow - tp - capRow - th * 2.4 - r * 1.5) / 2
   panel(ctx, pal, b, { x: cx, y: cy, r })
   const ang = (g: number) => A0 + clamp(g, 0, 1) * SWEEP
   const arc = (g0: number, g1: number, rr: number) => {
@@ -1124,115 +974,84 @@ function drawDial(ctx: CanvasRenderingContext2D, L: Layout, pal: Palette, fr: Fr
     ctx.arc(cx, cy, rr, ang(g0), ang(g1))
     ctx.stroke()
   }
-  // the groove
+  // the groove, and a thin outer ring for the whole 0-1 Garn scale
   ctx.lineCap = 'round'
   ctx.strokeStyle = pal.ink
   ctx.globalAlpha = 0.08
   ctx.lineWidth = th
   arc(0, 1, r)
-  // the three zones of the check-in scale, on a thin outer ring (same cuts as on the rail: stop 1, stops 2-3, stops 4-7)
   ctx.lineCap = 'butt'
-  const on = fr.checkin > 0 ? ui.zone : null
-  const cuts: [number, number, 0 | 1 | 2][] = [
-    [0, 0.5 / 6 - 0.012, 0],
-    [0.5 / 6 + 0.012, 2.5 / 6 - 0.012, 1],
-    [2.5 / 6 + 0.012, 1, 2],
-  ]
-  for (const [g0, g1, z] of cuts) {
-    ctx.strokeStyle = zoneColor(pal, z)
-    ctx.globalAlpha = on === z ? 1 : 0.42
-    ctx.lineWidth = Math.max(2, th * 0.22)
-    arc(g0, g1, r + th * 0.95)
-  }
-  // seven ticks inside the groove: the stops of the rail
   ctx.strokeStyle = pal.ink2
+  ctx.globalAlpha = 0.35
+  ctx.lineWidth = Math.max(1, th * 0.12)
+  arc(0, 1, r + th * 0.95)
+  // ticks every 0.1 Garn inside the groove; longer at 0, 0.5 and 1
   ctx.globalAlpha = 0.7
   ctx.lineWidth = Math.max(1, 1.2 * Math.sqrt(u))
   ctx.beginPath()
-  for (let s = 0; s <= 6; s++) {
-    const a = ang(s / 6)
+  for (let s = 0; s <= 10; s++) {
+    const a = ang(s / 10)
+    const long = s % 5 === 0
     ctx.moveTo(cx + Math.cos(a) * (r - th * 0.95), cy + Math.sin(a) * (r - th * 0.95))
-    ctx.lineTo(cx + Math.cos(a) * (r - th * 1.55), cy + Math.sin(a) * (r - th * 1.55))
+    ctx.lineTo(cx + Math.cos(a) * (r - th * (long ? 1.85 : 1.4)), cy + Math.sin(a) * (r - th * (long ? 1.85 : 1.4)))
   }
   ctx.stroke()
   ctx.globalAlpha = 1
 
-  // the check-in: a lit arc from 0 to its Garn value, and a knob at its end
-  const col = zoneColor(pal, ui.zone)
-  if (ui.handle !== null && fr.checkin > 0.01) {
-    const g = ((ui.handle - 1) / 6) * fr.checkin
+  // the model's reading: a lit arc from 0 to its value, and a knob at its end
+  const est = fr.estimate && fr.estimate.alpha > 0.01 ? fr.estimate : null
+  if (est) {
+    const g = clamp(est.garn, 0, 1)
+    ctx.globalAlpha = est.alpha
     ctx.lineCap = 'round'
-    ctx.strokeStyle = col
-    ctx.globalAlpha = 0.2
-    ctx.lineWidth = th * 2.1
+    ctx.strokeStyle = pal.accent
+    ctx.globalAlpha = 0.2 * est.alpha
+    ctx.lineWidth = th * 2.2
     arc(0, g, r)
-    ctx.globalAlpha = 1
+    ctx.globalAlpha = est.alpha
     ctx.lineWidth = th
     arc(0, g, r)
     const a = ang(g)
     const kx = cx + Math.cos(a) * r
     const ky = cy + Math.sin(a) * r
-    ctx.fillStyle = col
-    ctx.globalAlpha = 0.28
+    const halo = ctx.createRadialGradient(kx, ky, 0, kx, ky, th * 2.2)
+    halo.addColorStop(0, rgba(pal.accentRgb, 0.55 * est.alpha))
+    halo.addColorStop(1, rgba(pal.accentRgb, 0))
+    ctx.fillStyle = halo
     ctx.beginPath()
-    ctx.arc(kx, ky, th * 1.5, 0, TAU)
+    ctx.arc(kx, ky, th * 2.2, 0, TAU)
     ctx.fill()
-    ctx.globalAlpha = 1
     ctx.fillStyle = pal.ink
     ctx.beginPath()
-    ctx.arc(kx, ky, th * 0.78, 0, TAU)
+    ctx.arc(kx, ky, th * 0.72, 0, TAU)
     ctx.fill()
-    ctx.lineCap = 'butt'
-  }
-  // the model's estimate: the grey triangle of the rail, pointing at the groove from outside
-  if (fr.estimate && fr.estimate.alpha > 0.01) {
-    const a = ang(fr.estimate.garn)
-    const tip = r + th * 1.5
-    const back = tip + th * 1.25
-    const hw = (th * 0.72) / back
-    ctx.globalAlpha = fr.estimate.alpha
-    ctx.fillStyle = pal.mark
+    // a fine needle from the hub towards the knob
+    ctx.strokeStyle = pal.accent
+    ctx.globalAlpha = 0.45 * est.alpha
+    ctx.lineWidth = Math.max(1, th * 0.14)
     ctx.beginPath()
-    ctx.moveTo(cx + Math.cos(a) * tip, cy + Math.sin(a) * tip)
-    ctx.lineTo(cx + Math.cos(a - hw) * back, cy + Math.sin(a - hw) * back)
-    ctx.lineTo(cx + Math.cos(a + hw) * back, cy + Math.sin(a + hw) * back)
-    ctx.closePath()
-    ctx.fill()
-    ctx.strokeStyle = pal.mark
-    ctx.lineWidth = Math.max(1.5, th * 0.16)
-    ctx.beginPath()
-    ctx.moveTo(cx + Math.cos(a) * tip, cy + Math.sin(a) * tip)
-    ctx.lineTo(cx + Math.cos(a) * (r - th * 0.5), cy + Math.sin(a) * (r - th * 0.5))
+    ctx.moveTo(cx + Math.cos(a) * r * 0.72, cy + Math.sin(a) * r * 0.72)
+    ctx.lineTo(cx + Math.cos(a) * (r - th * 2), cy + Math.sin(a) * (r - th * 2))
     ctx.stroke()
     ctx.globalAlpha = 1
+    ctx.lineCap = 'butt'
   }
 
-  // the number: the check-in in Garns. It is on the dial with or without the small words.
-  const said = fr.checkin > 0.5 ? (ui.said ?? null) : null
-  const numPx = clamp(r * 0.56, 20, 96)
-  word(ctx, pal, said ? said.value : '–', cx, cy + numPx * 0.2, numPx, { align: 'center', weight: said ? 600 : 300, color: pal.ink, alpha: said ? 1 : 0.45, track: -0.02 })
+  // the number: the model's reading in Garns
+  const numPx = clamp(r * 0.56, 20, 104)
+  word(ctx, pal, est ? est.value.toFixed(2) : '–', cx, cy + numPx * 0.2, numPx, { align: 'center', weight: est ? 600 : 300, color: pal.ink, alpha: est ? 1 : 0.45, track: -0.02 })
   if (!L.notes) return
   const subPx = clamp(r * 0.15, 9.5, 20)
   word(ctx, pal, 'Garn', cx, cy + numPx * 0.2 + subPx * 1.35, subPx, { align: 'center', weight: 500 })
-  word(ctx, pal, said ? said.who : 'no check-in yet', cx, cy - numPx * 0.62, clamp(r * 0.125, 9, 17), { align: 'center' })
-  // the status word between the ends of the arc, with the zone's shape
-  if (said && !small) {
-    const wy = cy + r * 0.5 + th * 0.2
-    const wp = clamp(r * 0.15, 10, 20)
-    ctx.font = `700 ${wp.toFixed(1)}px ${pal.font}`
-    const tw = ctx.measureText(said.word).width
-    const k = wp / 11
-    const sx = cx - tw / 2 - 5.5 * k
-    ctx.fillStyle = col
-    ctx.strokeStyle = col
-    ctx.lineWidth = 2 * k
-    zoneShape(ctx, ui.zone, sx - 3 * k, wy - wp * 0.34, k * 0.92)
-    if (ui.zone === 0) ctx.stroke()
-    else ctx.fill()
-    word(ctx, pal, said.word, cx + 5.5 * k, wy, wp, { align: 'center', weight: 700, color: pal.ink })
+  word(ctx, pal, est ? 'the model reads' : 'no reading yet', cx, cy - numPx * 0.86, clamp(r * 0.125, 9, 17), { align: 'center' })
+  // what the number is, under the arc
+  if (est && capRow > 0 && d) {
+    const f = d.focus
+    const what = est.kind === 'scene' ? `scene ${f.index}: mean of its ${f.w1 - f.w0} readings` : est.kind === 'window' ? `scene ${f.index}: one 4 s window` : 'smoothed, as the session plays'
+    word(ctx, pal, what, cx, b.y + b.h - tp, clamp(r * 0.12, 10, 16), { align: 'center', color: pal.ink, alpha: 0.8 })
   }
   const px = b.x + clamp(b.w * 0.06, 8, 20)
-  word(ctx, pal, small ? 'GARN METER' : 'GARN METER · THE CHECK-IN', px, b.y + tp + titlePx, titlePx, { weight: 600, track: 0.08, color: pal.ink, alpha: 0.9 })
+  word(ctx, pal, small ? 'GARN METER' : 'GARN METER · THE MODEL', px, b.y + tp + titlePx, titlePx, { weight: 600, track: 0.08, color: pal.ink, alpha: 0.9 })
   // ends of the scale
   if (!small) {
     const ex = Math.cos(A0) * (r - th * 2.7)
@@ -1250,7 +1069,7 @@ export function tracesRect(L: Layout, fr: Frame): Rect {
 }
 
 /** Draws the whole stage for one frame. `d` is null before the model ran (idle). */
-export function drawScene(ctx: CanvasRenderingContext2D, L: Layout, pal: Palette, sig: Signal, d: StageData | null, fr: Frame, ui: RailUi, dpr: number) {
+export function drawScene(ctx: CanvasRenderingContext2D, L: Layout, pal: Palette, sig: Signal, d: StageData | null, fr: Frame, dpr: number) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
   ctx.globalAlpha = 1
   ctx.fillStyle = pal.stage
@@ -1268,6 +1087,5 @@ export function drawScene(ctx: CanvasRenderingContext2D, L: Layout, pal: Palette
   }
   drawTraces(ctx, tracesRect(L, fr), L, pal, sig, fr, dpr)
   drawScalpPanel(ctx, L, pal, sig, d, fr)
-  drawDial(ctx, L, pal, fr, ui)
-  drawRail(ctx, L, pal, fr, ui)
+  drawDial(ctx, L, pal, d, fr)
 }

@@ -1,0 +1,145 @@
+/* DF's extra screens (r4). Loaded with the home (index.tsx), because three small pieces live on DF's own pages:
+   the home's links to the credits and the QR screen, and the "Credits" link at the end of every check.
+   The rest styles the credits page (#/proto/DF/credits) and the sky and bar it shares with the QR screen. */
+@font-face{font-family:"JetBrains Mono";src:url("../../assets/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2");font-weight:100 800;font-display:swap}
+
+/* ---------- the home's two small links: top right on a laptop, the end of the list on a phone ---------- */
+.df-topnav{position:absolute;top:calc(var(--u)*30);right:calc(var(--u)*40);display:flex;align-items:center;gap:calc(var(--u)*8)}
+.df-topnav a{display:inline-flex;align-items:center;gap:8px;min-height:max(32px,calc(var(--u)*44));padding:0 max(12px,calc(var(--u)*16));border-radius:999px;border:1px solid transparent;
+  font:500 max(13px,calc(var(--u)*19))/1 var(--sans);color:var(--text-2);transition:color .15s var(--ease-out),border-color .15s var(--ease-out),background .15s var(--ease-out)}
+.df-topnav a:hover{color:var(--text-1);border-color:var(--line);background:rgba(11,15,31,.6)}
+.df-topnav svg{width:max(15px,calc(var(--u)*20));height:max(15px,calc(var(--u)*20));flex:none}
+.df-pfoot{display:flex;flex-wrap:wrap;gap:10px;padding:0 16px 34px}
+.df-pfoot a{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:1px solid var(--line);border-radius:999px;background:rgba(11,15,31,.72);font:600 15px/1 var(--sans);color:var(--text-1)}
+.df-pfoot svg{width:17px;height:17px;flex:none}
+.df.is-phone .df-credit{padding-bottom:14px}
+
+/* ---------- the end of every check: a quiet "Credits" link between "Back to the body" and "Next check" ---------- */
+.df-check .df-story-credits{display:inline-flex;align-items:center;align-self:center;min-height:44px;padding:0 14px;font:500 16px/1 var(--sans);color:var(--text-3);
+  text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:5px;transition:color .15s var(--ease-out),text-decoration-color .15s var(--ease-out)}
+.df-check .df-story-credits:hover{color:var(--text-1);text-decoration-color:var(--accent)}
+
+/* ---------- shared by the credits page and the QR screen ---------- */
+.df-xs-sky{position:absolute;inset:0;pointer-events:none}
+.df-xs .df-photo{opacity:.38}
+.df-xs-scroll{position:absolute;inset:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.df-xs-bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.df-xs-link{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 20px;border:1px solid var(--line);border-radius:999px;background:rgba(11,15,31,.6);
+  font:600 17px/1 var(--sans);color:var(--text-2);transition:color .15s var(--ease-out),border-color .15s var(--ease-out),transform .15s var(--ease-out)}
+.df-xs-link:hover{color:var(--text-1);border-color:var(--accent)}
+.df-xs-link:active{transform:scale(.97)}
+.df-xs-link svg{width:18px;height:18px;flex:none}
+
+/* ---------- the credits page ---------- */
+.df-cr-wrap{position:relative;max-width:1240px;margin:0 auto;padding:28px clamp(16px,4.2vw,64px) max(48px,18vh)}
+.df-cr-hero{padding:clamp(56px,11vh,120px) 0 clamp(48px,8vh,88px)}
+.df-cr-kicker{display:flex;align-items:center;gap:12px;margin:0;font:600 15px/1 "JetBrains Mono",ui-monospace,Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.df-cr-kicker::before{content:"";width:28px;height:2px;background:currentColor;box-shadow:0 0 12px currentColor}
+.df-cr-h1{margin:20px 0 0;font:700 clamp(46px,6.4vw,96px)/.94 var(--sans);letter-spacing:-.045em;color:var(--text-1);text-wrap:balance}
+.df-cr-lead{margin:26px 0 0;max-width:33em;font:500 clamp(18px,1.6vw,24px)/1.42 var(--sans);color:var(--text-2);text-wrap:pretty}
+.df-cr-lead b{font-weight:600;color:var(--text-1)}
+.df-cr-jump{display:flex;flex-wrap:wrap;gap:8px 10px;margin:34px 0 0;padding:0;list-style:none}
+.df-cr-jump button{cursor:pointer;display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border:1px solid var(--line-hair);border-radius:999px;background:rgba(11,15,31,.55);font:500 15px/1 var(--sans);color:var(--text-2);transition:color .15s var(--ease-out),border-color .15s var(--ease-out)}
+.df-cr-jump button:hover{color:var(--text-1);border-color:var(--accent)}
+
+.df-cr-sec{padding:clamp(44px,7vh,80px) 0;border-top:1px solid var(--line-hair);scroll-margin-top:12px}
+.df-cr-sec-head{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-bottom:30px}
+.df-cr-num{margin:0;font:600 14px/1 "JetBrains Mono",ui-monospace,Consolas,monospace;letter-spacing:.14em;color:var(--text-3)}
+.df-cr-h2{margin:0;font:700 clamp(30px,3.4vw,50px)/1.04 var(--sans);letter-spacing:-.035em;color:var(--text-1)}
+.df-cr-sub{margin:0;max-width:44em;font:500 clamp(16px,1.25vw,19px)/1.5 var(--sans);color:var(--text-2);text-wrap:pretty}
+
+.df-cr-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.df-cr-span{grid-column:1/-1}
+.df-cr-span .df-cr-hrp{display:flex;flex-wrap:wrap;gap:4px 28px}
+.df-cr-card{position:relative;display:flex;flex-direction:column;gap:12px;min-width:0;padding:24px 24px 22px;border:1px solid var(--line-hair);border-radius:18px;background:rgba(8,11,24,.78);
+  box-shadow:0 24px 60px rgba(0,0,8,.35)}
+.df-cr-card.is-nasa{border-color:rgba(143,184,255,.34);background:linear-gradient(180deg,rgba(28,40,86,.62),rgba(8,11,24,.84) 70%);box-shadow:0 24px 60px rgba(0,0,8,.4),0 0 60px rgba(143,184,255,.08)}
+.df-cr-card h3,.df-cr-card h4{margin:0;font:600 22px/1.2 var(--sans);letter-spacing:-.015em;color:var(--text-1)}
+.df-cr-card p{margin:0;font:500 16px/1.5 var(--sans);color:var(--text-2);text-wrap:pretty}
+.df-cr-cite{font:400 13px/1.55 "JetBrains Mono",ui-monospace,Consolas,monospace !important;color:var(--text-3) !important;overflow-wrap:anywhere}
+.df-cr-tags{display:flex;flex-wrap:wrap;gap:6px 8px}
+.df-cr-lic{display:inline-flex;align-items:center;max-width:100%;padding:6px 10px;border:1px solid rgba(143,184,255,.3);border-radius:8px;background:rgba(143,184,255,.07);
+  font:600 13px/1.3 "JetBrains Mono",ui-monospace,Consolas,monospace;color:#CFE0FF;overflow-wrap:anywhere}
+.df-cr-lic.is-plain{border-color:var(--line-hair);background:transparent;color:var(--text-2);font-weight:500}
+.df-cr-links{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:auto;padding-top:4px}
+.df-cr-links a,.df a.df-cr-a{display:inline-flex;align-items:center;gap:6px;min-height:28px;font:600 15px/1.3 var(--sans);color:var(--accent);text-decoration:underline;text-decoration-color:rgba(143,184,255,.35);text-underline-offset:4px;overflow-wrap:anywhere}
+.df-cr-links a:hover,.df a.df-cr-a:hover{text-decoration-color:var(--accent);color:#CFE0FF}
+.df-cr-links svg{width:13px;height:13px;flex:none}
+.df-cr-photo{display:block;width:100%;aspect-ratio:16/7;object-fit:cover;object-position:50% 62%;border-radius:12px;border:1px solid var(--line-hair)}
+.df-cr-hrp{margin:0;padding:0;list-style:none;display:grid;gap:2px}
+
+/* the data, one block per check, in the check's colour */
+/* two columns, filled by credits.tsx so they end at about the same height; one column (pitch order) when narrow */
+.df-cr-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px;align-items:start}
+.df-cr-col{display:flex;flex-direction:column;min-width:0}
+.df-cr-check{display:flex;flex-direction:column;gap:12px;min-width:0;margin-bottom:34px}
+.df-cr-check-head{display:flex;align-items:center;gap:12px;margin:0;font:700 26px/1.1 var(--sans);letter-spacing:-.025em;color:var(--mc)}
+.df-cr-check-head svg{width:20px;height:20px;flex:none;filter:drop-shadow(0 0 8px var(--mc))}
+.df-cr-check-head span{font:500 16px/1.2 var(--sans);letter-spacing:0;color:var(--text-3)}
+.df-cr-check .df-cr-card{border-left:2px solid color-mix(in srgb,var(--mc) 70%,transparent)}
+.df-cr-check .df-cr-card h4{font-size:20px}
+
+/* rows: models we started from, code, type, tools */
+.df-cr-rows{display:grid;gap:10px}
+.df-cr-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr);align-items:center;gap:8px 24px;padding:18px 22px;border:1px solid var(--line-hair);border-radius:14px;background:rgba(8,11,24,.72)}
+.df-cr-row h3{margin:0;font:600 19px/1.25 var(--sans);color:var(--text-1);overflow-wrap:anywhere}
+.df-cr-row h3 small{display:block;margin-top:4px;font:400 13px/1.4 "JetBrains Mono",ui-monospace,Consolas,monospace;color:var(--text-3)}
+.df-cr-row p{margin:0;font:500 15px/1.45 var(--sans);color:var(--text-2)}
+.df-cr-uses{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.df-cr-use{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--mc) 45%,transparent);font:600 13px/1 var(--sans);color:var(--mc);white-space:nowrap}
+.df-cr-use i{width:7px;height:7px;border-radius:50%;background:var(--mc);box-shadow:0 0 8px var(--mc)}
+
+.df-cr-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.df-cr-wide{grid-column:1/-1}
+.df-cr-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.df-cr-chip{display:inline-block;max-width:100%;padding:8px 12px;border:1px solid var(--line-hair);border-radius:10px;background:rgba(255,255,255,.02);font:600 15px/1.25 var(--sans);color:var(--text-1)}
+.df-cr-chip small{margin-left:8px;font:500 12px/1.25 "JetBrains Mono",ui-monospace,Consolas,monospace;color:var(--text-3)}
+.df-cr-note{margin:18px 0 0 !important;font:500 15px/1.5 var(--sans);color:var(--text-3) !important}
+
+/* AI use: the honest block, in a glowing frame */
+.df-cr-ai{position:relative;padding:clamp(26px,3.4vw,44px);border-radius:24px;border:1px solid rgba(143,184,255,.38);
+  background:radial-gradient(90% 120% at 0% 0%,rgba(92,80,220,.22),transparent 60%),radial-gradient(80% 100% at 100% 100%,rgba(46,230,166,.10),transparent 60%),rgba(7,10,24,.86);
+  box-shadow:0 30px 90px rgba(0,0,10,.5),0 0 90px rgba(143,184,255,.12)}
+.df-cr-ai-who{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;margin:0 0 28px;font:600 clamp(20px,1.8vw,26px)/1.3 var(--sans);letter-spacing:-.015em;color:var(--text-1)}
+.df-cr-ai-who svg{width:26px;height:26px;color:#CFE0FF;filter:drop-shadow(0 0 8px rgba(143,184,255,.8))}
+.df-cr-ai-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,2.4vw,36px)}
+.df-cr-ai h3{display:flex;align-items:center;gap:10px;margin:0 0 14px;font:600 14px/1 "JetBrains Mono",ui-monospace,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ac,#CFE0FF)}
+.df-cr-ai h3::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ac,#CFE0FF);box-shadow:0 0 10px var(--ac,#CFE0FF)}
+.df-cr-ai ul{margin:0;padding:0;list-style:none;display:grid;gap:12px}
+.df-cr-ai li{position:relative;padding-left:18px;font:500 16px/1.5 var(--sans);color:var(--text-2);text-wrap:pretty}
+.df-cr-ai li::before{content:"";position:absolute;left:0;top:.62em;width:7px;height:2px;background:var(--ac,#CFE0FF);opacity:.8}
+.df-cr-ai li b{font-weight:600;color:var(--text-1)}
+.df-cr-mark{display:inline-flex;align-items:center;gap:7px;margin:0 2px;padding:2px 9px 2px 7px;border-radius:9px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.28);font:600 14px/1.5 var(--sans);color:var(--text-1);white-space:nowrap}
+.df-cr-mark svg{width:13px;height:13px;color:#CFE0FF}
+
+.df-cr-end{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;padding:clamp(40px,6vh,64px) 0 8px;border-top:1px solid var(--line-hair)}
+.df-cr-end p{margin:0;max-width:40em;font:500 16px/1.55 var(--sans);color:var(--text-2)}
+.df-cr-end p b{color:var(--text-1);font-weight:600}
+.df-cr-end-links{display:flex;flex-wrap:wrap;gap:10px}
+
+@media (max-width:1060px){
+  .df-cr-cols,.df-cr-ai-cols,.df-cr-grid{grid-template-columns:minmax(0,1fr)}
+  .df-cr-checks{display:flex;flex-direction:column}
+  .df-cr-col{display:contents}
+}
+@media (max-width:759px){
+  .df-cr-wrap{padding:16px 16px max(40px,14vh)}
+  .df-cr-hero{padding:44px 0 40px}
+  .df-cr-kicker{font-size:13px}
+  .df-cr-h1{font-size:44px}
+  .df-cr-lead{font-size:17px}
+  .df-cr-sec{padding:40px 0}
+  .df-cr-sec-head{margin-bottom:22px}
+  .df-cr-h2{font-size:30px}
+  .df-cr-sub{font-size:16px}
+  .df-cr-card{padding:20px 18px 18px;border-radius:16px}
+  .df-cr-card h3,.df-cr-card h4{font-size:20px}
+  .df-cr-card p{font-size:15px}
+  .df-cr-row{grid-template-columns:minmax(0,1fr);padding:16px 18px}
+  .df-cr-uses{justify-content:flex-start}
+  .df-cr-check-head{font-size:23px}
+  .df-cr-ai{border-radius:18px}
+  .df-cr-ai li{font-size:15px}
+  .df-xs-bar .df-back{padding:0 18px 0 14px;font-size:16px}
+  .df-xs-link{padding:0 16px;font-size:16px}
+}

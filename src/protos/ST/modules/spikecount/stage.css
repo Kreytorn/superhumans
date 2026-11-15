@@ -1,0 +1,542 @@
+/* Station, spikecount stage. Scoped under .spk-stage; colours, faces and steps are the shell's tokens.
+   The stage is its own size container: the photo is the largest square that fits beside a readout column of
+   fixed width, at laptop size and in the small phone sheet alike. --u (set from the page) is one screen pixel
+   in the photo's own 572-pixel space, so every stroke keeps its screen width at any size. */
+.spk-stage {
+  --spk-amber: var(--st-amber, #ffb45a);
+  --spk-blue: var(--st-blue, #8fb3d9);
+  container: spk / size;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.spk-in {
+  --p: 26px;
+  --col: 184px;
+  --gap: 32px;
+  --side: min(calc(100cqh - 2 * var(--p)), calc(100cqw - 2 * var(--p) - var(--col) - var(--gap)));
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  padding: var(--p);
+}
+.spk-stage p {
+  margin: 0;
+}
+
+/* ============================================================================================ the photo */
+.spk-well {
+  position: relative;
+  flex: none;
+  width: var(--side);
+  height: var(--side);
+}
+.spk-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0a0e13;
+  box-shadow: 0 0 0 1px var(--st-hair-2);
+  outline: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.spk-stage[data-phase='result'] .spk-field {
+  cursor: crosshair;
+}
+.spk-field:focus-visible {
+  outline: 1.5px solid var(--st-ink);
+  outline-offset: 5px;
+}
+.spk-photo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: brightness(0.9) contrast(1.08);
+  pointer-events: none;
+}
+/* the photo sits in the dark of the film: a cool cast, corners falling off; a little darker once outlines glow */
+.spk-tint,
+.spk-tint::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.spk-tint {
+  background:
+    radial-gradient(ellipse 72% 72% at 50% 50%, rgba(4, 7, 11, 0) 58%, rgba(4, 7, 11, 0.5) 100%),
+    rgba(10, 18, 30, 0.14);
+}
+.spk-tint::after {
+  content: '';
+  background: rgba(4, 7, 11, 0.36);
+  opacity: 0;
+  transition: opacity 0.9s linear;
+}
+.spk-stage[data-phase='draw'] .spk-tint::after,
+.spk-stage[data-phase='result'] .spk-tint::after {
+  opacity: 1;
+}
+/* while the models read the photo, it breathes */
+.spk-stage[data-phase='load'] .spk-tint::after,
+.spk-stage[data-phase='read'] .spk-tint::after {
+  animation: spk-breathe 1.3s ease-in-out infinite alternate;
+}
+@keyframes spk-breathe {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.55;
+  }
+}
+
+/* ========================================================================================== the outlines */
+.spk-cells,
+.spk-loupe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.spk-cell {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: spk-trace 0.52s cubic-bezier(0.3, 0.6, 0.2, 1) var(--at, 0ms) backwards;
+}
+.spk-calm .spk-cell {
+  stroke: var(--spk-blue);
+  stroke-opacity: 0.78;
+  stroke-width: calc(1.1 * var(--u, 1));
+}
+.spk-hot .spk-cell {
+  stroke: var(--spk-amber);
+  stroke-width: calc(1.7 * var(--u, 1));
+}
+.spk-hot .spk-halo {
+  stroke-opacity: 0.2;
+  stroke-width: calc(6 * var(--u, 1));
+}
+/* cut by the photo's edge: dashed, and they fade in rather than trace */
+.spk-cell.is-cut {
+  stroke-dasharray: calc(4 * var(--u, 1)) calc(3.5 * var(--u, 1));
+  animation-name: spk-show;
+}
+.spk-stage[data-instant='1'] .spk-cell {
+  animation: none;
+}
+@keyframes spk-trace {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+@keyframes spk-show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* the scan line: one trip down the photo, the cells' own order */
+.spk-scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 100%;
+  pointer-events: none;
+  animation: spk-sweep 2.8s linear both;
+}
+.spk-scan::before,
+.spk-scan::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.spk-scan::before {
+  top: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255, 226, 184, 0), #ffe2b8 12%, #fff 50%, #ffe2b8 88%, rgba(255, 226, 184, 0));
+  box-shadow: 0 0 14px 1px rgba(255, 180, 90, 0.75);
+}
+.spk-scan::after {
+  top: -72px;
+  height: 72px;
+  background: linear-gradient(to top, rgba(255, 180, 90, 0.16), rgba(255, 180, 90, 0));
+}
+@keyframes spk-sweep {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  4% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 100%, 0);
+    opacity: 0;
+  }
+}
+
+/* ============================================================================================ the loupe */
+.spk-loupe {
+  animation: spk-show 0.35s linear both;
+}
+.spk-l-target {
+  fill: none;
+  stroke: #fff;
+  stroke-opacity: 0.85;
+  stroke-width: calc(1.1 * var(--u, 1));
+  stroke-dasharray: calc(3 * var(--u, 1)) calc(3 * var(--u, 1));
+}
+.spk-l-wire {
+  stroke: rgba(255, 255, 255, 0.5);
+  stroke-width: calc(1 * var(--u, 1));
+}
+.spk-l-back {
+  fill: #05070a;
+}
+.spk-l-ring {
+  fill: none;
+  stroke: var(--spk-amber);
+  stroke-width: calc(1.4 * var(--u, 1));
+}
+.spk-loupe[data-hot='0'] .spk-l-ring {
+  stroke: var(--spk-blue);
+}
+.spk-l-lens image {
+  filter: brightness(0.95) contrast(1.12);
+}
+.spk-l-poly {
+  fill: none;
+  stroke: var(--spk-amber);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.spk-loupe[data-hot='0'] .spk-l-poly {
+  stroke: var(--spk-blue);
+}
+.spk-chip {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px 11px 9px;
+  background: rgba(5, 7, 10, 0.86);
+  border: 1px solid var(--st-hair);
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate3d(0, 10px, 0);
+  animation: spk-show 0.35s linear both;
+}
+.spk-chip[data-below='0'] {
+  transform: translate3d(0, calc(-100% - 10px), 0);
+}
+.spk-chip b {
+  font: 500 var(--st-t-small) / 1.15 var(--st-font-body);
+  color: #fff;
+}
+.spk-chip span {
+  font: 500 var(--st-t-label) / 1.15 var(--st-font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--spk-blue);
+}
+.spk-chip[data-hot='1'] span {
+  color: var(--spk-amber);
+}
+
+/* ======================================================================================= the readout */
+/* the column stands exactly beside the photo: its first line on the photo's top edge, its last on the bottom */
+.spk-read {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--side);
+  display: flex;
+  flex-direction: column;
+}
+.spk-narrow {
+  display: none !important;
+}
+.spk-read-end {
+  margin-top: auto;
+}
+.spk-k {
+  font: 500 var(--st-t-label) / 1.35 var(--st-font-mono);
+  letter-spacing: var(--st-track-label);
+  text-transform: uppercase;
+  color: var(--st-ink-3);
+}
+.spk-k--on {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--spk-amber);
+}
+.spk-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--spk-amber);
+  box-shadow: 0 0 8px rgba(255, 180, 90, 0.8);
+  animation: spk-blink 1s steps(2, jump-none) infinite;
+}
+@keyframes spk-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+.spk-q {
+  margin-top: 16px !important;
+  font: 400 var(--st-t-body) / 1.45 var(--st-font-body);
+  color: var(--st-ink);
+  text-wrap: pretty;
+}
+.spk-note {
+  margin-top: 14px !important;
+  font: 400 var(--st-t-small) / 1.45 var(--st-font-body);
+  color: var(--st-ink-2);
+  text-wrap: pretty;
+}
+
+/* the one number: the share of spiky cells, in the film's title face */
+.spk-big {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-top: 12px !important;
+  font: 300 clamp(30px, 7.2cqw, 60px) / 0.92 var(--st-font-display);
+  font-stretch: 125%;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: var(--spk-amber);
+  text-shadow: 0 0 26px rgba(255, 180, 90, 0.28);
+}
+.spk-big b {
+  font-weight: inherit;
+}
+.spk-big i {
+  font-style: normal;
+  font-size: 0.42em;
+  letter-spacing: 0;
+}
+.spk-of {
+  margin-top: 12px !important;
+  font: 400 var(--st-t-small) / 1.4 var(--st-font-body);
+  font-variant-numeric: tabular-nums;
+  color: var(--st-ink-2);
+}
+
+/* its comparison: the stored before-flight sample */
+.spk-base {
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--st-hair-2);
+  transition: opacity 0.6s linear;
+}
+.spk-base[data-on='0'] {
+  opacity: 0;
+}
+.spk-mid {
+  margin-top: 10px !important;
+  font: 300 clamp(22px, 3.7cqw, 32px) / 1 var(--st-font-display);
+  font-stretch: 125%;
+  font-variant-numeric: tabular-nums;
+  color: var(--st-ink);
+}
+.spk-mid i {
+  font-style: normal;
+  font-size: 0.5em;
+  margin-left: 3px;
+}
+.spk-tag {
+  display: inline-block;
+  margin-top: 12px !important;
+  padding: 4px 8px 4px 9px;
+  border: 1px solid var(--st-hair);
+  font: 500 var(--st-t-label) / 1 var(--st-font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--st-ink-2);
+}
+
+.spk-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.spk-key li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font: 500 var(--st-t-label) / 1 var(--st-font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--st-ink-2);
+}
+.spk-key li::before {
+  content: '';
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--spk-blue);
+}
+.spk-key li.is-hot::before {
+  border-color: var(--spk-amber);
+  box-shadow: 0 0 7px rgba(255, 180, 90, 0.65);
+}
+.spk-src {
+  margin-top: 18px !important;
+  font: 400 var(--st-t-small) / 1.45 var(--st-font-body);
+  color: var(--st-ink-3);
+  text-wrap: pretty;
+}
+.spk-src b {
+  display: block;
+  margin-bottom: 6px;
+  font: 500 var(--st-t-label) / 1.2 var(--st-font-mono);
+  letter-spacing: var(--st-track-label);
+  text-transform: uppercase;
+  color: var(--spk-amber);
+}
+.spk-stage[data-mode='replay'] .spk-src b {
+  color: var(--st-ink-2);
+}
+.spk-hint {
+  margin-top: 14px !important;
+  font: 500 var(--st-t-label) / 1.3 var(--st-font-mono);
+  letter-spacing: var(--st-track-label);
+  text-transform: uppercase;
+  color: var(--st-ink-3);
+}
+.spk-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* the line under the photo on the small phone sheet (hidden on larger stages, where it stands in the column) */
+.spk-foot {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  overflow: hidden;
+  font: 400 13px / 1.3 var(--st-font-body);
+  color: var(--st-ink-3);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.spk-foot b {
+  margin-right: 10px;
+  font: 500 var(--st-t-label) / 1 var(--st-font-mono);
+  letter-spacing: var(--st-track-label);
+  text-transform: uppercase;
+  color: var(--spk-amber);
+}
+.spk-stage[data-mode='replay'] .spk-foot b {
+  color: var(--st-ink-2);
+}
+
+/* ============================================================================ the small phone sheet */
+@container spk (max-width: 560px) {
+  .spk-in {
+    --p: 12px;
+    --col: 104px;
+    --gap: 14px;
+    --foot: 26px;
+    --side: min(calc(100cqh - 2 * var(--p) - var(--foot)), calc(100cqw - 2 * var(--p) - var(--col) - var(--gap)));
+    padding-bottom: calc(var(--p) + var(--foot));
+  }
+  .spk-q,
+  .spk-hint,
+  .spk-key,
+  .spk-wide {
+    display: none !important;
+  }
+  .spk-k--on {
+    gap: 7px;
+  }
+  .spk-narrow {
+    display: block !important;
+  }
+  .spk-k {
+    letter-spacing: 0.08em;
+  }
+  .spk-big {
+    font-size: 30px;
+    margin-top: 8px !important;
+  }
+  .spk-of {
+    margin-top: 6px !important;
+    font-size: 13px;
+  }
+  .spk-base {
+    margin-top: 14px;
+    padding-top: 12px;
+  }
+  .spk-mid {
+    font-size: 21px;
+    margin-top: 6px !important;
+  }
+  .spk-tag {
+    margin-top: 6px !important;
+    padding: 0;
+    border: 0;
+    letter-spacing: 0.08em;
+    color: var(--st-ink-3);
+  }
+  .spk-chip {
+    padding: 5px 7px 6px;
+    gap: 3px;
+    transform: translate3d(0, 6px, 0);
+  }
+  .spk-chip[data-below='0'] {
+    transform: translate3d(0, calc(-100% - 6px), 0);
+  }
+  .spk-chip b {
+    font-size: 12.5px;
+  }
+  .spk-chip span {
+    letter-spacing: 0.08em;
+  }
+}
+
+/* ================================================================================== reduced motion */
+.st[data-motion='reduced'] .spk-dot,
+.st[data-motion='reduced'] .spk-stage .spk-tint::after {
+  animation: none;
+}

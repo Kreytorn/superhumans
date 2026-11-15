@@ -1,0 +1,124 @@
+/* BrainDrift stage (Station). Scoped under .stbd-stage. The moment itself is restyled only through its tokens
+   (Stage.tsx); this file lays out the stage box and the compact readout used where the moment's labels have no room. */
+
+.stbd-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /* a phone on its side leaves a very short body: the stage keeps the room it needs and the body scrolls */
+  min-height: 280px;
+  overflow: hidden;
+  background: var(--st-well);
+}
+
+/* --------------------------------------------------------------- the compact readout (phone sheet, short panel) */
+.stbd-read {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.stbd-read-block {
+  position: absolute;
+  display: grid;
+  gap: 2px;
+  font-family: var(--st-font-body);
+  font-variant-numeric: tabular-nums;
+  text-wrap: balance;
+  animation: stbd-read-in 0.7s var(--st-ease) both;
+}
+.stbd-read-block[data-side='l'] {
+  left: 14px;
+  justify-items: start;
+  text-align: left;
+}
+.stbd-read-block[data-side='r'] {
+  right: 14px;
+  justify-items: end;
+  text-align: right;
+  animation-delay: 0.12s;
+}
+@keyframes stbd-read-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+}
+.stbd-read-big {
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  color: #8ec3ec;
+  text-shadow: 0 0 18px rgba(143, 179, 217, 0.5);
+}
+.stbd-read-mid {
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--st-ink);
+}
+.stbd-read-cap {
+  margin-top: 5px;
+  font-size: 13px;
+  line-height: 1.25;
+  color: var(--st-ink);
+}
+.stbd-read-sub {
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--st-ink-2);
+}
+.stbd-read-sub b {
+  font-weight: 500;
+  color: var(--st-ink);
+}
+/* the readout breaks only between its phrases, never inside one */
+.stbd-read-sub > *,
+.stbd-read-key > span {
+  white-space: nowrap;
+}
+.stbd-read-key {
+  display: block;
+  margin-top: 9px;
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--st-ink-2);
+  text-align: left;
+}
+.stbd-read-key i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 2px;
+  border-radius: 2px;
+  vertical-align: 0;
+  background: #f4f8fc;
+  box-shadow: 0 0 8px rgba(244, 248, 252, 0.6);
+}
+
+/* wide gutters (a short laptop panel): the same readout, at the moment's own sizes */
+.stbd-read[data-size='l'] .stbd-read-block {
+  gap: 3px;
+}
+.stbd-read[data-size='l'] .stbd-read-big {
+  font-size: clamp(30px, 2.6vw, 40px);
+}
+.stbd-read[data-size='l'] .stbd-read-mid {
+  font-size: clamp(22px, 1.9vw, 28px);
+}
+.stbd-read[data-size='l'] .stbd-read-cap {
+  font-size: 14px;
+}
+.stbd-read[data-size='l'] .stbd-read-sub {
+  font-size: 13px;
+}
+.stbd-read[data-size='l'] .stbd-read-key {
+  font-size: 12.5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stbd-read-block {
+    animation: none;
+  }
+}

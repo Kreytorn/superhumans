@@ -13,7 +13,7 @@ Built by Team SuperHumans at the NASA Space Apps Challenge 2026 (Istanbul) for t
 | **SpikeCount** | Outlines every red blood cell in a microscope photo and grades the spiky shapes of space anemia. |
 | **VeinSqueeze** | Reads a vein-ultrasound clip as an AI second opinion: a clot is a vein that will not squash. |
 | **BrainDrift** | Maps a brain MRI and measures the fluid spaces and the upward shift seen after long flights. |
-| **Garn Meter** | Space sickness in "Garns". The crew member's own check-in drives it; our EEG model is shown as an honest "does not work yet". |
+| **Garn Meter** | Space sickness in "Garns": an experimental model (CorrFuse-EEG) reads it from 14-channel brainwaves and shows its reading on a gauge. |
 
 Each check shows a real sample, runs the model on one press, draws what it found on the sample, and ends with who acts and what to do. The evidence, sources and limits sit one tap away.
 

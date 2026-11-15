@@ -93,6 +93,15 @@
   grid-template-rows: minmax(0, 1fr) auto;
   gap: clamp(6px, 0.7cqi, 10px);
 }
+/* r4: side by side, both clips share one pair of rows (subgrid), so the two pictures always end on the same line, even
+   when one AI line runs to a second line (the REPLAY tag, a narrow laptop) */
+.vsq[data-layout='row']:not([data-count='1']) .vsq-pair {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+.vsq[data-layout='row']:not([data-count='1']) .vsq-clip {
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+}
 .vsq-frame {
   position: relative;
   min-height: 0;
@@ -211,22 +220,20 @@
 .vsq[data-layout='col'] .vsq-bet {
   font-size: clamp(18px, 5cqi, 25px);
 }
-/* the rule explains the button, so it is said at the bet's own weight: under the second picture in a wide box,
-   right under the bet in a tall one (and when there is one clip) */
+/* the rule explains the button, so it is said at the bet's own weight: under the second picture with two clips (wide
+   or tall box; r4: in a tall box it used to sit under the bet and left the room under the second picture empty at
+   rest), right after the bet when there is one clip */
 .vsq-bet-rule {
   display: none;
 }
 .vsq[data-count='1'] .vsq-bet-rule {
   display: inline;
 }
-.vsq[data-layout='col'] .vsq-bet-rule {
+.vsq[data-layout='col'][data-count='1'] .vsq-bet-rule {
   display: block;
 }
-.vsq[data-layout='col'] .vsq-clip + .vsq-clip .vsq-bet {
-  display: none;
-}
-/* in a wide box the rule is the quieter half of the pair of sentences */
-.vsq[data-layout='row'] .vsq-clip + .vsq-clip .vsq-bet {
+/* the rule is the quieter half of the pair of sentences */
+.vsq-clip + .vsq-clip .vsq-bet {
   color: var(--m-ink-2);
 }
 
@@ -435,9 +442,11 @@
   position: relative;
   display: block;
   flex: 0 0 auto;
-  width: clamp(38px, 13cqi, 230px);
+  /* r4: 13 -> 12cqi and tighter margins, so the first AI line (with LIVE and "above alarm") stays on one line down to a
+     1366 px window, and with REPLAY at 1440 */
+  width: clamp(38px, 12cqi, 230px);
   height: 8px;
-  margin: 0 12px 0 10px;
+  margin: 0 10px 0 8px;
 }
 .vsq-op-track {
   position: absolute;
@@ -480,7 +489,7 @@
 .vsq-alarm {
   display: inline-block;
   white-space: nowrap;
-  margin-left: 14px;
+  margin-left: 10px;
   font-size: clamp(12px, 1.12cqi, 16px);
 }
 .vsq-alarm-mark {

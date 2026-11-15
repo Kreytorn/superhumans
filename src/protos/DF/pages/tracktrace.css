@@ -1,0 +1,46 @@
+/* DF TrackTrace page: W1's beamline room (../../tracktrace_w1/w1.css) inside DF's page layer. Scoped under .tt-page. */
+.df-check.tt-page{background:#03060c}
+.df-check.tt-page::before{display:none}
+.tt-page .w1{min-height:100%;font-variant-numeric:normal}
+/* (DF's root sets tabular numerals; W1 draws its "01" and "583" with Unbounded's own figures, so it is reset here) */
+/* the room and its vignette cover the page layer, not 100vw/100vh (the page layer is the scroller here) */
+.tt-page .w1-gl,.tt-page .w1-vignette{width:100%;height:100%}
+
+/* top bar: DF's Back on the left, the small brand on the right */
+.tt-page .tt-top .df-back{flex:none;align-self:center}
+.tt-page .tt-top .w1-brand{color:var(--ink2)}
+.tt-page .tt-top .w1-brand i{color:rgba(147,167,185,.6)}
+
+/* the problem, then the architecture filling the screen, then the way on */
+.tt-page .tt-story{padding-bottom:16px}
+.tt-tail{position:relative;z-index:1;max-width:1392px;margin:0 auto;padding:0 48px 44px}
+.tt-tail .df-arch{--arch-c:var(--cy);max-width:none;padding-top:96px}
+.tt-tail .df-arch-h{margin-top:0}
+.tt-tail .df-arch-cap{font-family:var(--body)}
+/* the card takes the figure's own shape (ionscan_architecture.svg is 500.918 x 484.213): as tall as the screen
+   allows, never wider than its column, so no white bands open around the figure; the shape is held before the
+   lazy image arrives, so nothing jumps */
+.tt-tail .df-arch-fig{align-items:center}
+.tt-tail .df-arch-card{width:min(100%,calc((100svh - 112px) * 500.918 / 484.213 + 22px))}
+.tt-tail .df-arch-card img{width:100%;height:auto;aspect-ratio:500.918 / 484.213;max-height:none;min-height:0}
+
+/* wide screens: the words on the left, the figure as tall as the screen on the right */
+@media (min-width:1100px) and (min-aspect-ratio:5/4){
+  /* big screens (1920x1080 and up): the column widens until the figure, in its 67% share, is as tall as the screen */
+  .tt-tail{max-width:max(1392px,calc(((100svh - 112px) * 500.918 / 484.213 + 22px) / 0.67 + 152px))}
+  .tt-tail .df-arch{display:grid;grid-template-columns:minmax(320px,.66fr) minmax(0,1.34fr);align-items:center;gap:0 56px;min-height:100svh;padding:44px 0}
+  .tt-tail .df-arch-head{gap:16px}
+  .tt-tail .df-arch-h{font-size:clamp(30px,2.5vw,38px);line-height:1.12;max-width:none}
+  .tt-tail .df-arch-cap{font-size:19px}
+}
+
+@media (max-width:820px){
+  .tt-page .w1-top{height:64px}
+  .tt-page .w1-first{padding-top:76px}
+  .tt-tail{padding:0 16px 28px}
+  .tt-tail .df-arch{padding-top:56px}
+  .tt-tail .df-arch-h{font-size:26px;line-height:1.12}
+}
+@media (max-width:520px){
+  .tt-page .tt-top .w1-brand{display:none}
+}

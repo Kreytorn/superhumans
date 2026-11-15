@@ -11,7 +11,7 @@
   --ease-out:cubic-bezier(.23,1,.32,1);
   --sans:"Space Grotesk",system-ui,sans-serif;
   --u:1px;--k:1px;
-  position:fixed;inset:0;overflow:hidden;color:var(--text-1);font-family:var(--sans);font-variant-numeric:tabular-nums;color-scheme:dark;
+  position:fixed;inset:0;overflow:hidden;overflow:clip;color:var(--text-1);font-family:var(--sans);font-variant-numeric:tabular-nums;color-scheme:dark;
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
   background:
     radial-gradient(48% 58% at 71% 42%,rgba(70,60,170,.20),transparent 70%),

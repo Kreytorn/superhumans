@@ -1,0 +1,39 @@
+/* The architecture page at the end of every DF check: the figure on a white card, filling most of one screen.
+   Self-contained (works inside .df-check and inside the W1-based pages); --mc is the check's colour.
+   On a laptop the title and the whole figure fit one screen. On an upright phone a wide figure ([data-turn], set by
+   arch.tsx from its own --ar = width / height) is turned a quarter turn, so it runs along the phone's long side at
+   about twice the size, with no sideways scroll; turning the phone sideways then reads it, and a phone that turns
+   its screen gets the landscape rule below (the figure fits the screen's height). */
+.df-arch{--arch-c:var(--mc,#8FB7FF);width:100%;max-width:1320px;margin:0 auto;min-height:min(100svh,1100px);display:flex;flex-direction:column;justify-content:center;gap:28px;padding:32px 0;box-sizing:border-box}
+.df-arch-head{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.df-arch-kicker{display:flex;align-items:center;gap:12px;margin:0;font:600 15px/1 "JetBrains Mono",ui-monospace,Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--arch-c)}
+.df-arch-kicker::before{content:"";width:28px;height:2px;background:var(--arch-c);box-shadow:0 0 12px var(--arch-c)}
+.df-arch-h{margin:0;max-width:22em;font:700 44px/1.08 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.03em;color:#F1F4FF;text-wrap:balance}
+.df-arch-cap{margin:0;max-width:44em;font:500 19px/1.45 "Space Grotesk",system-ui,sans-serif;color:#9AA3BF;text-wrap:pretty}
+.df-arch-fig{margin:0;display:flex;flex-direction:column;align-items:center;gap:14px}
+.df-arch-card{max-width:100%;padding:10px;border:1px solid rgba(160,176,230,.28);border-radius:18px;background:rgba(11,15,31,.6);
+  box-shadow:0 40px 90px rgba(0,0,8,.55),0 0 120px color-mix(in srgb,var(--arch-c) 12%,transparent)}
+.df-arch-card img{display:block;width:auto;height:auto;max-width:100%;max-height:calc(100svh - 290px);min-height:420px;object-fit:contain;border-radius:10px;background:#fff}
+.df-arch-turn{display:none}
+.df-arch-open{display:contents;cursor:zoom-in}
+@media (max-width:760px){
+  .df-arch{min-height:0;padding:32px 0;gap:20px}
+  .df-arch-h{font-size:30px}
+  .df-arch-cap{font-size:17px}
+  .df-arch-card{padding:6px;border-radius:14px}
+  .df-arch-card img{width:100%;max-height:none;min-height:0}
+}
+/* an upright phone: the wide figure turned a quarter turn (clockwise, so a phone turned to the left reads it),
+   as wide as the column and never taller than the screen */
+@media (max-width:760px) and (orientation:portrait){
+  .df-arch[data-turn] .df-arch-card{position:relative;box-sizing:border-box;width:min(100%,calc((100svh - 88px) / var(--ar)));aspect-ratio:1 / var(--ar);padding:0;overflow:hidden;background:#fff}
+  .df-arch[data-turn] .df-arch-card img{position:absolute;left:50%;top:50%;width:calc(100% * var(--ar));height:auto;max-width:none;max-height:none;min-height:0;border-radius:0;
+    transform:translate(-50%,-50%) rotate(90deg)}
+  .df-arch[data-turn] .df-arch-turn{display:flex;align-items:center;gap:10px;margin:0;font:600 12px/1.3 "JetBrains Mono",ui-monospace,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:#9AA3BF}
+  .df-arch-turn svg{width:20px;height:20px;flex:none;color:var(--arch-c)}
+}
+/* a phone held sideways (or any short window): the whole figure fits the screen's height */
+@media (orientation:landscape) and (max-height:520px){
+  .df-arch{min-height:0;padding:20px 0}
+  .df-arch-card img{max-height:calc(100svh - 34px);min-height:0}
+}

@@ -1,0 +1,306 @@
+/* Station / BubbleGrade frozen scene. Scoped under .stbgs-scene. Only transform, opacity and stroke-dashoffset
+   move; every animation has fill-mode both, so the shell's "end" state is the held last frame.
+   The arc, head and seam keyframes are written for the T constants in Scene.tsx:
+   start 140 ms, fill 520 ms (to 26.263 %), hold to 820 ms (34.343 %), drain 1300 ms (to 100 %). */
+
+.stbgs-scene {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.stbgs-sv {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.stbgs-sv * {
+  transform-box: view-box;
+}
+
+/* ---- the frame dims round the hatch: one composited layer, faded in once */
+.stbgs-iris {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: opacity;
+  animation: stbgs-fade 560ms linear both;
+}
+@keyframes stbgs-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---- the hatch seal light: up with the pressure, out with it */
+.stbgs-seam circle {
+  stroke: var(--st-amber, #ffb45a);
+}
+.stbgs-seam {
+  opacity: 0;
+  animation: stbgs-seam 1980ms linear 140ms both;
+}
+@keyframes stbgs-seam {
+  0% {
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
+  }
+  26.263% {
+    opacity: 1;
+    animation-timing-function: linear;
+  }
+  34.343% {
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.3, 0.45, 0.25, 1);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---- the gauge */
+.stbgs-track {
+  stroke: var(--st-ink, #e8eef5);
+  opacity: 0.22;
+  animation: stbgs-fade-track 320ms linear 80ms both;
+}
+@keyframes stbgs-fade-track {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.22;
+  }
+}
+.stbgs-ticks-dim {
+  stroke: var(--st-ink, #e8eef5);
+  animation: stbgs-fade-dim 320ms linear 80ms both;
+}
+@keyframes stbgs-fade-dim {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.34;
+  }
+}
+.stbgs-ticks-lit {
+  stroke: var(--st-amber, #ffb45a);
+}
+.stbgs-tick-on {
+  animation: stbgs-on 140ms linear both;
+}
+@keyframes stbgs-on {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.stbgs-tick-off {
+  animation: stbgs-off 260ms linear both;
+}
+@keyframes stbgs-off {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.stbgs-arc path {
+  stroke: var(--st-amber, #ffb45a);
+  stroke-linecap: butt;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  animation: stbgs-arc 1980ms linear 140ms both;
+}
+@keyframes stbgs-arc {
+  0% {
+    stroke-dashoffset: 1;
+    animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
+  }
+  26.263% {
+    stroke-dashoffset: 0;
+    animation-timing-function: linear;
+  }
+  34.343% {
+    stroke-dashoffset: 0;
+    animation-timing-function: cubic-bezier(0.3, 0.45, 0.25, 1);
+  }
+  100% {
+    stroke-dashoffset: 0.93;
+  }
+}
+
+/* the bright point riding the end of the arc */
+.stbgs-head {
+  animation: stbgs-head 1980ms linear 140ms both;
+}
+@keyframes stbgs-head {
+  0% {
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
+  }
+  26.263% {
+    transform: rotate(360deg);
+    animation-timing-function: linear;
+  }
+  34.343% {
+    transform: rotate(360deg);
+    animation-timing-function: cubic-bezier(0.3, 0.45, 0.25, 1);
+  }
+  100% {
+    transform: rotate(25.2deg);
+  }
+}
+.stbgs-head-in {
+  stroke: none;
+  animation: stbgs-fade 160ms linear 140ms both;
+}
+
+/* ---- the label and its leader */
+.stbgs-lead {
+  stroke: var(--st-amber, #ffb45a);
+  opacity: 0.85;
+  stroke-linecap: butt;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  animation: stbgs-draw 420ms cubic-bezier(0.22, 1, 0.36, 1) 600ms both;
+}
+@keyframes stbgs-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.stbgs-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.stbgs-tag[data-placed='1'] {
+  visibility: visible;
+}
+.stbgs-tag[data-align='bottom'] {
+  transform: translate(-50%, -100%);
+  text-align: center;
+}
+.stbgs-tag[data-align='top'] {
+  transform: translate(-50%, 0);
+  text-align: center;
+}
+.stbgs-tag[data-align='left'] {
+  transform: translate(0, -50%);
+  text-align: left;
+}
+.stbgs-tag[data-align='right'] {
+  transform: translate(-100%, -50%);
+  text-align: right;
+}
+.stbgs-tag-in {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  animation: stbgs-tag 620ms cubic-bezier(0.22, 1, 0.36, 1) 700ms both;
+}
+.stbgs-tag[data-align='bottom'] .stbgs-tag-in,
+.stbgs-tag[data-align='top'] .stbgs-tag-in {
+  align-items: center;
+}
+.stbgs-tag[data-align='right'] .stbgs-tag-in {
+  align-items: flex-end;
+}
+@keyframes stbgs-tag {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.stbgs-tag-k {
+  font: 500 var(--st-t-label, 11.5px) / 1 var(--st-font-mono, monospace);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--st-amber, #ffb45a);
+  text-shadow:
+    0 0 3px rgba(0, 0, 0, 0.95),
+    0 0 14px rgba(0, 0, 0, 0.85);
+}
+.stbgs-tag-v {
+  font: 400 var(--st-t-body, 17px) / 1.2 var(--st-font-body, sans-serif);
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  color: #fff;
+  text-shadow:
+    0 0 3px rgba(0, 0, 0, 0.9),
+    0 1px 16px rgba(0, 0, 0, 0.85);
+}
+.stbgs-tag[data-form='narrow'] .stbgs-tag-v {
+  max-width: 5.6em;
+  white-space: normal;
+  font-size: 15px;
+}
+/* no room round the ring (a phone, where the hatch fills the frame): one short line in the label voice */
+.stbgs-tag[data-form='compact'] .stbgs-tag-v {
+  font: 500 var(--st-t-label, 11.5px) / 1 var(--st-font-mono, monospace);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+/* a phone: smaller words */
+@media (orientation: portrait) {
+  .stbgs-tag-v {
+    font-size: 15px;
+  }
+  .stbgs-tag-in {
+    gap: 5px;
+  }
+}
+
+/* ---- ice */
+.stbgs-speck {
+  animation: stbgs-drift 1000ms cubic-bezier(0.08, 0.82, 0.18, 1) both;
+}
+@keyframes stbgs-drift {
+  from {
+    transform: translate(var(--dx, 0px), var(--dy, 0px));
+  }
+  to {
+    transform: translate(0px, 0px);
+  }
+}
+.stbgs-speck-in {
+  stroke: none;
+  animation: stbgs-fade 180ms linear both;
+}
+.stbgs-speck-core {
+  fill: #f4f9ff;
+}
+.stbgs-glint {
+  stroke: #eaf4ff;
+  animation: stbgs-glint 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes stbgs-glint {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+}

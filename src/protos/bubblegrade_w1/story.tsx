@@ -77,6 +77,20 @@ function DiveCurve({ d }: { d: Dive }) {
   )
 }
 
+/** Phone width (the same break as w1.css): the drawing then shows fewer, larger labels. */
+function useCompact() {
+  const q = '(max-width: 700px)'
+  const [on, setOn] = useState(() => window.matchMedia(q).matches)
+  useEffect(() => {
+    const m = window.matchMedia(q)
+    const f = () => setOn(m.matches)
+    f()
+    m.addEventListener('change', f)
+    return () => m.removeEventListener('change', f)
+  }, [])
+  return on
+}
+
 const VEIN = 'M 40 262 C 240 262, 300 168, 500 176 S 760 268, 912 214'
 const BUBBLES = [
   { r: 5, dur: 11, begin: -1 },
@@ -132,6 +146,145 @@ function Strip({ r }: { r: BubbleResult }) {
   return <canvas ref={ref} className="bgw1-strip-cv" role="img" aria-label="The sound picture the model read, with its attention in amber" />
 }
 
+/** Section 01, the problem: the ISS photo, the airlock-to-heart drawing, four beats and the card's honesty line.
+ *  Also the second screen of DF's BubbleGrade page. On a phone the drawing keeps its full width (no sideways scroll)
+ *  and shows fewer, larger labels. */
+export function Problem() {
+  const compact = useCompact()
+  return (
+    <section className="bgw1-sec bgw1-problem">
+      <p className="bgw1-sec-k">01 <i /> The problem</p>
+      <figure className="bgw1-orbit">
+        <img src={sunrise} alt="Sunrise over the Earth's edge, photographed from the International Space Station" loading="lazy" />
+        <figcaption>Sunrise from the International Space Station. Photo: NASA, public domain.</figcaption>
+      </figure>
+      <h2 className="bgw1-over">
+        Open the airlock, and your blood can <em>fizz</em>.
+      </h2>
+      <div className="bgw1-fig">
+        <svg viewBox="0 0 1200 380" role="img" aria-label="Illustration: pressure drops at the airlock, dissolved gas turns into bubbles, the veins carry them to the heart, and a Doppler probe hears them">
+          <defs>
+            <linearGradient id="bgw1-vein" x1="0" x2="1">
+              <stop offset="0" stopColor="#0c3a4e" />
+              <stop offset="0.3" stopColor="#0f5069" />
+              <stop offset="1" stopColor="#1a2f55" />
+            </linearGradient>
+            <radialGradient id="bgw1-heart" cx="0.45" cy="0.4" r="0.7">
+              <stop offset="0" stopColor="#ff9a5a" stopOpacity="0.95" />
+              <stop offset="0.6" stopColor="#d2443c" stopOpacity="0.7" />
+              <stop offset="1" stopColor="#5a1830" stopOpacity="0.2" />
+            </radialGradient>
+            <radialGradient id="bgw1-bub" cx="0.35" cy="0.3" r="0.8">
+              <stop offset="0" stopColor="#ffffff" stopOpacity="0.9" />
+              <stop offset="0.35" stopColor="#9be8ff" stopOpacity="0.35" />
+              <stop offset="1" stopColor="#3fd0ff" stopOpacity="0.05" />
+            </radialGradient>
+            <filter id="bgw1-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="9" />
+            </filter>
+          </defs>
+
+          {/* pressure line: cabin, then the suit */}
+          <path d="M 40 62 H 300 C 322 62, 318 112, 340 112 H 1160" fill="none" stroke="#3fd0ff" strokeWidth="2" strokeOpacity="0.85" />
+          <path d="M 40 62 H 300 C 322 62, 318 112, 340 112 H 1160 V 140 H 40 Z" fill="#3fd0ff" opacity="0.06" />
+          <line x1="320" y1="34" x2="320" y2="330" stroke="#e6f6fa" strokeOpacity="0.28" strokeDasharray="3 7" />
+          {compact ? (
+            <>
+              <text x="40" y="50" className="t-k t-c">CABIN</text>
+              <text x="356" y="98" className="t-k t-c">SUIT: LOWER PRESSURE</text>
+              <text x="332" y="368" className="t-k t-c t-w">AIRLOCK OPENS</text>
+            </>
+          ) : (
+            <>
+              <text x="40" y="46" className="t-k">CABIN PRESSURE</text>
+              <text x="356" y="98" className="t-k">SUIT PRESSURE: LOWER</text>
+              <text x="332" y="346" className="t-k t-w">AIRLOCK OPENS</text>
+            </>
+          )}
+
+          {/* the vein */}
+          <path d={VEIN} fill="none" stroke="#3fd0ff" strokeOpacity="0.14" strokeWidth="78" strokeLinecap="round" filter="url(#bgw1-glow)" />
+          <path d={VEIN} fill="none" stroke="url(#bgw1-vein)" strokeWidth="58" strokeLinecap="round" />
+          <path d={VEIN} fill="none" stroke="#04121b" strokeWidth="48" strokeLinecap="round" />
+          <path d={VEIN} fill="none" stroke="#5fd9ff" strokeOpacity="0.5" strokeWidth="1.2" strokeDasharray="2 14" className="bgw1-flow" />
+          {/* dissolved gas: small specks, before the drop */}
+          {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <circle key={`d${i}`} r="1.8" fill="#9be8ff" opacity="0.7">
+              <animateMotion dur={`${10 + (i % 3)}s`} begin={`${-i * 1.37}s`} repeatCount="indefinite" path={VEIN} keyPoints="0;0.27" keyTimes="0;1" calcMode="linear" />
+              <animate attributeName="opacity" values="0;0.8;0.8;0" keyTimes="0;0.15;0.8;1" dur={`${10 + (i % 3)}s`} begin={`${-i * 1.37}s`} repeatCount="indefinite" />
+            </circle>
+          ))}
+          {/* bubbles: after the drop, growing as they travel */}
+          {BUBBLES.map((b, i) => (
+            <g key={`b${i}`}>
+              <circle r={b.r} fill="url(#bgw1-bub)" stroke="#bff1ff" strokeOpacity="0.85" strokeWidth="1.1" transform={`translate(0 ${((i * 37) % 30) - 15})`}>
+                <animateMotion dur={`${b.dur}s`} begin={`${b.begin}s`} repeatCount="indefinite" path={VEIN} keyPoints="0.27;1" keyTimes="0;1" calcMode="linear" />
+                <animate attributeName="r" values={`0.5;${b.r};${b.r * 1.25}`} keyTimes="0;0.3;1" dur={`${b.dur}s`} begin={`${b.begin}s`} repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.93;1" dur={`${b.dur}s`} begin={`${b.begin}s`} repeatCount="indefinite" />
+              </circle>
+            </g>
+          ))}
+          {compact ? (
+            <text x="440" y="302" className="t-k t-c">BUBBLES</text>
+          ) : (
+            <>
+              <text x="76" y="318" className="t-k">GAS, DISSOLVED IN THE BODY</text>
+              <text x="470" y="250" className="t-k">BUBBLES RIDE THE VEINS</text>
+            </>
+          )}
+
+          {/* the heart and the probe */}
+          <g className="bgw1-heartbeat" style={{ transformOrigin: '990px 210px' }}>
+            <circle cx="990" cy="210" r="120" fill="#ff7a4a" opacity="0.16" filter="url(#bgw1-glow)" />
+            <path d="M 990 300 C 890 236, 880 160, 928 136 C 958 122, 982 140, 990 162 C 998 140, 1022 122, 1052 136 C 1100 160, 1090 236, 990 300 Z" fill="url(#bgw1-heart)" stroke="#ffb48a" strokeOpacity="0.8" strokeWidth="1.6" />
+          </g>
+          <g>
+            <rect x="1084" y="150" width="76" height="30" rx="15" fill="#0b1c28" stroke="#e6f6fa" strokeOpacity="0.75" strokeWidth="1.4" transform="rotate(24 1122 165)" />
+            {[0, 1, 2].map((i) => (
+              <path key={i} d={`M ${1078 - i * 16} ${150 - i * 4} q -14 22 0 46`} fill="none" stroke="#3fd0ff" strokeWidth="2" strokeLinecap="round" className="bgw1-ping" style={{ animationDelay: `${i * 0.22}s` }} />
+            ))}
+            {compact ? (
+              <>
+                <text x="1062" y="90" className="t-k t-c">PROBE</text>
+                <text x="930" y="354" className="t-k t-c">THE HEART</text>
+              </>
+            ) : (
+              <>
+                <text x="1058" y="124" className="t-k">DOPPLER PROBE</text>
+                <text x="948" y="330" className="t-k">THE HEART</text>
+              </>
+            )}
+          </g>
+        </svg>
+        <span className="bgw1-ai">AI-generated illustration</span>
+      </div>
+      <ol className="bgw1-beats">
+        <li>
+          <b>1</b>
+          <h3>Pressure drops</h3>
+          <p>A spacesuit runs at a lower pressure than the cabin. Going outside is like a diver coming up.</p>
+        </li>
+        <li>
+          <b>2</b>
+          <h3>Gas leaves the blood</h3>
+          <p>Gas that was dissolved in the body can come out as bubbles, the way a soda fizzes when it is opened.</p>
+        </li>
+        <li>
+          <b>3</b>
+          <h3>The heart hears it</h3>
+          <p>The veins carry them to the heart. A Doppler probe on the chest turns them into sound: chirps over the steady whoosh.</p>
+        </li>
+        <li>
+          <b>4</b>
+          <h3>A grade, then an action</h3>
+          <p>A technician grades that sound from 0 to IV. BubbleGrade grades it the same way, and says what to do next.</p>
+        </li>
+      </ol>
+      <p className="bgw1-quote">{bubble.HONESTY.card}</p>
+    </section>
+  )
+}
+
 export default function Story({ samples, current, onPick }: { samples: BubbleSample[]; current: string; onPick: (id: string) => void }) {
   const [meta, setMeta] = useState<Meta | null>(null)
   const [clips, setClips] = useState<BubbleResult[]>([])
@@ -176,111 +329,7 @@ export default function Story({ samples, current, onPick }: { samples: BubbleSam
 
   return (
     <div className="bgw1-story" id="story">
-      <section className="bgw1-sec bgw1-problem">
-        <p className="bgw1-sec-k">01 <i /> The problem</p>
-        <figure className="bgw1-orbit">
-          <img src={sunrise} alt="Sunrise over the Earth's edge, photographed from the International Space Station" loading="lazy" />
-          <figcaption>Sunrise from the International Space Station. Photo: NASA, public domain.</figcaption>
-        </figure>
-        <h2 className="bgw1-over">
-          Open the airlock, and your blood can <em>fizz</em>.
-        </h2>
-        <div className="bgw1-fig">
-          <svg viewBox="0 0 1200 380" role="img" aria-label="Illustration: pressure drops at the airlock, dissolved gas turns into bubbles, the veins carry them to the heart, and a Doppler probe hears them">
-            <defs>
-              <linearGradient id="bgw1-vein" x1="0" x2="1">
-                <stop offset="0" stopColor="#0c3a4e" />
-                <stop offset="0.3" stopColor="#0f5069" />
-                <stop offset="1" stopColor="#1a2f55" />
-              </linearGradient>
-              <radialGradient id="bgw1-heart" cx="0.45" cy="0.4" r="0.7">
-                <stop offset="0" stopColor="#ff9a5a" stopOpacity="0.95" />
-                <stop offset="0.6" stopColor="#d2443c" stopOpacity="0.7" />
-                <stop offset="1" stopColor="#5a1830" stopOpacity="0.2" />
-              </radialGradient>
-              <radialGradient id="bgw1-bub" cx="0.35" cy="0.3" r="0.8">
-                <stop offset="0" stopColor="#ffffff" stopOpacity="0.9" />
-                <stop offset="0.35" stopColor="#9be8ff" stopOpacity="0.35" />
-                <stop offset="1" stopColor="#3fd0ff" stopOpacity="0.05" />
-              </radialGradient>
-              <filter id="bgw1-glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="9" />
-              </filter>
-            </defs>
-
-            {/* pressure line: cabin, then the suit */}
-            <path d="M 40 62 H 300 C 322 62, 318 112, 340 112 H 1160" fill="none" stroke="#3fd0ff" strokeWidth="2" strokeOpacity="0.85" />
-            <path d="M 40 62 H 300 C 322 62, 318 112, 340 112 H 1160 V 140 H 40 Z" fill="#3fd0ff" opacity="0.06" />
-            <line x1="320" y1="34" x2="320" y2="330" stroke="#e6f6fa" strokeOpacity="0.28" strokeDasharray="3 7" />
-            <text x="40" y="46" className="t-k">CABIN PRESSURE</text>
-            <text x="356" y="98" className="t-k">SUIT PRESSURE: LOWER</text>
-            <text x="332" y="346" className="t-k t-w">AIRLOCK OPENS</text>
-
-            {/* the vein */}
-            <path d={VEIN} fill="none" stroke="#3fd0ff" strokeOpacity="0.14" strokeWidth="78" strokeLinecap="round" filter="url(#bgw1-glow)" />
-            <path d={VEIN} fill="none" stroke="url(#bgw1-vein)" strokeWidth="58" strokeLinecap="round" />
-            <path d={VEIN} fill="none" stroke="#04121b" strokeWidth="48" strokeLinecap="round" />
-            <path d={VEIN} fill="none" stroke="#5fd9ff" strokeOpacity="0.5" strokeWidth="1.2" strokeDasharray="2 14" className="bgw1-flow" />
-            {/* dissolved gas: small specks, before the drop */}
-            {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <circle key={`d${i}`} r="1.8" fill="#9be8ff" opacity="0.7">
-                <animateMotion dur={`${10 + (i % 3)}s`} begin={`${-i * 1.37}s`} repeatCount="indefinite" path={VEIN} keyPoints="0;0.27" keyTimes="0;1" calcMode="linear" />
-                <animate attributeName="opacity" values="0;0.8;0.8;0" keyTimes="0;0.15;0.8;1" dur={`${10 + (i % 3)}s`} begin={`${-i * 1.37}s`} repeatCount="indefinite" />
-              </circle>
-            ))}
-            {/* bubbles: after the drop, growing as they travel */}
-            {BUBBLES.map((b, i) => (
-              <g key={`b${i}`}>
-                <circle r={b.r} fill="url(#bgw1-bub)" stroke="#bff1ff" strokeOpacity="0.85" strokeWidth="1.1" transform={`translate(0 ${((i * 37) % 30) - 15})`}>
-                  <animateMotion dur={`${b.dur}s`} begin={`${b.begin}s`} repeatCount="indefinite" path={VEIN} keyPoints="0.27;1" keyTimes="0;1" calcMode="linear" />
-                  <animate attributeName="r" values={`0.5;${b.r};${b.r * 1.25}`} keyTimes="0;0.3;1" dur={`${b.dur}s`} begin={`${b.begin}s`} repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.93;1" dur={`${b.dur}s`} begin={`${b.begin}s`} repeatCount="indefinite" />
-                </circle>
-              </g>
-            ))}
-            <text x="76" y="318" className="t-k">GAS, DISSOLVED IN THE BODY</text>
-            <text x="470" y="250" className="t-k">BUBBLES RIDE THE VEINS</text>
-
-            {/* the heart and the probe */}
-            <g className="bgw1-heartbeat" style={{ transformOrigin: '990px 210px' }}>
-              <circle cx="990" cy="210" r="120" fill="#ff7a4a" opacity="0.16" filter="url(#bgw1-glow)" />
-              <path d="M 990 300 C 890 236, 880 160, 928 136 C 958 122, 982 140, 990 162 C 998 140, 1022 122, 1052 136 C 1100 160, 1090 236, 990 300 Z" fill="url(#bgw1-heart)" stroke="#ffb48a" strokeOpacity="0.8" strokeWidth="1.6" />
-            </g>
-            <g>
-              <rect x="1084" y="150" width="76" height="30" rx="15" fill="#0b1c28" stroke="#e6f6fa" strokeOpacity="0.75" strokeWidth="1.4" transform="rotate(24 1122 165)" />
-              {[0, 1, 2].map((i) => (
-                <path key={i} d={`M ${1078 - i * 16} ${150 - i * 4} q -14 22 0 46`} fill="none" stroke="#3fd0ff" strokeWidth="2" strokeLinecap="round" className="bgw1-ping" style={{ animationDelay: `${i * 0.22}s` }} />
-              ))}
-              <text x="1058" y="124" className="t-k">DOPPLER PROBE</text>
-              <text x="948" y="330" className="t-k">THE HEART</text>
-            </g>
-          </svg>
-          <span className="bgw1-ai">AI-generated illustration</span>
-        </div>
-        <ol className="bgw1-beats">
-          <li>
-            <b>1</b>
-            <h3>Pressure drops</h3>
-            <p>A spacesuit runs at a lower pressure than the cabin. Going outside is like a diver coming up.</p>
-          </li>
-          <li>
-            <b>2</b>
-            <h3>Gas leaves the blood</h3>
-            <p>Gas that was dissolved in the body can come out as bubbles, the way a soda fizzes when it is opened.</p>
-          </li>
-          <li>
-            <b>3</b>
-            <h3>The heart hears it</h3>
-            <p>The veins carry them to the heart. A Doppler probe on the chest turns them into sound: chirps over the steady whoosh.</p>
-          </li>
-          <li>
-            <b>4</b>
-            <h3>A grade, then an action</h3>
-            <p>A technician grades that sound from 0 to IV. BubbleGrade grades it the same way, and says what to do next.</p>
-          </li>
-        </ol>
-        <p className="bgw1-quote">{bubble.HONESTY.card}</p>
-      </section>
+      <Problem />
 
       <section className="bgw1-sec bgw1-wall">
         <p className="bgw1-sec-k">02 <i /> The evidence</p>
@@ -325,7 +374,7 @@ export default function Story({ samples, current, onPick }: { samples: BubbleSam
             One diver, after one dive: {dive.nClips} recordings over {dive.nTimes} check times. Rings are what the technician heard; amber dots are what the model heard in
             each recording, scored on a diver it never heard. That is why the check says to re-grade.
           </p>
-          <div className="bgw1-dive-fig">
+          <div className="bgw1-dive-fig" tabIndex={0} role="region" aria-label="One diver after one dive: technician and model grades over time">
             <DiveCurve d={dive} />
             <div className="bgw1-dive-key">
               <span><i className="k-t" />technician, by ear</span>

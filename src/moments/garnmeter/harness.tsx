@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from 'react'
 import * as garn from '../../engine/garnmeter'
 import type { GarnAct, GarnResult } from '../../engine/garnmeter'
-import GarnMoment, { type GarnMomentHandle, type MomentState } from './index'
+import GarnMoment, { type GarnMomentHandle, type GarnReading, type MomentState } from './index'
 import { GarnScalp } from './scalp'
 import './harness.css'
 
@@ -12,7 +12,7 @@ export default function GarnHarness({ params }: { params: URLSearchParams }) {
   const ref = useRef<GarnMomentHandle>(null)
   const [state, setState] = useState<MomentState>('idle')
   const [ready, setReady] = useState(false)
-  const [out, setOut] = useState<{ result: GarnResult; act: GarnAct } | null>(null)
+  const [out, setOut] = useState<{ result: GarnResult; act: GarnAct; reading: GarnReading } | null>(null)
   const [how, setHow] = useState(false)
 
   const pinned = params.get('state')
@@ -39,7 +39,6 @@ export default function GarnHarness({ params }: { params: URLSearchParams }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [how])
 
-  // the session's own result (not the stored one that a check-in before playing comes with)
   const played = out && state === 'result' ? out.result : null
   return (
     <div className={`gmh-root${light ? ' gmh-light' : ''}`} data-ready={ready ? '1' : undefined} data-state={state} data-bare={bare ? '1' : undefined}>
@@ -72,7 +71,7 @@ export default function GarnHarness({ params }: { params: URLSearchParams }) {
                 {played
                   ? played.source === 'live'
                     ? `The model answered all ${played.session.nWindows} windows in ${Math.round(played.timing.ms)} ms in this browser. `
-                    : `The grey line is ${garn.STRINGS.precomputedLabel}. `
+                    : `The model's line is ${garn.STRINGS.precomputedLabel}. `
                   : 'Pressing play gets the model\'s answer for the whole recording at once. '}
                 The animation then plays that finished answer. {garn.STRINGS.playback}
               </p>
@@ -97,12 +96,12 @@ export default function GarnHarness({ params }: { params: URLSearchParams }) {
           className={bare ? 'gmh-bare' : undefined}
           onState={setState}
           onReady={() => setReady(true)}
-          onResult={(result, act) => setOut({ result, act })}
+          onResult={(result, act, reading) => setOut({ result, act, reading })}
         />
       </div>
       {!bare && (
         <p className="gmh-out" data-qa="readout" aria-live="polite">
-          {out && state !== 'running' ? out.act.headline : ''}
+          {out && state !== 'running' ? `The model reads ${out.reading.garn.toFixed(2)} Garn for scene ${out.reading.trial}.` : ''}
         </p>
       )}
     </div>

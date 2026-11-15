@@ -1,0 +1,600 @@
+/* Station / BubbleGrade stage. Scoped under .stbg; uses only the Station tokens (set on .st).
+   Landscape (side): the sound picture on the left, the readout as a column on the right.
+   Portrait (sheet): caption, picture, rail and one readout row, for the ~290 px tall phone body. */
+
+.stbg {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(158px, 24%, 232px);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    'cap  read'
+    'well read'
+    'rail read'
+    'key  read';
+  column-gap: clamp(20px, 2.4vw, 34px);
+  padding: 20px 24px 18px;
+  color: var(--st-ink);
+  font-family: var(--st-font-body);
+  -webkit-user-select: none;
+  user-select: none;
+  /* the stage is a size container: the readout tightens on a short panel (a 1280 x 720 laptop) */
+  container: stbg / size;
+}
+.stbg *,
+.stbg *::before,
+.stbg *::after {
+  box-sizing: border-box;
+}
+:where(.stbg) p {
+  margin: 0;
+}
+
+/* the one small label voice: mono, uppercase, tracked */
+.stbg-cap,
+.stbg-key,
+.stbg-sec,
+.stbg-read-k,
+.stbg-of,
+.stbg-alert,
+.stbg-wait,
+.stbg-tech,
+.stbg-src span,
+.stbg-read-lab {
+  font: 500 var(--st-t-label) / 1 var(--st-font-mono);
+  letter-spacing: var(--st-track-label);
+  text-transform: uppercase;
+}
+
+/* ------------------------------------------------------------------------------------------- caption */
+.stbg-cap {
+  grid-area: cap;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  margin-bottom: 14px;
+  color: var(--st-ink-2);
+}
+.stbg-cap-what {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stbg-cap-time {
+  flex: none;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.stbg-cap-now {
+  color: var(--st-ink);
+  opacity: 0;
+  transition: opacity 0.3s linear;
+}
+.stbg-cap-now[data-on='1'] {
+  opacity: 1;
+}
+.stbg-cap-now i {
+  margin: 0 0.6em;
+  font-style: normal;
+  color: var(--st-ink-3);
+}
+
+/* -------------------------------------------------------------------------------- the sound picture */
+.stbg-well {
+  grid-area: well;
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+/* the sound picture fades in once its clip has loaded (never a bare box while it loads) */
+.stbg-pic {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s linear;
+}
+.stbg[data-loaded='1'] .stbg-pic,
+.stbg[data-state='error'] .stbg-pic {
+  opacity: 1;
+}
+.stbg-corner {
+  position: absolute;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  border: 0 solid rgba(232, 238, 245, 0.42);
+  pointer-events: none;
+}
+.stbg-corner[data-c='tl'] {
+  left: 0;
+  top: 0;
+  border-left-width: 1px;
+  border-top-width: 1px;
+}
+.stbg-corner[data-c='tr'] {
+  right: 0;
+  top: 0;
+  border-right-width: 1px;
+  border-top-width: 1px;
+}
+.stbg-corner[data-c='bl'] {
+  left: 0;
+  bottom: 0;
+  border-left-width: 1px;
+  border-bottom-width: 1px;
+}
+.stbg-corner[data-c='br'] {
+  right: 0;
+  bottom: 0;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+}
+
+/* the playhead: a full-width layer moved by its own width share, so no measuring is needed */
+.stbg-head,
+.stbg-grip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+  transition:
+    opacity 0.25s linear,
+    transform 0.11s linear;
+}
+.stbg-head {
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+}
+.stbg[data-playing='1'] .stbg-head,
+.stbg[data-playing='1'] .stbg-grip {
+  opacity: 1;
+}
+.stbg-head i {
+  position: absolute;
+  left: -0.5px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #fff;
+  box-shadow: 0 0 12px 1px rgba(232, 238, 245, 0.45);
+}
+
+/* ------------------------------------------------------------------------------------------ time rail */
+.stbg-rail {
+  grid-area: rail;
+  position: relative;
+  height: 32px;
+}
+.stbg-rail-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: var(--st-hair);
+}
+.stbg-rail-line i {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 4px;
+  margin-left: -0.5px;
+  background: rgba(232, 238, 245, 0.3);
+}
+.stbg-rail-line i[data-long='1'] {
+  height: 8px;
+  background: rgba(232, 238, 245, 0.55);
+}
+.stbg-sec {
+  position: absolute;
+  top: 15px;
+  letter-spacing: 0.1em;
+  color: var(--st-ink-3);
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+.stbg-sec[data-first='1'] {
+  transform: none;
+}
+.stbg-grip {
+  top: 0;
+  height: 0;
+}
+.stbg-grip i {
+  position: absolute;
+  left: -4.5px;
+  top: -4px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--st-amber);
+  box-shadow: 0 0 10px rgba(255, 180, 90, 0.7);
+}
+
+/* ----------------------------------------------------------------------------- the model-attention key */
+.stbg-key {
+  grid-area: key;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin-top: 2px;
+  white-space: nowrap;
+  color: var(--st-ink-2);
+}
+.stbg-key i {
+  flex: none;
+  width: 18px;
+  height: 10px;
+  background: color-mix(in srgb, var(--st-blue) 70%, #05070a);
+}
+.stbg-key em {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 4px;
+  font: 400 var(--st-t-small) / 1.3 var(--st-font-body);
+  font-style: normal;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--st-ink-3);
+}
+
+/* --------------------------------------------------------------------------------------- the readout */
+.stbg-read {
+  grid-area: read;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-width: 0;
+  min-height: 0;
+  padding-left: clamp(18px, 2vw, 28px);
+  border-left: 1px solid var(--st-hair-2);
+}
+.stbg-read-k {
+  color: var(--st-ink-2);
+}
+.stbg-read-num {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 12px;
+  row-gap: 8px;
+  min-height: 0.9em;
+  margin-top: 26px;
+  font-size: clamp(58px, 5.3vw, 92px);
+}
+.stbg-num {
+  font: 300 1em / 0.9 var(--st-font-display);
+  font-stretch: 125%;
+  letter-spacing: 0.05em;
+  color: #fff;
+  animation: stbg-num 0.55s var(--st-ease) both;
+}
+.stbg-num--none {
+  color: rgba(232, 238, 245, 0.28);
+  animation: none;
+}
+@keyframes stbg-num {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.stbg-of {
+  color: var(--st-ink-3);
+}
+
+.stbg-alert,
+.stbg-wait,
+.stbg-hint {
+  margin-top: 22px;
+}
+.stbg-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--st-ink-2);
+  animation: stbg-num 0.5s var(--st-ease) both;
+}
+.stbg-alert i {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+.stbg[data-alert='1'] .stbg-alert {
+  color: var(--st-amber);
+}
+.stbg[data-alert='1'] .stbg-alert i {
+  background: var(--st-amber);
+  box-shadow: 0 0 10px rgba(255, 180, 90, 0.65);
+}
+.stbg-wait {
+  display: grid;
+  gap: 11px;
+  color: var(--st-ink-2);
+}
+.stbg-wait i {
+  display: block;
+  width: 100%;
+  max-width: 132px;
+  height: 1px;
+  overflow: hidden;
+  background: var(--st-hair);
+}
+.stbg-wait b {
+  display: block;
+  height: 100%;
+  background: var(--st-amber);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.11s linear;
+}
+.stbg-hint {
+  max-width: 12em;
+  font: 400 var(--st-t-small) / 1.45 var(--st-font-body);
+  color: var(--st-ink-3);
+}
+
+/* the human comparison: arrives with the result, its hairline with it */
+.stbg-tech {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin-top: 34px;
+  padding-top: 20px;
+  border-top: 1px solid var(--st-hair-2);
+  color: var(--st-ink-2);
+  opacity: 0;
+  transform: translate3d(0, 6px, 0);
+  transition:
+    opacity 0.5s linear 0.15s,
+    transform 0.7s var(--st-ease) 0.15s;
+}
+.stbg-tech[data-on='1'] {
+  opacity: 1;
+  transform: none;
+}
+.stbg-tech b {
+  font: 300 34px / 0.9 var(--st-font-display);
+  font-stretch: 125%;
+  letter-spacing: 0.05em;
+  color: var(--st-ink);
+}
+
+/* the foot of the column: where the result came from, and the sound */
+.stbg-read-foot {
+  display: grid;
+  justify-items: start;
+  gap: 24px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+.stbg-src {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.4s linear;
+}
+.stbg-src[data-on='1'] {
+  opacity: 1;
+}
+.stbg-src span {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--st-hair);
+  color: var(--st-ink-2);
+}
+.stbg-src[data-src='live'] span {
+  border-color: rgba(255, 180, 90, 0.5);
+  color: var(--st-amber);
+}
+.stbg-src em {
+  max-width: 13em;
+  font: 400 var(--st-t-small) / 1.35 var(--st-font-body);
+  font-style: normal;
+  color: var(--st-ink-3);
+}
+
+.stbg-sound {
+  flex: none;
+}
+.stbg-sound svg {
+  width: 17px;
+  height: 17px;
+}
+.stbg-sound[aria-pressed='false'] {
+  color: var(--st-ink-2);
+}
+
+/* a short or narrow landscape panel */
+@container stbg (max-height: 440px) {
+  .stbg[data-layout='side'] .stbg-read-num {
+    margin-top: 16px;
+    font-size: clamp(48px, 4.4vw, 64px);
+  }
+  .stbg[data-layout='side'] .stbg-alert,
+  .stbg[data-layout='side'] .stbg-wait,
+  .stbg[data-layout='side'] .stbg-hint {
+    margin-top: 14px;
+  }
+  .stbg[data-layout='side'] .stbg-tech {
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 14px;
+  }
+  .stbg[data-layout='side'] .stbg-tech b {
+    font-size: 26px;
+  }
+  .stbg[data-layout='side'] .stbg-read-foot {
+    gap: 14px;
+    padding-top: 12px;
+  }
+  .stbg[data-layout='side'] .stbg-src {
+    gap: 6px;
+  }
+}
+@container stbg (max-width: 660px) {
+  .stbg[data-layout='side'] .stbg-key em {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------------------------ portrait sheet */
+.stbg[data-layout='sheet'] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    'cap'
+    'well'
+    'rail'
+    'read';
+  padding: 4px 12px 10px;
+}
+.stbg[data-layout='sheet'] .stbg-cap {
+  gap: 10px;
+  margin-bottom: 6px;
+  letter-spacing: 0.08em;
+}
+.stbg[data-layout='sheet'] .stbg-cap-now {
+  display: none;
+}
+.stbg[data-layout='sheet'] .stbg-src {
+  flex-direction: row;
+  margin: 0;
+}
+.stbg[data-layout='sheet'] .stbg-src span {
+  letter-spacing: 0.08em;
+}
+.stbg[data-layout='sheet'] .stbg-sound {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+}
+.stbg[data-layout='sheet'] .stbg-sound::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+/* on the phone the key rides on the picture, top left */
+.stbg[data-layout='sheet'] .stbg-key {
+  position: absolute;
+  z-index: 2;
+  left: 8px;
+  top: 8px;
+  margin: 0;
+  padding: 5px 8px;
+  gap: 8px;
+  letter-spacing: 0.08em;
+  background: rgba(5, 7, 10, 0.8);
+}
+.stbg[data-layout='sheet'] .stbg-key i {
+  width: 14px;
+  height: 8px;
+}
+.stbg[data-layout='sheet'] .stbg-rail {
+  height: 28px;
+}
+.stbg[data-layout='sheet'] .stbg-sec {
+  top: 13px;
+  letter-spacing: 0.06em;
+}
+.stbg[data-layout='sheet'] .stbg-read {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  min-height: 50px;
+  padding: 8px 0 0;
+  border-left: 0;
+  border-top: 1px solid var(--st-hair-2);
+}
+.stbg[data-layout='sheet'] .stbg-read-num {
+  flex: none;
+  min-width: 0.9em;
+  margin: 0;
+  font-size: 38px;
+}
+.stbg-read-lab {
+  display: grid;
+  gap: 7px;
+  letter-spacing: 0.08em;
+  color: var(--st-ink-2);
+}
+.stbg-read-lab span + span {
+  color: var(--st-ink-3);
+}
+.stbg-read-sep {
+  flex: none;
+  width: 1px;
+  height: 32px;
+  background: var(--st-hair-2);
+}
+.stbg-read-st {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.stbg[data-layout='sheet'] .stbg-alert,
+.stbg[data-layout='sheet'] .stbg-wait,
+.stbg[data-layout='sheet'] .stbg-hint,
+.stbg[data-layout='sheet'] .stbg-tech {
+  margin: 0;
+  letter-spacing: 0.08em;
+}
+.stbg[data-layout='sheet'] .stbg-tech {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+}
+.stbg[data-layout='sheet'] .stbg-tech b {
+  font-size: 16px;
+}
+.stbg[data-layout='sheet'] .stbg-wait i {
+  max-width: 110px;
+}
+.stbg[data-layout='sheet'] .stbg-hint {
+  font-size: var(--st-t-small);
+  letter-spacing: 0;
+}
+
+/* --------------------------------------------------------------------------------------- reduced motion */
+.st[data-motion='reduced'] .stbg-head,
+.st[data-motion='reduced'] .stbg-grip,
+.st[data-motion='reduced'] .stbg-num,
+.st[data-motion='reduced'] .stbg-alert,
+.st[data-motion='reduced'] .stbg-tech,
+.st[data-motion='reduced'] .stbg-src,
+.st[data-motion='reduced'] .stbg-cap-now,
+.st[data-motion='reduced'] .stbg-wait b {
+  animation: none !important;
+  transition-duration: 0ms !important;
+  transition-delay: 0ms !important;
+}

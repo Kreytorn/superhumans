@@ -4,6 +4,7 @@
 import type { CSSProperties } from 'react'
 import './story.css'
 import { MODS, href, type Mod } from './data'
+import ArchSection from './arch'
 
 const BASE = import.meta.env.BASE_URL
 
@@ -99,8 +100,8 @@ const STORIES: Record<string, Story> = {
   },
   braindrift: {
     img: `${BASE}_posters/braindrift.jpg`,
-    imgAlt: 'A real brain MRI with the fluid spaces the AI mapped lit up',
-    imgCap: 'One real brain MRI the model never saw, mapped by the AI.',
+    imgAlt: 'One slice of a real brain MRI in a dark scanner window, the fluid spaces the AI mapped outlined in glowing green',
+    imgCap: 'One real brain MRI the model never saw, before flight, mapped by the AI.',
     kicker: 'The problem',
     head: 'Long missions push the brain upward and swell its fluid spaces.',
     body: [
@@ -117,21 +118,17 @@ const STORIES: Record<string, Story> = {
   },
   garnmeter: {
     img: `${BASE}_posters/garnmeter.jpg`,
-    imgAlt: 'Recorded brainwaves, the model’s estimate under them, and the Garn gauge',
+    imgAlt: 'Recorded brainwaves, the model’s reading under them, and the Garn gauge',
     imgCap: 'Real 14-channel brainwaves from a VR-sickness study, played back.',
     kicker: 'The problem',
     head: 'About 7 in 10 shuttle-era flyers had space motion sickness.',
     body: [
       'That is 419 of 588 person-missions; it usually fades within 3-4 days.',
-      'We tried to read it from brainwaves. On people the model never saw it did not work, and we show that openly. So the crew member’s own check-in drives what to do next.',
+      'Garn Meter reads 4 seconds of brainwaves from a 14-channel headset, every half second, and gives its reading in Garns: 0 is fine, 1 is totally sick. It is an experimental model.',
     ],
     src: 'NASA MEDPRAT ICL97. The Garn is folklore, not an official unit.',
-    steps: [
-      { t: 'Play the brainwaves', d: 'Real recorded brainwaves play back: a recording, not a live headset.' },
-      { t: 'The model’s line', d: 'Every half second the model estimates from the last 4 seconds: the thin line.' },
-      { t: 'You decide', d: 'The gauge moves only on a check-in: how sick you feel, 1 to 7, in Garns.' },
-    ],
-    stat: { n: '0.54', d: 'AUROC on 32 people the model never saw: close to chance, an honest negative result' },
+    steps: [],
+    stat: { n: '32', d: 'people it learned from: 2,592 brainwave trials from a VR-sickness study' },
     limit: 'Tested in a VR-sickness study on the ground, not on astronauts or in weightlessness.',
   },
 }
@@ -230,8 +227,6 @@ function IonScanDeep() {
 export default function StorySection({ mod }: { mod: Mod }) {
   const s = STORIES[mod.id]
   if (!s) return null
-  const i = MODS.findIndex((m) => m.id === mod.id)
-  const next = MODS[(i + 1) % MODS.length]
   const deep = mod.id === 'tracktrace'
   return (
     <div className={`df-story${deep ? ' is-deep' : ''}`}>
@@ -242,7 +237,7 @@ export default function StorySection({ mod }: { mod: Mod }) {
         </figure>
         <div className="df-story-text">
           <p className="df-story-kicker">{s.kicker}</p>
-          <h2 id={`df-story-${mod.id}`} className="df-story-h">
+          <h2 id={`df-story-${mod.id}`} className="df-story-h" tabIndex={-1}>
             {s.head}
           </h2>
           {s.body.map((p) => (
@@ -254,21 +249,8 @@ export default function StorySection({ mod }: { mod: Mod }) {
         </div>
       </section>
 
-      {deep ? (
-        <IonScanDeep />
-      ) : (
-        <section className="df-story-how" aria-label="How it works">
-          <p className="df-story-kicker">How it works</p>
-          <ol className="df-story-steps">
-            {s.steps.map((st) => (
-              <li key={st.t}>
-                <b>{st.t}</b>
-                <span>{st.d}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
+      {/* r4: the step cards ("How it works") are gone; the check's architecture figure takes their place. */}
+      {deep ? <IonScanDeep /> : <ArchSection id={mod.id} />}
 
       <section className="df-story-trust" aria-label="How well it works">
         <p className="df-story-stat">
@@ -278,18 +260,30 @@ export default function StorySection({ mod }: { mod: Mod }) {
         <p className="df-story-limit">{s.limit}</p>
       </section>
 
-      <nav className="df-story-next" aria-label="More checks">
-        <a className="df-story-home" href={href('home')}>
-          Back to the body
-        </a>
-        <a className="df-story-go" href={href(next.id)} style={{ '--nc': next.color } as CSSProperties}>
-          <span>Next check</span>
-          <b>{next.name}</b>
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </a>
-      </nav>
+      <NextNav mod={mod} />
     </div>
+  )
+}
+
+/** The end of every check page: back to the body, or on to the next check. Also used by the pages in ./pages/. */
+export function NextNav({ mod }: { mod: Mod }) {
+  const i = MODS.findIndex((m) => m.id === mod.id)
+  const next = MODS[(i + 1) % MODS.length]
+  return (
+    <nav className="df-story-next" aria-label="More checks">
+      <a className="df-story-home" href={href('home')}>
+        Back to the body
+      </a>
+      <a className="df-story-credits" href={href('credits')}>
+        Credits
+      </a>
+      <a className="df-story-go" href={href(next.id)} style={{ '--nc': next.color } as CSSProperties}>
+        <span>Next check</span>
+        <b>{next.name}</b>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </a>
+    </nav>
   )
 }

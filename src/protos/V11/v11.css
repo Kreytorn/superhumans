@@ -1,0 +1,1284 @@
+/* V11 "Crystal Human". Everything is scoped under .v11. */
+.v11 {
+  --ink: #f7f4ff;
+  --ink-2: rgba(232, 226, 255, 0.84);
+  --ink-3: rgba(214, 206, 250, 0.7);
+  --line: rgba(196, 184, 255, 0.24);
+  --cy: #2be4ff;
+  --mg: #ff36bd;
+  --gd: #ffbe38;
+  --display: 'Syne Variable', 'Syne', system-ui, sans-serif;
+  --text: 'Red Hat Display Variable', 'Red Hat Display', system-ui, sans-serif;
+  --mono: 'Geist Mono Variable', ui-monospace, monospace;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #04030c;
+  color: var(--ink);
+  font-family: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.v11 *,
+.v11 *::before,
+.v11 *::after {
+  box-sizing: border-box;
+}
+/* resets carry no weight, so the working stages' own styles always win inside them */
+:where(.v11) :where(p, h1, figure) {
+  margin: 0;
+}
+:where(.v11) :where(a) {
+  color: inherit;
+  text-decoration: none;
+}
+:where(.v11) :where(button) {
+  font: inherit;
+  color: inherit;
+}
+
+/* ------------------------------------------------------------------ the scene */
+.v11-scene {
+  position: absolute;
+  inset: 0;
+  transition: visibility 0s;
+}
+/* the live canvas fades in over a still of its own first frame, so the figure is there from the first paint */
+.v11-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+.v11[data-scene='1'] .v11-canvas {
+  opacity: 1;
+}
+/* the page fades in over the jewel's picture; the scene is hidden only once the page covers it */
+.v11[data-phase='open'] .v11-scene {
+  visibility: hidden;
+  transition: visibility 0s linear 420ms;
+}
+.v11-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(130% 95% at 55% 45%, transparent 58%, rgba(3, 2, 10, 0.55) 100%),
+    linear-gradient(32deg, rgba(3, 2, 10, 0.62) 0%, rgba(3, 2, 10, 0.22) 20%, transparent 36%);
+  transition: opacity 500ms ease;
+}
+.v11[data-phase='fly'] .v11-veil,
+.v11[data-phase='open'] .v11-veil {
+  opacity: 0;
+}
+
+/* ------------------------------------------------------------------ home: title low on the left, under the names */
+.v11-home {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity 240ms ease;
+}
+.v11[data-phase='fly'] .v11-home,
+.v11[data-phase='open'] .v11-home {
+  opacity: 0;
+}
+.v11[data-phase='back'] .v11-jewels {
+  opacity: 0;
+}
+.v11-jewels {
+  transition: opacity 360ms ease;
+}
+.v11-title {
+  position: absolute;
+  left: clamp(24px, 4.4vw, 64px);
+  bottom: clamp(30px, 8.6vh, 80px);
+  text-align: left;
+  animation: v11-in 600ms cubic-bezier(0.2, 0.7, 0.2, 1) 80ms both;
+}
+/* the title waits for its own face (at most 1.2 s), so it never shows in a stand-in font first */
+.v11[data-font='0'] .v11-title {
+  opacity: 0;
+  animation: none;
+}
+@keyframes v11-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+.v11-title h1 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(32px, min(3.6vw, 6vh), 54px);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  background: linear-gradient(96deg, #ffffff 0%, #d6fbff 26%, #ffffff 46%, #ffd6f2 66%, #fff3d2 84%, #ffffff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 30px rgba(150, 120, 255, 0.32)) drop-shadow(0 2px 0 rgba(4, 3, 12, 0.5));
+  padding-bottom: 0.08em;
+}
+.v11-title h1 span {
+  font: inherit;
+}
+.v11-read {
+  position: relative;
+  margin-top: 12px;
+}
+.v11-line {
+  max-width: 30em;
+  font-size: clamp(16px, 1.3vw, 19px);
+  font-weight: 500;
+  line-height: 1.32;
+  color: var(--ink-2);
+  text-shadow: 0 1px 14px rgba(4, 3, 12, 0.9);
+}
+.v11-focus {
+  position: absolute;
+  inset: 0 0 auto 0;
+  animation: v11-rise 280ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes v11-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+.v11-focus-line {
+  font-weight: 500;
+  color: var(--ink);
+  text-shadow: 0 1px 14px rgba(4, 3, 12, 0.95);
+  text-wrap: pretty;
+}
+
+/* ------------------------------------------------------------------ home: the six jewels and their names */
+.v11-jewels {
+  position: absolute;
+  inset: 0;
+}
+.v11-ch {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.v11-ch[data-hot='1'] {
+  z-index: 3;
+}
+.v11-ch[data-vis='0'] {
+  visibility: hidden;
+}
+/* the keyboard's ring: a hexagon round the jewel */
+.v11-ch-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--gw, 120%);
+  aspect-ratio: 100 / 115.47;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+.v11-ch-ring svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.v11-ch-ring polygon {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px var(--h));
+}
+.v11-ch:focus-visible .v11-ch-ring {
+  opacity: 1;
+}
+/* the names: one column on the figure's left, right-aligned, each on its own dark pill */
+.v11-ch-tag {
+  position: absolute;
+  left: calc(50% + var(--lx, 0px));
+  top: calc(50% + var(--ly, 0px));
+  display: inline-flex;
+  align-items: baseline;
+  gap: 9px;
+  padding: 6px 12px 7px 13px;
+  white-space: nowrap;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(17px, 1.4vw, 21px);
+  line-height: 1.1;
+  letter-spacing: -0.012em;
+  color: #fff;
+  background: rgba(7, 5, 20, 0.8);
+  border: 1px solid rgba(214, 206, 255, 0.16);
+  border-radius: 8px;
+  box-shadow: 0 6px 22px rgba(3, 2, 10, 0.5);
+  transform: translate(-100%, -50%);
+  transition: opacity 200ms ease, border-color 160ms ease, background 160ms ease;
+}
+.v11-ch-tag i {
+  font-family: var(--mono);
+  font-style: normal;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--h);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--h) 60%, transparent);
+}
+.v11-ch-tag b {
+  font-weight: inherit;
+  background: linear-gradient(var(--h), var(--h)) 0 100% / 0 2px no-repeat;
+  padding-bottom: 2px;
+  transition: background-size 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.v11-ch[data-hot='1'] .v11-ch-tag {
+  border-color: color-mix(in srgb, var(--h) 75%, #fff);
+  background: rgba(12, 9, 30, 0.92);
+}
+.v11-ch[data-hot='1'] .v11-ch-tag b {
+  background-size: 100% 2px;
+}
+/* the leader: a thin line of the jewel's colour from the name to the jewel's rim */
+.v11-ch-lead {
+  position: absolute;
+  left: calc(50% + var(--lx, 0px) + 2px);
+  top: calc(50% + var(--ly, 0px) - 0.75px);
+  width: var(--ll, 0px);
+  height: 1.5px;
+  transform-origin: 0 50%;
+  transform: rotate(var(--la, 0rad));
+  background: linear-gradient(90deg, rgba(214, 206, 255, 0.35), color-mix(in srgb, var(--h) 85%, #fff));
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+.v11-ch-lead::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: -2.25px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--h);
+  box-shadow: 0 0 8px var(--h);
+}
+.v11[data-scene='1'] .v11-ch[data-vis='1'] :is(.v11-ch-tag, .v11-ch-lead) {
+  animation: v11-tag 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.v11[data-scene='1'] .v11-ch:nth-child(2) :is(.v11-ch-tag, .v11-ch-lead) {
+  animation-delay: 50ms;
+}
+.v11[data-scene='1'] .v11-ch:nth-child(3) :is(.v11-ch-tag, .v11-ch-lead) {
+  animation-delay: 100ms;
+}
+.v11[data-scene='1'] .v11-ch:nth-child(4) :is(.v11-ch-tag, .v11-ch-lead) {
+  animation-delay: 150ms;
+}
+.v11[data-scene='1'] .v11-ch:nth-child(5) :is(.v11-ch-tag, .v11-ch-lead) {
+  animation-delay: 200ms;
+}
+.v11[data-scene='1'] .v11-ch:nth-child(6) :is(.v11-ch-tag, .v11-ch-lead) {
+  animation-delay: 250ms;
+}
+.v11[data-scene='0'][data-webgl='1'] :is(.v11-ch-tag, .v11-ch-lead) {
+  opacity: 0;
+}
+@keyframes v11-tag {
+  from {
+    opacity: 0;
+  }
+}
+/* while one jewel is lit, the other names and leaders step well back */
+.v11[data-lit='1'] .v11-ch:not([data-hot='1']) :is(.v11-ch-tag, .v11-ch-lead) {
+  opacity: 0.22;
+}
+.v11[data-lit='1'] .v11-ch[data-under='1']:not([data-hot='1']) :is(.v11-ch-tag, .v11-ch-lead) {
+  opacity: 0;
+}
+/* the card: the jewel's picture large and lit, with the name and its sentence, on the names' side */
+.v11-card {
+  position: absolute;
+  left: calc(50% + var(--lx, 0px));
+  top: calc(50% + var(--cy, 0px));
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-align: left;
+  background: #0b0920;
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 1.5px color-mix(in srgb, var(--h) 80%, #fff),
+    0 0 26px color-mix(in srgb, var(--h) 45%, transparent),
+    0 24px 60px rgba(2, 1, 8, 0.7);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-100%, -50%) translateX(8px) scale(0.97);
+  transform-origin: 100% 50%;
+  transition: opacity 160ms ease, transform 200ms cubic-bezier(0.2, 0.7, 0.2, 1), visibility 0s linear 200ms;
+}
+.v11-ch[data-hot='1'] .v11-card {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-100%, -50%);
+  transition: opacity 160ms ease, transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1), visibility 0s;
+}
+.v11-card-img {
+  display: block;
+  height: 176px;
+  background-repeat: no-repeat;
+  background-color: #06050e;
+}
+.v11-card-txt {
+  display: grid;
+  gap: 7px;
+  padding: 13px 16px 16px;
+  border-top: 1px solid color-mix(in srgb, var(--h) 50%, transparent);
+}
+.v11-card-name {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: #fff;
+}
+.v11-card-name i {
+  margin-left: 6px;
+  font-family: var(--mono);
+  font-style: normal;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--h);
+  vertical-align: 0.2em;
+}
+.v11-card-line {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.36;
+  color: #ece8ff;
+  text-wrap: pretty;
+}
+.v11-say {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.v11-mark {
+  position: absolute;
+  right: 20px;
+  bottom: 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(222, 214, 255, 0.62);
+  pointer-events: none;
+  z-index: 2;
+}
+.v11[data-phase='open'] .v11-mark {
+  display: none;
+}
+.v11[data-bare='1'] .v11-home,
+.v11[data-bare='1'] .v11-mark,
+.v11[data-bare='1'] .v11-veil {
+  display: none;
+}
+
+/* the jewel's light as the camera enters: short, never a sheet that holds */
+.v11-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse 72% 68% at 50% 50%,
+    rgba(255, 255, 255, 0.85) 0%,
+    color-mix(in srgb, var(--hue) 60%, rgba(255, 255, 255, 0.6)) 30%,
+    color-mix(in srgb, var(--hue) 35%, transparent) 68%,
+    transparent 100%
+  );
+}
+.v11-flash[data-out='1'] {
+  opacity: 0 !important;
+  transition: opacity 250ms ease-out;
+}
+
+/* ------------------------------------------------------------------ the still picture of the scene */
+.v11-still {
+  position: absolute;
+  inset: 0;
+  background-color: #04030c;
+  background-repeat: no-repeat;
+  background-size: auto 100%;
+  background-position: 53.5% 0;
+}
+.v11[data-tall='1'] .v11-still {
+  background-size: 100% auto;
+  background-position: 0 63%;
+}
+
+/* ------------------------------------------------------------------ phones: the same figure, framed tall */
+.v11[data-tall='1'] .v11-title {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: auto;
+  padding: 26px 18px 30px;
+  text-align: center;
+  animation-delay: 0ms;
+  background: radial-gradient(ellipse 80% 70% at 50% 34%, rgba(6, 4, 18, 0.78), rgba(6, 4, 18, 0.35) 58%, transparent 80%);
+}
+.v11[data-tall='1'] .v11-title h1 {
+  font-size: clamp(28px, 8.2vw, 44px);
+}
+.v11[data-tall='1'] .v11-read {
+  min-height: 66px;
+  margin-top: 10px;
+}
+.v11[data-tall='1'] .v11-line,
+.v11[data-tall='1'] .v11-focus-line {
+  max-width: 19em;
+  margin: 0 auto !important;
+  font-size: 16px;
+  line-height: 1.3;
+}
+.v11[data-tall='1'][data-lit='1'] .v11-line {
+  opacity: 0;
+}
+.v11[data-tall='1'] .v11-ch-tag {
+  font-size: 14px;
+  gap: 6px;
+  padding: 4px 7px 5px;
+  border-radius: 6px;
+}
+.v11[data-tall='1'] .v11-ch-tag i,
+.v11[data-tall='1'] .v11-card {
+  display: none;
+}
+.v11[data-tall='1'] .v11-veil {
+  background:
+    linear-gradient(180deg, rgba(3, 2, 10, 0.55) 0%, transparent 22%),
+    linear-gradient(0deg, rgba(3, 2, 10, 0.5) 0%, transparent 10%);
+}
+.v11[data-tall='1'] .v11-mark {
+  right: 12px;
+  bottom: 10px;
+  font-size: 9.5px;
+}
+
+/* ------------------------------------------------------------------ the check's page */
+.v11-mod {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* heights the stage's frame leaves for the bar, the head and the next-step line */
+  --bar: 62px;
+  --head: 112px;
+  --act: 126px;
+}
+/* mounted hidden while the camera flies in, so the page is ready the moment it lands */
+.v11-mod[data-shown='0'] {
+  opacity: 0;
+  pointer-events: none;
+}
+.v11-mod[data-shown='1'] {
+  animation: v11-open 320ms ease both;
+}
+@keyframes v11-open {
+  from {
+    opacity: 0;
+  }
+}
+.v11-mod-bg {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(70% 55% at 50% -8%, color-mix(in srgb, var(--hue) 34%, transparent), transparent 70%),
+    radial-gradient(60% 50% at 100% 100%, rgba(43, 228, 255, 0.1), transparent 70%),
+    radial-gradient(60% 50% at 0% 100%, rgba(255, 54, 189, 0.09), transparent 70%), #05040d;
+}
+/* the jewel's own picture, stretched from a tiny canvas into a soft wash of its light */
+.v11-mod-wash {
+  position: absolute;
+  left: -10%;
+  top: -10%;
+  width: 120%;
+  height: 120%;
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.v11-mod-wash[data-on='1'] {
+  opacity: 0.3;
+}
+.v11-mod-gem {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(118vw, 150vh);
+  height: max(118vw, 150vh);
+  transform: translate(-50%, -50%);
+  fill: none;
+  stroke: color-mix(in srgb, var(--hue) 70%, #fff);
+  stroke-width: 0.12;
+  opacity: 0.32;
+  animation: v11-gem 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.v11-mod-gem polygon:first-child {
+  stroke-width: 0.3;
+  filter: drop-shadow(0 0 1px var(--hue));
+}
+@keyframes v11-gem {
+  from {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(0.72);
+  }
+}
+.v11-mod-bg::after {
+  /* facets of the jewel round the page */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(115deg, transparent 0 62%, rgba(255, 255, 255, 0.035) 62% 62.2%, transparent 62.2%),
+    linear-gradient(62deg, transparent 0 18%, color-mix(in srgb, var(--hue) 9%, transparent) 18% 38%, transparent 38%),
+    linear-gradient(-28deg, transparent 0 70%, rgba(43, 228, 255, 0.045) 70% 86%, transparent 86%);
+}
+.v11-mod-in {
+  position: relative;
+  max-width: 1640px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 0 44px;
+  display: flex;
+  flex-direction: column;
+}
+.v11-bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: var(--bar);
+  flex: none;
+}
+.v11-back,
+.v11-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-self: start;
+  height: 40px;
+  padding: 0 16px 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.005em;
+  background: rgba(10, 8, 26, 0.5);
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+.v11-next {
+  justify-self: end;
+  padding: 0 10px 0 16px;
+}
+.v11-next span {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #c9c3e6;
+}
+.v11-back svg,
+.v11-next svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.v11-back:hover,
+.v11-next:hover,
+.v11-back:focus-visible,
+.v11-next:focus-visible {
+  border-color: #fff;
+  background: rgba(30, 24, 70, 0.7);
+}
+.v11 a:focus-visible,
+.v11-mod button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.v11-steps {
+  display: flex;
+  gap: 8px;
+}
+.v11-steps a {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 36px;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #c9c3e6;
+  border: 1px solid var(--line);
+  clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
+  background: rgba(10, 8, 26, 0.5);
+  transition: background 160ms ease, color 160ms ease;
+}
+.v11-steps a:hover,
+.v11-steps a:focus-visible {
+  background: color-mix(in srgb, var(--h) 38%, #0a081a);
+  color: #fff;
+}
+.v11-steps a.is-on {
+  background: var(--h);
+  color: #07060f;
+  font-weight: 700;
+}
+
+/* the head keeps one height and three fixed columns, so the frame below never moves and the sentence starts at
+   the same place on every page */
+.v11-head {
+  flex: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px 352px;
+  align-items: end;
+  gap: 36px;
+  height: var(--head);
+  padding: 0 2px 18px;
+}
+.v11-kicker {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #c9c3e6;
+}
+.v11-kicker b {
+  color: var(--hue);
+  font-weight: 600;
+}
+.v11-kicker i {
+  font-style: normal;
+  margin-left: 14px;
+  padding-left: 14px;
+  border-left: 1px solid var(--line);
+  color: var(--ink-2);
+}
+.v11-head h1 {
+  margin-top: 6px;
+  font-family: var(--display);
+  font-weight: 800;
+  width: max-content;
+  max-width: 100%;
+  font-size: clamp(38px, 3.7vw, 54px);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  background: linear-gradient(96deg, #fff 0%, #fff 45%, color-mix(in srgb, var(--hue) 60%, #fff) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding-bottom: 0.06em;
+}
+.v11-sentence {
+  padding-bottom: 5px;
+  font-size: clamp(16px, 1.3vw, 19px);
+  font-weight: 500;
+  line-height: 1.32;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.v11-ctl {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  padding-bottom: 5px;
+}
+.v11-run {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 352px;
+  height: 54px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: -0.005em;
+  color: #07060f !important;
+  background: linear-gradient(100deg, #fff 0%, color-mix(in srgb, var(--hue) 78%, #fff) 55%, var(--hue) 100%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5) inset, 0 10px 40px color-mix(in srgb, var(--hue) 45%, transparent);
+  transition: transform 140ms ease, filter 140ms ease, opacity 160ms ease;
+  white-space: nowrap;
+}
+.v11-run svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+.v11-run:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.v11-run:active {
+  transform: translateY(1px) scale(0.985);
+}
+/* running: the same light, with a glint passing through it */
+.v11-run:disabled {
+  cursor: progress;
+  opacity: 0.9;
+  filter: none;
+  transform: none;
+}
+.v11-run:disabled::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.75) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: v11-shimmer 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes v11-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+.v11-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #c9c3e6;
+}
+.v11-status i {
+  width: 7px;
+  height: 7px;
+  transform: rotate(45deg);
+  background: #c9c3e6;
+}
+.v11-status[data-s='running'] i {
+  background: var(--gd);
+  box-shadow: 0 0 10px var(--gd);
+  animation: v11-pulse 0.9s ease-in-out infinite;
+}
+.v11-status[data-s='result'] i {
+  background: var(--cy);
+  box-shadow: 0 0 10px var(--cy);
+}
+.v11-status[data-s='error'] i {
+  background: #ff5a52;
+}
+
+/* the stage in its prismatic frame */
+.v11-frame {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 430px;
+  height: calc(100svh - var(--bar) - var(--head) - var(--act));
+  --cut: 26px;
+}
+.v11-frame-glow {
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    -14px -10px 44px rgba(43, 228, 255, 0.16),
+    14px 10px 44px rgba(255, 54, 189, 0.16),
+    0 0 30px color-mix(in srgb, var(--hue) 16%, transparent);
+  pointer-events: none;
+}
+.v11-stage {
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: conic-gradient(from 215deg at 50% 50%, var(--cy), #8d7bff 18%, var(--mg) 36%, #fff 50%, var(--gd) 64%, var(--mg) 82%, var(--cy));
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+}
+.v11-stage-in {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #06050e;
+  clip-path: polygon(calc(var(--cut) - 0.8px) 0, 100% 0, 100% calc(100% - var(--cut) + 0.8px), calc(100% - var(--cut) + 0.8px) 100%, 0 100%, 0 calc(var(--cut) - 0.8px));
+}
+.v11 .v11-fill {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+}
+
+/* what to do next, with the way back and on */
+.v11-act {
+  flex: none;
+  display: grid;
+  place-items: start center;
+  height: var(--act);
+  padding-top: 16px;
+}
+.v11-act-mid {
+  text-align: center;
+  max-width: 100%;
+  animation: v11-rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.v11-act-mid span {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--hue);
+}
+.v11-act-mid p {
+  margin: 4px auto 0 !important;
+  max-width: 52em;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(17px, 1.4vw, 22px);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: #fff;
+  text-wrap: balance;
+}
+.v11-act-mid small {
+  display: block;
+  margin-top: 4px;
+  font-size: 15px;
+  color: #c9c3e6;
+}
+
+/* TrackTrace: our own network on a white card */
+.v11-arch {
+  flex: none;
+  width: min(100%, 880px);
+  margin: 56px auto 64px !important;
+}
+.v11-arch-card {
+  padding: 22px 26px;
+  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  outline: 1px solid var(--line);
+  outline-offset: 7px;
+}
+.v11-arch-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.v11-arch figcaption {
+  margin-top: 20px;
+  text-align: center;
+  font-family: var(--text);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.005em;
+  color: #c9c3e6;
+}
+
+/* ------------------------------------------------------------------ SpikeCount stage */
+.v11-mod[data-id='spikecount'] .v11-frame {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+.v11-spike {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  align-items: center;
+  gap: 44px;
+  padding: 22px 36px 22px 22px;
+}
+.v11-spike-field {
+  position: relative;
+  height: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+.v11-spike-field img,
+.v11-spike-field svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.v11-spike-field img {
+  filter: contrast(1.15) brightness(0.86);
+}
+.v11-spike-field polygon {
+  fill: rgba(79, 208, 255, 0.1);
+  stroke: #7fe0ff;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: v11-draw 520ms ease forwards;
+}
+.v11-spike-field polygon.is-spiky {
+  fill: rgba(255, 90, 82, 0.2);
+  stroke: #ff6a5e;
+  stroke-width: 2.6;
+}
+@keyframes v11-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.v11-spike-sweep {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: #fff;
+  box-shadow: 0 0 22px 4px var(--hue);
+  animation: v11-sweep 3.2s linear forwards;
+}
+@keyframes v11-sweep {
+  to {
+    left: 100%;
+  }
+}
+.v11-spike-read {
+  display: grid;
+  gap: 20px;
+  align-content: center;
+  justify-items: start;
+  max-width: 30em;
+}
+.v11-spike-hint {
+  font-size: clamp(20px, 1.8vw, 26px);
+  font-weight: 500;
+  line-height: 1.34;
+  color: #f1edff;
+  text-wrap: pretty;
+}
+.v11-spike-big {
+  display: grid;
+  gap: 4px;
+}
+.v11-spike-big b {
+  font-family: var(--text);
+  font-weight: 800;
+  font-size: clamp(64px, 6.7vw, 96px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.v11-spike-big span {
+  font-size: 20px;
+  font-weight: 500;
+  color: #ece8ff;
+}
+.v11-spike-big.is-hot b {
+  color: #ff6a5e;
+}
+.v11-spike-big.is-hot {
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.v11-spike-big.is-hot[data-show='1'] {
+  opacity: 1;
+}
+.v11-spike-key {
+  display: flex;
+  gap: 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 18px;
+  color: #ece8ff;
+}
+.v11-spike-key li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.v11-spike-key i {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #7fe0ff;
+}
+.v11-spike-key i.k-hot {
+  border-color: #ff6a5e;
+  background: rgba(255, 90, 82, 0.3);
+}
+.v11-tag {
+  justify-self: start;
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: #c9c3e6;
+}
+
+
+/* ------------------------------------------------------------------ phones: the check's page */
+@media (max-width: 760px) {
+  .v11-focus-name {
+    display: none;
+  }
+  .v11-mod-in {
+    padding: 0 14px 22px;
+  }
+  .v11-bar {
+    grid-template-columns: auto 1fr;
+    height: 58px;
+  }
+  .v11-steps {
+    display: none;
+  }
+  .v11-back,
+  .v11-next {
+    font-size: 14px;
+    height: 40px;
+  }
+  .v11-next span {
+    display: none;
+  }
+  .v11-head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    height: auto;
+    padding: 4px 2px 16px;
+  }
+  .v11-head h1 {
+    font-size: min(35px, 8vw);
+    white-space: nowrap;
+  }
+  .v11-sentence {
+    font-size: 17px;
+    padding-bottom: 0;
+  }
+  .v11-ctl {
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 14px;
+  }
+  .v11-run {
+    min-width: 220px;
+    height: 52px;
+    font-size: 17px;
+    padding: 0 20px 0 16px;
+  }
+  .v11-frame {
+    flex: none;
+    height: 66svh;
+    min-height: 460px;
+    margin: 0 -6px;
+    --cut: 16px;
+  }
+  .v11-act {
+    height: auto;
+    min-height: 0;
+    padding: 16px 0 8px;
+  }
+  .v11-arch {
+    margin: 36px auto 40px !important;
+  }
+  .v11-arch-card {
+    padding: 12px;
+    overflow-x: auto;
+  }
+  .v11-arch-card img {
+    min-width: 640px;
+  }
+  .v11-spike {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    gap: 16px;
+    padding: 18px 14px;
+    align-content: center;
+    justify-items: center;
+  }
+  .v11-mod[data-id='spikecount'] .v11-frame {
+    max-width: none;
+  }
+  .v11-spike-field {
+    width: min(100%, 330px);
+    height: auto;
+  }
+  .v11-spike-hint {
+    font-size: 17px;
+  }
+  .v11-spike-read {
+    gap: 10px;
+    width: 100%;
+  }
+  .v11-spike-big b {
+    font-size: 52px;
+  }
+  .v11-spike-read {
+    max-width: none;
+  }
+  .v11-tag {
+    font-size: 12px;
+    letter-spacing: 0.03em;
+  }
+  .v11-spike-big {
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .v11-spike-hint {
+    font-size: 16px;
+  }
+}
+
+/* a real browser window at laptop width is about 730 px tall: a compact head gives the stage the height */
+/* a smaller laptop: narrower columns; under 1100 px the sentence takes its own row */
+@media (min-width: 761px) and (max-width: 1360px) {
+  .v11-head {
+    grid-template-columns: minmax(0, 1fr) 320px 300px;
+    gap: 28px;
+  }
+  .v11-head h1 {
+    font-size: clamp(34px, 3.4vw, 46px);
+  }
+  .v11-run {
+    width: 300px;
+    font-size: 15.5px;
+  }
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .v11-mod {
+    --head: 158px;
+  }
+  .v11-head {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-areas: 'name ctl' 'line line';
+    row-gap: 10px;
+  }
+  .v11-head-name {
+    grid-area: name;
+  }
+  .v11-sentence {
+    grid-area: line;
+  }
+  .v11-ctl {
+    grid-area: ctl;
+  }
+}
+
+/* a narrow phone: the main button takes the full width, its status line sits under it */
+@media (max-width: 500px) {
+  .v11-ctl {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .v11-run {
+    width: 100%;
+    min-width: 0;
+    font-size: 16px;
+  }
+  .v11-status {
+    justify-content: center;
+  }
+}
+
+@media (min-width: 761px) and (max-height: 800px) {
+  .v11-mod {
+    --bar: 52px;
+    --head: 84px;
+    --act: 104px;
+  }
+  .v11-back,
+  .v11-next {
+    height: 36px;
+  }
+  .v11-steps a {
+    height: 32px;
+  }
+  .v11-head {
+    gap: 36px;
+    padding: 0 2px 14px;
+  }
+  .v11-head h1 {
+    margin-top: 2px;
+    font-size: 48px;
+  }
+  .v11-kicker {
+    font-size: 13px;
+  }
+  .v11-sentence {
+    font-size: 17px;
+    padding-bottom: 4px;
+  }
+  .v11-run {
+    height: 48px;
+    font-size: 17px;
+  }
+  .v11-ctl {
+    gap: 8px;
+    padding-bottom: 2px;
+  }
+  .v11-act {
+    padding-top: 12px;
+  }
+  .v11-act-mid small {
+    margin-top: 2px;
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v11 *,
+  .v11 *::before,
+  .v11 *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}

@@ -136,6 +136,8 @@
   border-radius: 3px;
   padding: 0.12em 0.5em;
   white-space: nowrap;
+  /* opaque, so the lens's thin leader line passes under the tag instead of through its letters (phone layout) */
+  background: var(--m-stage, #0b0f12);
 }
 .ttm .ttm-error {
   position: absolute;

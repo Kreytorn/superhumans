@@ -48,7 +48,8 @@ if (!project.licenceFile) flag('blocker', 'app/LICENSE', 'no LICENSE file', 'add
 
 const AI_DISCLOSURE =
   'This project was built with Super Intelligence (AI) tools. Claude by Anthropic (through Claude Code) wrote the code of the ' +
-  'website, the desktop app and the model-training scripts, drew the IonScan architecture diagram as LaTeX/TikZ code, and helped ' +
+  'website, the desktop app and the model-training scripts, drew the six architecture diagrams (IonScan, and one for each other ' +
+  'check) as LaTeX/TikZ code, each with a visible "AI-generated diagram" mark, and helped ' +
   'with research and with the wording of this page. Humans on Team SuperHumans chose the solution idea and the six modules, ' +
   'made the design decisions and checked the results. There are no AI-generated images or video in the project except those ' +
   'that carry a visible "AI-generated" mark. The health data shown is real, openly published research data; none of it was ' +
@@ -61,7 +62,7 @@ const aiTools = [
     usedFor: [
       'wrote the application code (website, Electron desktop wrapper, in-browser model engines)',
       'wrote the model-training, evaluation and export scripts that the team ran on rented GPUs',
-      'drew the IonScan architecture diagram as LaTeX/TikZ code',
+      'drew the six architecture diagrams (IonScan, and one for each other check) as LaTeX/TikZ code; each carries a visible "AI-generated diagram" mark',
       'helped with research: surveyed NASA and partner sources, published space-medicine findings and open datasets, and listed candidate health problems with their sources; humans chose the idea and the six modules',
       'helped word the documentation and the project page',
     ],
@@ -437,8 +438,9 @@ for (const m of MODULES) {
 
 // Other files in public/ that are not part of a module.
 const KNOWN_PUBLIC = {
-  'favicon.svg': { licence: 'unclear', credit: 'the default icon of the Vite project template (the Vite logo), not ours', level: 'review', action: 'replace it with our own icon before publishing' },
-  'icons.svg': { licence: 'unclear', credit: 'sprite from the Vite project template; it contains third-party brand marks (social-network logos)', level: 'review', action: 'delete it if nothing uses it' },
+  // r4: the Vite template's favicon.svg and icons.svg are deleted; the site icon is inline in index.html
+  'qr/superhumans_qr.svg': { licence: 'MIT (Team SuperHumans, project licence)', credit: 'QR code of https://kreytorn.github.io/superhumans/, drawn once with segno 1.6.6 (BSD-3-Clause) and checked by decoding it back with OpenCV; no code of either ships', level: null },
+  'qr/superhumans_qr.png': { licence: 'MIT (Team SuperHumans, project licence)', credit: 'QR code of https://kreytorn.github.io/superhumans/, drawn once with segno 1.6.6 (BSD-3-Clause) and checked by decoding it back with OpenCV; no code of either ships', level: null },
   '_selftest/tiny.onnx': { licence: 'MIT (Team SuperHumans, project licence)', credit: 'a tiny test model made by the team to check that the browser can run ONNX', level: null },
   'coi-serviceworker.LICENSE.txt': { licence: 'MIT', credit: 'licence text of coi-serviceworker (Guido Zuidhof)', level: null },
   'coi-serviceworker.js': { licence: 'MIT', credit: 'coi-serviceworker by Guido Zuidhof (github.com/gzuidhof/coi-serviceworker): makes the hosted page cross-origin isolated so the models can use several threads', level: null },
@@ -628,7 +630,7 @@ const tools = [
   { name: 'EEGNet', use: 'baseline model raced against ours; not shipped', licence: 'published method, re-implemented', recorded: 'Garn Meter brief' },
   { name: 'S4D, GSS, GeM, CORAL', use: 'published methods re-implemented inside CorrFuse-EEG and the ordinal heads', licence: 'methods: Gu et al. 2022, Mehta et al. 2023, Radenovic et al. 2019, Cao et al. 2020', recorded: 'Garn Meter manifest' },
   { name: 'CorrFuse', use: 'a team member\'s own earlier code (June 2026, TEKNOFEST 2026 Healthcare-AI, not built for Space Apps), adapted to EEG', licence: 'MIT (Team SuperHumans)', recorded: 'Garn Meter manifest' },
-  { name: 'LaTeX / TikZ, Latin Modern and AMS fonts', use: 'the IonScan architecture figure', licence: 'LPPL (LaTeX, TikZ); GUST Font License; OFL-1.1', recorded: 'TrackTrace manifest' },
+  { name: 'LaTeX / TikZ, Latin Modern and AMS fonts', use: 'the six architecture figures', licence: 'LPPL (LaTeX, TikZ); GUST Font License; OFL-1.1', recorded: 'module manifests' },
   { name: 'ffmpeg', use: 'encoding the ultrasound clips as webm', licence: 'LGPL-2.1-or-later / GPL (tool only; nothing of it ships)', recorded: 'VeinSqueeze scripts' },
   { name: 'Google Colab GPUs', use: 'rented compute for training', licence: 'service', recorded: 'module logs' },
   { name: 'ruff, oxlint', use: 'code formatting and linting', licence: 'MIT', recorded: 'project environment; package.json' },

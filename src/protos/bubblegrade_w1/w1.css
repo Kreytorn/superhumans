@@ -233,7 +233,7 @@
 .bgw1-clip:active {
   transform: scale(0.96);
 }
-.bgw1-clip[aria-pressed='true'] {
+.bgw1-clip[aria-checked='true'] {
   background: var(--cyan);
   border-color: var(--cyan);
   color: #021018;
@@ -638,6 +638,7 @@
   font-family: var(--disp);
   font-weight: 700;
   font-size: 19px;
+  line-height: 1.15;
   letter-spacing: -0.01em;
 }
 .bgw1-play-meta > span {
@@ -733,10 +734,28 @@
   color: var(--ink-3);
   text-decoration: none;
   white-space: nowrap;
+  background: none;
+  border: 0;
+  padding: 6px 4px;
   transition: color 0.2s;
 }
 .bgw1-cue:hover {
   color: var(--cyan);
+}
+/* r4: the cue is a button now; the base reset (.bgw1 button: font inherit) outranks a single class */
+.bgw1 .bgw1-cue {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.2;
+  color: var(--ink-3);
+}
+.bgw1 .bgw1-cue:hover {
+  color: var(--cyan);
+}
+@media (max-width: 700px) {
+  .bgw1 .bgw1-cue {
+    font-size: 10px;
+  }
 }
 .bgw1-cue svg {
   animation: bgw1-bob 1.8s ease-in-out infinite;
@@ -1495,13 +1514,20 @@
   .bgw1-lede {
     font-size: 16px;
   }
+  /* r4: the drawing keeps the full width on a phone (it used to scroll sideways); story.tsx swaps in fewer, larger labels */
   .bgw1-fig {
     margin-top: 24px;
     border-radius: 18px;
-    overflow-x: auto;
+    padding-bottom: 30px;
   }
-  .bgw1-fig svg {
-    width: 760px;
+  .bgw1-fig .t-c {
+    font-size: 36px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    fill: rgba(225, 244, 250, 0.9);
+  }
+  .bgw1-fig .t-c.t-w {
+    fill: #fff;
   }
   .bgw1-beats {
     grid-template-columns: 1fr 1fr;
@@ -1990,9 +2016,8 @@
     margin-top: -178px;
   }
   .bgw1-ai {
-    top: 10px;
     right: 10px;
-    bottom: auto;
+    bottom: 7px;
     font-size: 9px;
     padding: 3px 7px;
   }

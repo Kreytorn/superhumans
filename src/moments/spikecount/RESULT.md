@@ -10,3 +10,9 @@
 **Shots:** `work/Web/shots/k2/spikecount_k/screen_1440.png`, `screen_390.png`; rounds in `r1`-`r4`. Posters refreshed in `app/public/_posters/`.
 **Extra material:** none added; all from `app/public/spikecount/` (RedTell, CC BY 4.0).
 **Unfinished:** the live run tonight (machine shared by many agents) took over 30 s to load the 45 MB models and fell back to REPLAY, as designed; on an idle laptop the brief measures about 3 s. Not tried on a real phone.
+
+**r4 (Sun 15 Nov, the owner's note: "remove scrub bar and day pick, and a second page with an architecture diagram")**
+- Harness `#/moment/spikecount`: one main button only; no scrub bar, no day picker (tests still pin through `?state`, `?t`, `?sample`). On a phone the page scrolls, not the stage, so the scroll is reachable by keyboard (axe `scrollable-region-focusable`).
+- DF page `#/proto/DF/spikecount`: opens on field-96; below the stage, the problem, then the architecture figure (`app/public/spikecount/architecture.*`, title "SpikeCount, two networks in a row"; its grade colours now match the stage's).
+- While the two models load on a laptop (live run), the panel keeps its idle look (the real grade-3 cell, the two networks; root `data-pre="1"`) instead of a big "0" and a row of zero counts. On a 320 px phone the grade notes wrap instead of being cut.
+- Shots: `work/Web/shots/r4qa/spikecount/`.

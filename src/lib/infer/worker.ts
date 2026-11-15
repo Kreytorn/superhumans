@@ -39,6 +39,9 @@ const text = (e: unknown) => (e instanceof Error ? e.message : String(e))
 
 async function init(forceWasm: boolean): Promise<EnvInfo> {
   ort.env.wasm.wasmPaths = { wasm: wasmUrl, mjs: mjsUrl }
+  // onnxruntime prints its C++ warnings (e.g. "Some nodes were not assigned to the preferred execution providers")
+  // through console.error; only real errors should reach the console.
+  ort.env.logLevel = 'error'
   const isolated = scope.crossOriginIsolated === true
   const cores = navigator.hardwareConcurrency || 2
   ort.env.wasm.numThreads = isolated ? Math.max(1, Math.min(4, Math.floor(cores / 2))) : 1
@@ -99,7 +102,8 @@ function plan(wish: Backend[] | undefined): Backend[] {
 
 function create(source: Source, b: Backend): Promise<ort.InferenceSession> {
   const eps = b === 'webgpu' ? ['webgpu', 'wasm'] : ['wasm']
-  const opts: ort.InferenceSession.SessionOptions = { executionProviders: eps, graphOptimizationLevel: 'all' }
+  // logSeverityLevel 3 = errors only (the session's own logger; env.logLevel covers the global one)
+  const opts: ort.InferenceSession.SessionOptions = { executionProviders: eps, graphOptimizationLevel: 'all', logSeverityLevel: 3 }
   return 'bytes' in source ? ort.InferenceSession.create(source.bytes, opts) : ort.InferenceSession.create(source.url, opts)
 }
 

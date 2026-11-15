@@ -9,3 +9,4 @@
 - Unfinished: on this overloaded laptop the live IonScan run hit the stage's 20 s timeout and fell back to REPLAY, so the tag said REPLAY. On a quiet machine it should run live; not re-measured.
 - Unfinished: the 3D markers come from the 3D file's stored foci, so their number can differ from the 2D circle count.
 - Dev-only scripts: `_final.mjs` and `_live.mjs` (screenshots). They are not imported.
+- r4: the first screen and section 01 now live in `room.tsx` (`W1Room`, `ProblemSection`; ids in `ids.ts`) so the DF TrackTrace page (`../DF/pages/tracktrace.tsx`) shows the same code; `index.tsx` keeps sections 02 and 03 and the route. The WebGL canvas is now made and dropped by the room itself (its context is handed back on leave), and a press on a `?state=` pinned stage lets go of the pin and runs.

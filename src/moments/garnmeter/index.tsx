@@ -1,9 +1,8 @@
-// Garn Meter moment: the stage only. The real 14-channel EEG, the model's marks on it (the 4 s window, the grey
-// estimate), the person's own ratings, and one interaction: the 1-7 check-in rail that drives the gauge and act().
-// The rail answers before the session is played (the check-in alone sets the zone and the action) and after it.
-// At idle the stage is the recording under one sentence; the session strip comes on stage when Play fills it and is then
-// a second handle on the specimen: tap or drag it to bring another scene into view.
-// No page chrome: the page gets the number and the action through onResult(result, act).
+// Garn Meter moment: the stage only. The real 14-channel EEG, the model's marks on it (the 4 s window), and the
+// model's own reading: a line over the whole session and the Garn gauge (r4: model output only, no check-in on stage).
+// At idle the stage is the recording under one sentence; Play runs the model over the session and the gauge follows its
+// reading. The session strip is then a handle on the specimen: tap or drag it to bring another scene into view.
+// No page chrome: the page gets the reading through onResult(result, act, reading).
 import '@fontsource-variable/schibsted-grotesk'
 import '@fontsource-variable/spline-sans-mono'
 import './moment.css'
@@ -12,10 +11,10 @@ import * as garn from '../../engine/garnmeter'
 import type { GarnAct, GarnResult } from '../../engine/garnmeter'
 import { loadSessionData } from '../../engine/garnmeter/data'
 import { preferBackends } from '../../lib/infer/client'
-import { drawScene, garnX, layoutFor, scanPx, stopX, stripSampleX, timeScale, type Layout, type Palette, type RailUi, type Signal } from './draw'
-import { CALIBRATE_END, calibrateFrame, DURATION, frameAt, idleAmbient, idleFrame, resultAmbient, stageData, type Frame, type StageData } from './timeline'
+import { drawScene, layoutFor, scanPx, stripSampleX, timeScale, type Layout, type Palette, type Signal } from './draw'
+import { CALIBRATE_END, calibrateFrame, DURATION, frameAt, idleAmbient, idleFrame, resultAmbient, sceneReading, stageData, type Frame, type StageData } from './timeline'
 
-export { BEATS, DURATION } from './timeline'
+export { BEATS, DURATION, HERO_TRIAL } from './timeline'
 export type MomentState = 'idle' | 'running' | 'result' | 'error'
 
 // This model is tiny: wasm is the faster backend for it (model brief, section 3), so it is asked for first.
@@ -24,15 +23,17 @@ preferBackends('garnmeter/garn', ['wasm'])
 export interface GarnMomentProps {
   /** Engine sample id. Default: the whole session of the held-out test person ('user19-s3'). A single scene ('user19-s3-t24') also works. */
   sampleId?: string
-  /** auto: the real model on a laptop, stored outputs on a phone or when the model fails. */
+  /** auto: the real model on a laptop, stored outputs on a phone, when the model fails, or for a run the live model
+   *  has not answered within 4 s of the press (a slow first download). */
   mode?: 'auto' | 'live' | 'replay'
   /** Pins the stage: 'idle' = before the action, 'result' = settled, no animation. */
   state?: 'idle' | 'result'
   /** Pins the timeline at this many ms (0 to DURATION). */
   t?: number
-  /** Called when the result settles and again after every check-in or scene change, with the engine's decision for that
-   *  check-in. A check-in made before the session was played comes with the stored-outputs result: use only `act` then. */
-  onResult?: (result: GarnResult, act: GarnAct) => void
+  /** Called when the result settles and again after every scene change. `reading` is what the gauge shows: the model's
+   *  reading for the scene in view. `act` is the engine's decision for that scene (Tier C: it follows the study's own
+   *  rating, not the model); the stage itself no longer shows it. */
+  onResult?: (result: GarnResult, act: GarnAct, reading: GarnReading) => void
   onState?: (state: MomentState) => void
   /** Called once the recording is loaded and the stage shows what the props pin (idle, the result, or the frame at t). */
   onReady?: () => void
@@ -46,16 +47,27 @@ export interface GarnMomentHandle {
   run: () => Promise<void>
   /** Back to the idle stage. */
   reset: () => void
-  /** Sets the crew check-in (1-7), as a tap on the rail does. Works at idle and once a result is on stage. */
-  checkIn: (ids: number) => void
   /** Brings another analysed scene (1-based trial index) into view, as a tap on the session strip does. */
   focusOn: (trial: number) => void
 }
 
+/** What the gauge settles on, for the page: the model's reading for the scene in view, and the lines that go with it. */
+export interface GarnReading {
+  /** The model's reading in Garns (0 = fine, 1 = totally sick): the mean of the scene's 4 s windows. */
+  garn: number
+  /** The scene (1-based trial index) the reading is for. */
+  trial: number
+  /** How many 4 s windows the mean is over. */
+  windows: number
+  /** 'live' = the model ran now in this browser; 'precomputed' = the stored outputs of the same model (REPLAY). */
+  source: 'live' | 'precomputed'
+  /** Fixed engine lines for a "How do we know?" layer, verbatim. */
+  notes: string[]
+}
+
 const DEFAULT_SAMPLE = 'user19-s3'
-const STATUS_WORD: Record<string, string> = { nominal: 'Nominal', watch: 'Watch', caution: 'Caution', warning: 'Warning', critical: 'Critical' }
-/** A Garn value from a 1-7 check-in, as printed: 1.0, 0.5, 0.17. */
-const saidGarn = (ids: number) => ((ids - 1) / 6).toFixed(2).replace(/0$/, '')
+/** How long a run waits for the live model after the press before it plays the stored outputs instead (auto mode). */
+const LIVE_WAIT_MS = 4000
 
 const coarse = () => typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches
 const isPhone = () => coarse() || window.innerWidth <= 600
@@ -133,10 +145,21 @@ export function readPalette(el: HTMLElement): Palette {
     stageRgb,
     inkRgb,
     glowRgb: rgb(v('--m-glow', accent)),
+    accentRgb: rgb(accent),
     fieldHi: rgb(v('--m-field-hi', '#ff6fc4')),
     fieldLo: rgb(v('--m-field-lo', '#31d6f0')),
     fieldMid,
   }
+}
+
+
+/** The reading for the scene in view, and the engine's fixed lines that go with it. */
+function readingOf(r: GarnResult, d: StageData): GarnReading | null {
+  const garnValue = sceneReading(d)
+  if (garnValue === null) return null
+  const notes: string[] = [garn.STRINGS.personLabel, garn.STRINGS.garnDefinition, garn.STRINGS.groundAnalog, garn.STRINGS.playback]
+  if (r.source === 'precomputed') notes.push(`REPLAY: ${garn.STRINGS.precomputedLabel}.`)
+  return { garn: garnValue, trial: d.focus.index, windows: d.focus.w1 - d.focus.w0, source: r.source, notes }
 }
 
 export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function GarnMoment(
@@ -148,15 +171,12 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
   const sigRef = useRef<Signal | null>(null)
   const dataRef = useRef<StageData | null>(null)
   const resultRef = useRef<{ key: string; result: GarnResult } | null>(null)
-  const storedRef = useRef<{ key: string; job: Promise<GarnResult> } | null>(null)
+  /** The result whose data is on stage (a run that fell back to the stored outputs shows those, not the cached live one). */
+  const onStageRef = useRef<GarnResult | null>(null)
   const frameRef = useRef<Frame>(idleFrame(1024))
   /** The frame on stage: frameRef, plus the playhead that keeps the resting stage alive (idle and settled result). */
   const shownRef = useRef<Frame>(frameRef.current)
   const ambRef = useRef({ on: false, t0: 0 })
-  const saidRef = useRef<RailUi['said']>(null)
-  const rippleRef = useRef(0)
-  const railDrag = useRef({ on: false, moved: false, x: 0, n: 0 })
-  const uiRef = useRef<RailUi>({ handle: null, recorded: null, zone: null })
   const layoutRef = useRef<Layout | null>(null)
   const palRef = useRef<Palette | null>(null)
   const dprRef = useRef(1)
@@ -170,27 +190,20 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
   const scaleTextRef = useRef<HTMLSpanElement>(null)
   const viewRef = useRef<HTMLSpanElement>(null)
   const readsRef = useRef<HTMLSpanElement>(null)
-  const eegRef = useRef<HTMLSpanElement>(null)
-  const eegNumRef = useRef<HTMLSpanElement>(null)
-  const verdictRef = useRef<HTMLSpanElement>(null)
-  const verdictNumRef = useRef<HTMLSpanElement>(null)
-  const askRef = useRef<HTMLSpanElement>(null)
   const tagRef = useRef<HTMLSpanElement>(null)
-  const widthRef = useRef({ reads: 0, eeg: 0, tag: 0 })
+  const widthRef = useRef({ reads: 0, tag: 0 })
 
   const [ready, setReady] = useState(false)
   const [pinDone, setPinDone] = useState(false)
   const [status, setStatus] = useState<MomentState>('idle')
   const [layout, setLayout] = useState<Layout | null>(null)
-  const [checkin, setCheckin] = useState<number | null>(null)
-  const [recorded, setRecorded] = useState<number | null>(null)
-  const [act, setAct] = useState<GarnAct | null>(null)
+  const [reading, setReading] = useState<GarnReading | null>(null)
   const [source, setSource] = useState<'live' | 'precomputed' | null>(null)
   const [focus, setFocus] = useState<{ index: number; first: number; last: number; of: number } | null>(null)
   const dragRef = useRef(false)
   const hoverRef = useRef<HTMLSpanElement>(null)
 
-  /** Places the labels that ride on moving marks: the time scale, the 4 s window's name, the model's value, the gap, the scene tag. */
+  /** Places the labels that ride on moving marks: the time scale, the 4 s window's name, the scene tag. */
   const annotate = useCallback(() => {
     const L = layoutRef.current
     const sig = sigRef.current
@@ -214,34 +227,6 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
         const x = clampN(sp[0], L.traces.x, L.traces.x + L.traces.w - wd.reads)
         reads.style.transform = `translateX(${x.toFixed(1)}px)`
         showEl(reads, fr.scan.alpha)
-      }
-    }
-
-    // The verdict: one large line above the rail, on stage from the moment the person's check-in lands.
-    // Until then the model's value rides on its own tick.
-    const verdictOn = fr.estimate !== null && fr.checkin > 0.6
-    const verdict = verdictRef.current
-    if (verdict) {
-      if (!verdictOn || !fr.estimate) hideEl(verdict)
-      else {
-        setText(verdictNumRef.current, fr.estimate.value.toFixed(2))
-        showEl(verdict)
-      }
-    }
-    const ask = askRef.current
-    if (ask) {
-      if (verdictOn) hideEl(ask)
-      else showEl(ask)
-    }
-    const eeg = eegRef.current
-    if (eeg) {
-      if (!fr.estimate || fr.estimate.alpha <= 0.01 || verdictOn) hideEl(eeg)
-      else {
-        setText(eegNumRef.current, fr.estimate.value.toFixed(2))
-        if (!wd.eeg) wd.eeg = eeg.offsetWidth
-        const x = clampN(garnX(L, fr.estimate.garn) - wd.eeg / 2, 4, L.w - wd.eeg - 4)
-        eeg.style.transform = `translateX(${x.toFixed(1)}px)`
-        showEl(eeg, fr.estimate.alpha)
       }
     }
 
@@ -277,7 +262,7 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
       else if (fr.beat === 'result' && dataRef.current) fr = resultAmbient(fr, dataRef.current, clock)
     }
     shownRef.current = fr
-    drawScene(ctx, L, palRef.current, sig, dataRef.current, fr, { ...uiRef.current, said: saidRef.current, ripple: rippleRef.current }, dprRef.current)
+    drawScene(ctx, L, palRef.current, sig, dataRef.current, fr, dprRef.current)
     root.dataset.beat = frameRef.current.beat
     // 0 = the idle stage (the sentence over the traces), 1 = the session view (strip, legend and time scale are on stage)
     root.dataset.open = frameRef.current.open > 0.5 ? '1' : '0'
@@ -298,7 +283,7 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
       cv.height = Math.round(h * dpr)
       layoutRef.current = layoutFor(w, h, annotations)
       root.style.setProperty('--gm-u', layoutRef.current.u.toFixed(3))
-      widthRef.current = { reads: 0, eeg: 0, tag: 0 }
+      widthRef.current = { reads: 0, tag: 0 }
       palRef.current = readPalette(root)
       setLayout(layoutRef.current)
       render()
@@ -338,7 +323,7 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
     let dead = false
     document.fonts?.ready.then(() => {
       if (dead) return
-      widthRef.current = { reads: 0, eeg: 0, tag: 0 }
+      widthRef.current = { reads: 0, tag: 0 }
       render()
     })
     return () => {
@@ -358,38 +343,34 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
     return result
   }, [sampleId, mode])
 
-  /** A result for a check-in made before the session was played: act() needs one for its tables, not for any EEG value. */
-  const storedResult = useCallback(() => {
-    if (resultRef.current?.key === `${sampleId}|${mode}`) return Promise.resolve(resultRef.current.result)
-    if (storedRef.current?.key !== sampleId) storedRef.current = { key: sampleId, job: garn.replay(sampleId) }
-    return storedRef.current.job
-  }, [sampleId, mode])
-
-  /** Puts a result on stage (no frame yet): stage data, and the rail starts from the study's own rating for the scene in view. */
+  /** Puts a result on stage (no frame yet): stage data for the scene the moment zooms into. */
   const adopt = useCallback((r: GarnResult) => {
     const sig = sigRef.current
     if (!sig) return null
     const d = stageData(r, sig.nSamples, sig.baseline.length)
     dataRef.current = d
-    uiRef.current = { handle: d.focus.ids, recorded: d.focus.ids, zone: garn.checkinZone(d.focus.ids) }
+    onStageRef.current = r
     setSource(r.source)
-    setRecorded(d.focus.ids)
     const analysed = d.trials.filter((t) => t.w1 > t.w0)
     setFocus({ index: d.focus.index, first: analysed[0]?.index ?? d.focus.index, last: analysed[analysed.length - 1]?.index ?? d.focus.index, of: d.trials.length })
     return d
+  }, [])
+
+  /** Tells the page what the gauge shows (the model's reading for the scene in view). */
+  const report = useCallback((r: GarnResult, d: StageData) => {
+    const g = readingOf(r, d)
+    setReading(g)
+    if (g) cb.current.onResult?.(r, garn.act(r, { atTrial: d.focus.index }), g)
   }, [])
 
   const settle = useCallback(
     (r: GarnResult, d: StageData) => {
       frameRef.current = frameAt(DURATION, d)
       render()
-      const a = garn.act(r, { atTrial: d.focus.index })
-      setAct(a)
-      setCheckin(d.focus.ids)
       setStatus('result')
-      cb.current.onResult?.(r, a)
+      report(r, d)
     },
-    [render],
+    [render, report],
   )
 
   const stop = useCallback(() => {
@@ -401,10 +382,8 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
 
   const clearStage = useCallback(() => {
     dataRef.current = null
-    uiRef.current = { handle: null, recorded: null, zone: null }
-    setAct(null)
-    setCheckin(null)
-    setRecorded(null)
+    onStageRef.current = null
+    setReading(null)
     setFocus(null)
     setSource(null)
   }, [])
@@ -430,8 +409,7 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
         if (t >= DURATION) settle(r, d)
         else {
           frameRef.current = frameAt(t, d)
-          setAct(null)
-          setCheckin(null)
+          setReading(null)
           setStatus('running')
           render()
         }
@@ -456,21 +434,28 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
     // The clock starts at once. The first beat (calibration) needs only the recording, so it plays while the model
     // answers; if the model is slower than that beat, the clock holds at its end and then goes on.
     let got: { r: GarnResult; d: StageData } | null = null
-    getResult().then(
-      (r) => {
-        if (id !== runRef.current) return
-        const d = adopt(r)
-        if (d) got = { r, d }
-      },
-      (e) => {
-        console.error('garnmeter moment: no result', e)
-        if (id === runRef.current) {
-          runRef.current++
-          setStatus('error')
-        }
-      },
-    )
+    const take = (r: GarnResult) => {
+      if (got || id !== runRef.current) return
+      const d = adopt(r)
+      if (d) got = { r, d }
+    }
+    getResult().then(take, (e) => {
+      console.error('garnmeter moment: no result', e)
+      if (!got && id === runRef.current) {
+        runRef.current++
+        setStatus('error')
+      }
+    })
+    // A slow first download of the live model (a cold browser on a slow network) never keeps the stage waiting long:
+    // after LIVE_WAIT_MS this run plays the stored outputs of the same model, tagged REPLAY; the live model keeps loading
+    // and answers the next run. Only in auto mode (an explicit ?mode=live waits for the live model).
+    if (mode === 'auto' && !isPhone())
+      window.setTimeout(() => {
+        if (!got && id === runRef.current) garn.replay(sampleId).then(take, () => undefined)
+      }, LIVE_WAIT_MS)
     let t0 = performance.now()
+    const pressedAt = t0
+    const fs = sigRef.current.fs
     const tick = () => {
       if (id !== runRef.current) return
       let t = performance.now() - t0
@@ -479,7 +464,10 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
           t0 += t - CALIBRATE_END
           t = CALIBRATE_END
         }
-        frameRef.current = calibrateFrame(t, baseline)
+        // while the model is still loading, the recording keeps playing at 1x (a playhead over the 8 s at rest), so
+        // the stage never stands still on a slow first load
+        const fr = calibrateFrame(t, baseline)
+        frameRef.current = t >= CALIBRATE_END ? idleAmbient(fr, baseline, fs, performance.now() - pressedAt) : fr
       } else {
         if (t >= DURATION) return settle(got.r, got.d)
         frameRef.current = frameAt(t, got.d)
@@ -488,112 +476,50 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
       rafRef.current = requestAnimationFrame(tick)
     }
     rafRef.current = requestAnimationFrame(tick)
-  }, [adopt, clearStage, getResult, render, settle, showAt, stop])
+  }, [adopt, clearStage, getResult, mode, render, sampleId, settle, showAt, stop])
 
-  /** The handle travels to the new stop: the user moved it, so it may move (skipped under reduced motion). */
-  const moveHandle = useCallback(
-    (n: number) => {
-      cancelAnimationFrame(tweenRef.current)
-      // from where it is; the first answer starts from the resting handle in the middle of the rail
-      const from = uiRef.current.handle ?? (frameRef.current.beat === 'idle' ? 4 : n)
-      if (reducedMotion()) {
-        uiRef.current.handle = n
-        render()
-        return
-      }
-      const t0 = performance.now()
-      const step = () => {
-        const dt = performance.now() - t0
-        const p = Math.min(1, dt / 260)
-        const e = 1 - Math.pow(1 - p, 4)
-        uiRef.current.handle = from + (n - from) * e
-        // a ring leaves the handle as the answer lands
-        const q = Math.min(1, dt / 520)
-        rippleRef.current = q < 1 ? 1 - Math.pow(1 - q, 3) : 0
-        render()
-        if (q < 1) tweenRef.current = requestAnimationFrame(step)
-      }
-      tweenRef.current = requestAnimationFrame(step)
-    },
-    [render],
-  )
-
-  const checkIn = useCallback(
-    (ids: number) => {
-      const n = Math.min(7, Math.max(1, Math.round(ids)))
-      const sig = sigRef.current
-      if (status === 'idle' && sig) {
-        // Before the session is played there is no EEG on stage: the check-in alone sets the zone and the action.
-        frameRef.current = { ...idleFrame(sig.baseline.length), checkin: 1 }
-        uiRef.current = { handle: uiRef.current.handle, recorded: null, zone: garn.checkinZone(n) }
-        setCheckin(n)
-        moveHandle(n)
-        const id = runRef.current
-        storedResult().then(
-          (r) => {
-            if (id !== runRef.current) return
-            const a = garn.act(r, { checkinIds: n })
-            setAct(a)
-            cb.current.onResult?.(r, a)
-          },
-          (e) => console.warn('garnmeter moment: no decision for the check-in', e),
-        )
-        return
-      }
-      const r = resultRef.current?.result
-      const d = dataRef.current
-      if (!r || !d || status !== 'result') return
-      const a = garn.act(r, { checkinIds: n, atTrial: d.focus.index })
-      setAct(a)
-      setCheckin(n)
-      cb.current.onResult?.(r, a)
-      uiRef.current = { ...uiRef.current, zone: a.checkinZone }
-      moveHandle(n)
-    },
-    [moveHandle, status, storedResult],
-  )
-
-  /** Another scene comes into view: the traces pan to it, the rail shows that scene's own rating and the model's estimate for it. */
+  /** Another scene comes into view: the traces pan to it and the gauge moves to the model's reading for it. */
   const focusOn = useCallback(
     (trialIndex: number) => {
-      const r = resultRef.current?.result
+      const r = onStageRef.current
       const d = dataRef.current
       if (!r || !d || status !== 'result') return
       const tr = d.trials.find((x) => x.index === trialIndex && x.w1 > x.w0)
       if (!tr || tr.index === d.focus.index) return
-      const fromCam = frameRef.current.cam
+      const from = frameRef.current
       const nd = { ...d, focus: tr }
       dataRef.current = nd
       const end = frameAt(DURATION, nd)
-      uiRef.current = { handle: tr.ids, recorded: tr.ids, zone: garn.checkinZone(tr.ids) }
-      const a = garn.act(r, { atTrial: tr.index })
-      setAct(a)
-      setCheckin(tr.ids)
-      setRecorded(tr.ids)
       setFocus((f) => (f ? { ...f, index: tr.index } : f))
-      cb.current.onResult?.(r, a)
+      report(r, nd)
       cancelAnimationFrame(tweenRef.current)
-      rippleRef.current = 0
       ambRef.current.t0 = performance.now()
-      if (reducedMotion()) {
+      const est = end.estimate
+      if (reducedMotion() || !est || !from.estimate) {
         frameRef.current = end
         render()
         return
       }
+      const g0 = from.estimate.garn
       const t0 = performance.now()
       const step = () => {
-        const p = Math.min(1, (performance.now() - t0) / 340)
+        const p = Math.min(1, (performance.now() - t0) / 420)
         const e = 1 - Math.pow(1 - p, 4)
-        frameRef.current = { ...end, cam: [fromCam[0] + (end.cam[0] - fromCam[0]) * e, fromCam[1] + (end.cam[1] - fromCam[1]) * e] }
+        frameRef.current = {
+          ...end,
+          cam: [from.cam[0] + (end.cam[0] - from.cam[0]) * e, from.cam[1] + (end.cam[1] - from.cam[1]) * e],
+          estimate: { ...est, garn: g0 + (est.garn - g0) * e },
+          mean: e,
+        }
         render()
         if (p < 1) tweenRef.current = requestAnimationFrame(step)
       }
       tweenRef.current = requestAnimationFrame(step)
     },
-    [render, status],
+    [render, report, status],
   )
 
-  useImperativeHandle(ref, () => ({ run, reset, checkIn, focusOn }), [run, reset, checkIn, focusOn])
+  useImperativeHandle(ref, () => ({ run, reset, focusOn }), [run, reset, focusOn])
 
   const sceneAt = (e: PointerEvent<HTMLDivElement>) => {
     const sig = sigRef.current
@@ -664,35 +590,8 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
     }
   }, [exposed, status, pinnedT, render])
 
-  const railOn = ready && (status === 'idle' || status === 'result')
-  const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (!railOn) return
-    const cur = checkin ?? 1
-    const delta = e.key === 'ArrowRight' || e.key === 'ArrowUp' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? -1 : 0
-    const next = e.key === 'Home' ? 1 : e.key === 'End' ? 7 : Math.min(7, Math.max(1, cur + delta))
-    if (next === checkin || (delta === 0 && e.key !== 'Home' && e.key !== 'End')) return
-    e.preventDefault()
-    checkIn(next)
-    e.currentTarget.querySelector<HTMLButtonElement>(`[data-stop="${next}"]`)?.focus()
-  }
-
   const L = layout
-  const scenesOn = status === 'result' && act !== null
-  const shown = act !== null && checkin !== null && act.checkinIds === checkin
-  const hx = L && checkin !== null ? stopX(L, checkin) : 0
-  const edge = L ? 60 * L.u : 96
-  const wordAlign = !L ? 'mid' : hx < edge ? 'start' : hx > L.w - edge ? 'end' : 'mid'
-  const moved = recorded !== null && checkin !== null && checkin !== recorded && status === 'result'
-  // whose answer the handle shows: the test person's own rating for the scene in view, or the viewer's once they moved it
-  const said = checkin ?? recorded
-  // what the dial prints: the check-in in Garns, whose answer it is, and the engine's status word for it
-  const dialSaid = shown && act && checkin !== null ? { value: saidGarn(checkin), who: moved || status === 'idle' ? 'you said' : 'the person said', word: STATUS_WORD[act.severity] ?? act.tierName } : null
-  saidRef.current = dialSaid
-  const dialKey = dialSaid ? `${dialSaid.value}|${dialSaid.who}|${dialSaid.word}` : ''
-  useEffect(() => {
-    render()
-  }, [dialKey, render])
-  const seg = L ? (L.rail.x1 - L.rail.x0) / 6 : 48
+  const scenesOn = status === 'result' && reading !== null
   return (
     <div
       ref={rootRef}
@@ -701,18 +600,26 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
       data-state={status}
       data-ready={exposed ? '1' : undefined}
       data-source={source ?? undefined}
-      data-checkin={checkin ?? undefined}
-      data-zone={act ? act.zone.toLowerCase() : undefined}
+      data-reading={reading ? reading.garn.toFixed(2) : undefined}
       data-focus={focus && status !== 'idle' ? focus.index : undefined}
       data-notes={annotations ? '1' : '0'}
       data-narrow={L?.narrow ? '1' : undefined}
     >
-      <canvas ref={canvasRef} className="gm-canvas" role="img" aria-label="A recording, not live: fourteen brainwave (EEG) traces of one test person, with the model's estimate and the person's own ratings over the session" />
+      <canvas
+        ref={canvasRef}
+        className="gm-canvas"
+        role="img"
+        aria-label="A recording, not live: fourteen brainwave (EEG) traces of one test person, the model's reading over the session, and the Garn gauge with the model's reading"
+      />
+      {/* what the gauge shows, for screen readers (the gauge itself is drawn on the canvas) */}
+      <span className="gm-sr" aria-live="polite">
+        {reading ? `The model reads ${reading.garn.toFixed(2)} Garn for scene ${reading.trial}.` : ''}
+      </span>
       {L && annotations && (
         <>
           {/* idle: the one sentence that says what the traces are and what Play will show */}
           <span className="gm-say" style={{ left: L.head.x, top: L.head.y, width: L.col.w, fontSize: L.big }}>
-            Recorded brainwaves. Can a model tell how sick this person felt?
+            Recorded brainwaves. Can a model read motion sickness in them?
           </span>
           {/* once playing: the traces' name (what is in view) and a time scale; under them, the name of the 4 s window */}
           <span className="gm-scale" style={{ left: L.head.x, top: L.head.y, width: L.col.w }}>
@@ -728,18 +635,14 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
             what the model reads
           </span>
 
-          {/* the two lines of the strip, named: the person's own ratings, and the engine's sentence for the model's estimate
-              with where its values come from */}
+          {/* the strip's line, named: the model's reading, where its values come from, and one quiet tag */}
           <span className="gm-legend" style={{ left: L.legend.x, top: L.legend.y, width: L.legend.w }}>
-            <span>
-              <i className="gm-key gm-key-own" />
-              what the person said
-            </span>
             <span>
               <i className="gm-key gm-key-eeg" />
               {source && <b className="gm-tag">{source === 'live' ? 'LIVE' : 'REPLAY'}</b>}
-              {garn.STRINGS.eegLine}
+              the model’s reading, every half second
             </span>
+            <span className="gm-exp">experimental model</span>
           </span>
 
           {/* the session strip: its axis and the scene in view */}
@@ -752,32 +655,6 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
           <span ref={tagRef} className="gm-tag-scene" data-qa="tick" style={{ left: 0, top: L.strip.y }}>
             scene
           </span>
-
-          {/* the rail: the question; at the result one large line with both values takes its place */}
-          <span ref={askRef} className="gm-ask" style={{ left: L.rail.x0 - 9 * L.u, top: L.rows.status - 8 - Math.round(L.big * 1.2), fontSize: L.big }}>
-            How sick do you feel?
-          </span>
-          <span ref={verdictRef} className="gm-verdict" style={{ left: L.col.x, width: L.col.w, top: L.rows.big, fontSize: L.big }}>
-            <span>
-              Brainwave model <span ref={verdictNumRef}>0.00</span>
-            </span>
-            <i aria-hidden="true"> · </i>
-            <b>{said !== null ? `${moved ? 'you' : 'the person'} said ${saidGarn(said)} Garn` : ''}</b>
-          </span>
-          <span ref={eegRef} className="gm-eeg" style={{ left: 0, top: L.rows.status }}>
-            model <span ref={eegNumRef}>0.00</span>
-          </span>
-          {shown && act && checkin !== null && (
-            <span key={act.severity} className={`gm-status gm-status-${wordAlign}`} data-zone={act.zone.toLowerCase()} style={{ left: hx, top: L.rows.status }}>
-              <b>{STATUS_WORD[act.severity] ?? act.tierName}</b>
-              {status === 'idle' ? ` ${saidGarn(checkin)} Garn` : ''}
-            </span>
-          )}
-          {ready && status === 'idle' && checkin === null && (
-            <span className="gm-status gm-status-mid gm-hint" style={{ left: stopX(L, 4), top: L.rows.status }}>
-              tap to answer
-            </span>
-          )}
         </>
       )}
       {L && (
@@ -822,69 +699,6 @@ export const GarnMoment = forwardRef<GarnMomentHandle, GarnMomentProps>(function
           onPointerCancel={() => (dragRef.current = false)}
         >
           <span ref={hoverRef} className="gm-scene-hover" style={{ top: L.plot.top - 4 - L.strip.y, height: L.plot.base - L.plot.top + 4 }} />
-        </div>
-      )}
-      {L && (
-        <div
-          className="gm-stops"
-          role="radiogroup"
-          aria-label="Check-in: how sick do you feel, from 1 (not sick) to 7 (very sick)"
-          aria-disabled={!railOn}
-          onKeyDown={onKey}
-          // the handle can also be dragged along the rail: it snaps from stop to stop, and the dial follows
-          onPointerDown={(e) => {
-            const stopEl = (e.target as HTMLElement).closest<HTMLElement>('.gm-stop')
-            if (!railOn || !stopEl) return
-            railDrag.current = { on: true, moved: false, x: e.clientX, n: checkin ?? 0 }
-            stopEl.setPointerCapture(e.pointerId)
-          }}
-          onPointerMove={(e) => {
-            const g = railDrag.current
-            const root = rootRef.current
-            if (!g.on || !root) return
-            if (!g.moved && Math.abs(e.clientX - g.x) < 8) return
-            g.moved = true
-            const box = root.getBoundingClientRect()
-            const n = clampN(Math.round(1 + ((e.clientX - box.left - L.rail.x0) / (L.rail.x1 - L.rail.x0)) * 6), 1, 7)
-            if (n === g.n) return
-            g.n = n
-            checkIn(n)
-          }}
-          onPointerUp={() => {
-            railDrag.current.on = false
-            setTimeout(() => (railDrag.current.moved = false), 0)
-          }}
-          onPointerCancel={() => {
-            railDrag.current.on = false
-            railDrag.current.moved = false
-          }}
-        >
-          {[1, 2, 3, 4, 5, 6, 7].map((n) => {
-            const word = moved && n === recorded ? 'they said' : n === 1 ? 'not sick' : n === 7 ? 'very sick' : null
-            return (
-              <button
-                key={n}
-                type="button"
-                role="radio"
-                className="gm-stop"
-                data-stop={n}
-                data-qa="tick"
-                data-own={moved && n === recorded ? '1' : undefined}
-                aria-checked={checkin === n}
-                aria-label={`Check-in ${n} of 7, ${((n - 1) / 6).toFixed(2)} Garn`}
-                disabled={!railOn}
-                tabIndex={railOn && (checkin ?? 1) === n ? 0 : -1}
-                style={{ left: stopX(L, n), top: L.rail.y - 24, width: Math.max(44, Math.floor(seg)) }}
-                onClick={() => {
-                  if (railDrag.current.moved) return
-                  checkIn(n)
-                }}
-              >
-                <span className="gm-stop-n">{n}</span>
-                {annotations && word && <span className="gm-stop-w">{word}</span>}
-              </button>
-            )
-          })}
         </div>
       )}
       {!ready && status !== 'error' && <span className="gm-wait">Loading the recording</span>}

@@ -1,4 +1,5 @@
-// BrainDrift moment: a real brain, cut open, flown and re-read by Model B. Stage only (no title, number or action card).
+// BrainDrift moment: a real brain, flown and re-read by Model B. Stage only (no title, number or action card).
+// Default view (r4): slice.tsx, one real MRI slice in a framed scanner window. view="3d": the cut-away 3D brain below.
 // See README.md in this folder for props, tokens and beats.
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type CSSProperties } from 'react'
 import '@fontsource-variable/instrument-sans'
@@ -8,6 +9,7 @@ import type { BrainDriftAct, FlightResult, MetaFrame } from '../../engine/braind
 import { BrainScene, loadGlb, type MeshData, type Rgb, type SceneTokens } from './scene'
 import { growthFlags } from './growth'
 import { BEATS, END, dragFrame, frameAt, inOut, type Frame, type Geo } from './timeline'
+import { BrainSliceMoment } from './slice'
 import './braindrift.css'
 
 export { BEATS, END, frameAt } from './timeline'
@@ -31,6 +33,9 @@ export interface BrainDriftMomentProps {
   tags?: boolean
   /** The flight slider (default true). */
   controls?: boolean
+  /** slice (default since r4): one real MRI slice in a framed scanner window, the fluid spaces outlined in light.
+   *  3d: the earlier cut-away 3D brain (kept as a secondary view). */
+  view?: 'slice' | '3d'
   className?: string
   style?: CSSProperties
 }
@@ -175,7 +180,8 @@ function boxed<T>(box: Box<T>): (p: T) => void {
   return (p) => box.fn?.(p)
 }
 
-export const BrainDriftMoment = forwardRef<BrainDriftMomentHandle, BrainDriftMomentProps>(function BrainDriftMoment(props, ref) {
+/** The cut-away 3D view (view="3d"). */
+export const BrainDriftMoment3D = forwardRef<BrainDriftMomentHandle, BrainDriftMomentProps>(function BrainDriftMoment3D(props, ref) {
   const { sampleId, mode = 'auto', state: pinState, t: pinT, labels = true, tags = true, controls = true, className, style } = props
   const rootRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -1119,6 +1125,11 @@ export const BrainDriftMoment = forwardRef<BrainDriftMomentHandle, BrainDriftMom
       ) : null}
     </div>
   )
+})
+
+/** The stage: the slice view unless view="3d". */
+export const BrainDriftMoment = forwardRef<BrainDriftMomentHandle, BrainDriftMomentProps>(function BrainDriftMoment(props, ref) {
+  return props.view === '3d' ? <BrainDriftMoment3D {...props} ref={ref} /> : <BrainSliceMoment {...props} ref={ref} />
 })
 
 export default BrainDriftMoment

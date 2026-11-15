@@ -16,7 +16,7 @@
 - `bare` (optional): the two squares only (used for the posters).
 - `onResult(result, act)` once per run at the settled result; `onState(state)`; `onReady(bool)`. `className`, `style`.
 - Ref: `run()`, `reset()`.
-- Root attributes: `data-ready`, `data-state` (`idle | running | result | error`), `data-phase` (0 before the sweep, 1 sweeping, 2 number landed, 3 next step up), `data-count` (cells cleared by the line), `data-spiky`, `data-source` (`live | precomputed`), `data-narrow`, `data-bare`, `data-pick` (the grade being shown alone, or empty).
+- Root attributes: `data-ready`, `data-state` (`idle | running | result | error`), `data-phase` (0 before the sweep, 1 sweeping, 2 number landed, 3 next step up), `data-count` (cells cleared by the line), `data-spiky`, `data-source` (`live | precomputed`), `data-narrow`, `data-bare`, `data-pick` (the grade being shown alone, or empty), `data-pre` (1 before the reading: idle, or a live run still loading the models; the panel keeps its idle look then).
 
 **One clock** (`BEAT_TIMES`, exported): the sweep line crosses both squares at the same x from 450 to 4650 ms at constant speed; 4780 the % lands; 5200 "What to do next"; 5700 end.
 **Line and outlines are in step by construction:** everything the models drew is clipped to the line, so a cell's outline is drawn exactly where the line has passed, flares while the line is on it, and the cell is counted (number, bar, strip counts, lens) the moment the line clears its right edge.

@@ -1,0 +1,226 @@
+/* BrainDrift frozen scene (Station). Scoped under .stbd-scene.
+   Light inside the film: beads of fluid catching the warm light, one thin amber axis, one quiet label.
+   Only transform, opacity and stroke-dashoffset move, every animation with fill-mode both, so the shell's
+   "end" state (data-scene="end" on the scene box) shows the held frame at once. Nothing loops. */
+
+.stbd-scene {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* a quick start and a long glide into stillness: everything that travels and stops */
+  --stbd-glide: cubic-bezier(0.12, 0.72, 0.22, 1);
+  --stbd-arrive: cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* the light is added to the film, so it brightens what is under it and never greys it */
+.stbd-scene .stbd-light {
+  mix-blend-mode: screen;
+}
+
+/* ---------------------------------------------------------------------------------------- the axis */
+.stbd-scene .stbd-axis,
+.stbd-scene .stbd-lead {
+  fill: none;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.stbd-scene .stbd-axis {
+  animation: stbd-draw 1.25s var(--stbd-arrive) 0.1s both;
+}
+.stbd-scene .stbd-axis-core {
+  stroke-width: 1.6;
+}
+.stbd-scene .stbd-axis-glow {
+  stroke-width: 9;
+  opacity: 0.42;
+}
+@keyframes stbd-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.stbd-scene .stbd-head {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  animation: stbd-head 0.55s var(--stbd-arrive) 0.95s both;
+}
+.stbd-scene .stbd-head-core {
+  stroke: #ffefd9;
+  stroke-width: 1.8;
+}
+.stbd-scene .stbd-head-glow {
+  stroke: #ffb45a;
+  stroke-width: 9;
+  stroke-opacity: 0.45;
+}
+@keyframes stbd-head {
+  from {
+    opacity: 0;
+    transform: translate(var(--hx), var(--hy));
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+.stbd-scene .stbd-lead {
+  stroke: #ffb45a;
+  stroke-width: 1.2;
+  animation: stbd-draw 0.45s var(--stbd-arrive) 1.2s both;
+}
+
+/* ------------------------------------------------------------------------------------ the droplets */
+.stbd-scene .stbd-drop {
+  animation:
+    stbd-rise var(--dur) var(--stbd-glide) var(--delay) both,
+    stbd-in 0.45s linear var(--delay) both;
+}
+@keyframes stbd-rise {
+  from {
+    transform: translate(var(--sx), var(--sy));
+  }
+  to {
+    transform: translate(0, 0);
+  }
+}
+@keyframes stbd-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* the motion trail: longest while the droplet is fast, gone when it hangs still */
+.stbd-scene .stbd-trail {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: stbd-trail var(--dur) var(--stbd-glide) var(--delay) both;
+}
+@keyframes stbd-trail {
+  0% {
+    opacity: 0;
+    transform: scaleY(1);
+  }
+  8% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(0.02);
+  }
+}
+/* a moving bead is drawn out along its path (local y is the path here) and settles round as it stops */
+.stbd-scene .stbd-wobble {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  animation: stbd-wobble var(--dur) cubic-bezier(0.3, 0.6, 0.35, 1) var(--delay) both;
+}
+@keyframes stbd-wobble {
+  0% {
+    transform: scale(0.8, 1.26);
+  }
+  34% {
+    transform: scale(1.1, 0.9);
+  }
+  58% {
+    transform: scale(0.96, 1.04);
+  }
+  78% {
+    transform: scale(1.015, 0.985);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+/* as each droplet stops, it catches the light once: time has stopped */
+.stbd-scene .stbd-halo,
+.stbd-scene .stbd-glint {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+.stbd-scene .stbd-halo {
+  animation: stbd-flare-halo 0.7s ease-out calc(var(--delay) + var(--dur) * 0.62) both;
+}
+@keyframes stbd-flare-halo {
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  28% {
+    opacity: 1;
+    transform: scale(1.35);
+  }
+  100% {
+    opacity: 0.78;
+    transform: scale(1);
+  }
+}
+.stbd-scene .stbd-haze {
+  opacity: 0.7;
+}
+.stbd-scene .stbd-glint {
+  fill: #fff;
+  animation: stbd-flare 0.6s ease-out calc(var(--delay) + var(--dur) * 0.62) both;
+}
+@keyframes stbd-flare {
+  0% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  28% {
+    opacity: 1;
+    transform: scale(2.2);
+  }
+  100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+}
+
+/* --------------------------------------------------------------------------------------- the label */
+.stbd-scene .stbd-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  transform: translate(0, -50%);
+  font: 500 13px/1.62 var(--st-font-mono);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #fff;
+  text-shadow:
+    0 0 2px rgba(0, 0, 0, 0.9),
+    0 0 12px rgba(0, 0, 0, 0.85);
+  visibility: hidden;
+  animation: stbd-label 0.7s var(--stbd-arrive) 1.25s both;
+}
+/* a soft darkening behind the words, so they read on any part of the hull: no edge, no card */
+.stbd-scene .stbd-label::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -22px -34px;
+  background: radial-gradient(closest-side, rgba(3, 5, 7, 0.72), rgba(3, 5, 7, 0.42) 55%, rgba(3, 5, 7, 0));
+}
+.stbd-scene[data-on] .stbd-label {
+  visibility: visible;
+}
+.stbd-scene .stbd-label[data-side='l'] {
+  transform: translate(-100%, -50%);
+  text-align: right;
+}
+@keyframes stbd-label {
+  from {
+    opacity: 0;
+    translate: var(--lx, 0) 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}

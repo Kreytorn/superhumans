@@ -1,0 +1,49 @@
+/* Station, VeinSqueeze stage. Scoped under .vsqst. The moment inside is restyled only through its --m-* tokens
+   (Stage.tsx); this file lays out the frame round it: the "Best case" tag above the pair, the moment below. */
+.vsqst {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+.vsqst-top {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 16px 18px 0;
+}
+/* an honesty tag, not a control: the full sentence is its title */
+.vsqst-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 7px 0 8px;
+  border: 1px solid var(--st-hair);
+  border-radius: 2px;
+  font: 500 var(--st-t-label) / 1 var(--st-font-mono);
+  letter-spacing: var(--st-track-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--st-ink-2);
+  cursor: help;
+}
+.vsqst-body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+/* A phone's sheet (about 358 x 290) is too short for two pictures side by side with their curves: the moment then
+   squeezes the pictures to slivers. A box taller than wide makes it stack the two clips, each full width. It is
+   sized to fill the sheet pulled up by its handle; in the half-height sheet the panel body scrolls. */
+.vsqst[data-layout='sheet'] {
+  container-type: size; /* 100cqh below = the panel body's height */
+}
+.vsqst[data-layout='sheet'] .vsqst-top {
+  padding: 6px 8px 0;
+}
+.vsqst[data-layout='sheet'] .vsqst-body {
+  flex: none;
+  height: max(500px, calc(100cqh - 28px));
+}

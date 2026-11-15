@@ -36,26 +36,17 @@ interface Deck {
   pos: number
 }
 
-const KEY = 'ttm-pool-v1'
+// The deck lives in memory for one page load only (no storage): every load opens on the pool's first nucleus
+// (nucleus-238 for the default pool, the clearest straight line, for the pitch and a judge's first look), then
+// deals the shuffled rest; leaving the page and coming back within the same load continues the same deck.
 let mem: Deck | null = null
 
 function read(sig: string): Deck | null {
-  try {
-    const d = JSON.parse(localStorage.getItem(KEY) ?? 'null') as Deck | null
-    if (d && d.sig === sig && Array.isArray(d.order) && d.order.length > 0 && typeof d.pos === 'number') return d
-  } catch {
-    // private mode or blocked storage: the deck lives in memory for this page
-  }
   return mem && mem.sig === sig ? mem : null
 }
 
 function write(d: Deck) {
   mem = d
-  try {
-    localStorage.setItem(KEY, JSON.stringify(d))
-  } catch {
-    // see read()
-  }
 }
 
 function shuffle<V>(a: V[]): V[] {
@@ -97,7 +88,9 @@ export function peekNext(ids: string[]): string {
   const sig = ids.join(',')
   let d = read(sig)
   if (!d) {
-    d = { sig, order: deal(ids, null), pos: -1 }
+    // the first deck of a page load always opens with the pool's first nucleus, whatever its kind
+    const order = deal(ids, null)
+    d = { sig, order: order[0] === ids[0] ? order : [ids[0], ...order.filter((id) => id !== ids[0])], pos: -1 }
     write(d)
   } else if (d.pos + 1 >= d.order.length) {
     d = { sig, order: deal(ids, d.order[d.order.length - 1]), pos: -1 }

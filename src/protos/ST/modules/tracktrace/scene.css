@@ -1,0 +1,236 @@
+/* Station / TrackTrace, the frozen scene. Scoped under .stt-scene; keyframes are prefixed stt-.
+   Only transform, opacity and stroke-dashoffset move. Every animation has fill-mode both: its first keyframe
+   holds before it starts, its last one holds after it ends (the shell's "end" state jumps straight there).
+   Clock (custom properties set by Scene.tsx): --in the ion enters, --cross it crosses the frame, --hit it
+   meets the hull. Transforms work in each element's own frame: the path group is rotated along the path. */
+.stt-scene {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.stt-scene svg * {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+
+/* ---- the frame lights up for an instant round the hit */
+.stt-blink {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: stt-blink 0.5s cubic-bezier(0.2, 0.6, 0.3, 1) var(--hit) both;
+}
+@keyframes stt-blink {
+  0% {
+    opacity: 0;
+  }
+  7% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---- the path: drawn in behind the ion, white-hot, then it cools to a faint warm line */
+.stt-draw {
+  transform: scaleX(0.0001);
+  animation: stt-draw var(--cross) linear var(--in) both;
+}
+@keyframes stt-draw {
+  from {
+    transform: scaleX(0.0001);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.stt-glow {
+  animation: stt-glow 1.25s cubic-bezier(0.2, 0.6, 0.3, 1) var(--hit) both;
+}
+@keyframes stt-glow {
+  from {
+    opacity: 0.3;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.stt-halo {
+  animation: stt-halo 1.6s cubic-bezier(0.2, 0.6, 0.3, 1) var(--hit) both;
+}
+@keyframes stt-halo {
+  from {
+    opacity: 0.85;
+  }
+  to {
+    opacity: 0.3;
+  }
+}
+.stt-trail {
+  fill: #ffe6c4;
+  animation: stt-trail 1.7s cubic-bezier(0.2, 0.6, 0.3, 1) var(--hit) both;
+}
+@keyframes stt-trail {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.58;
+  }
+}
+.stt-core {
+  fill: #ffffff;
+  animation: stt-core 0.95s cubic-bezier(0.3, 0.5, 0.3, 1) calc(var(--hit) + 110ms) both;
+}
+@keyframes stt-core {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---- the ion: a bright head that crosses the whole frame and leaves it */
+.stt-head {
+  animation: stt-head var(--cross) linear var(--in) both;
+}
+@keyframes stt-head {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  99% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(var(--len));
+    opacity: 0;
+  }
+}
+
+/* ---- the hit: a short flash, a thin lens streak, an ember that stays */
+.stt-flash {
+  animation: stt-flash 0.62s cubic-bezier(0.12, 0.7, 0.25, 1) var(--hit) both;
+}
+@keyframes stt-flash {
+  0% {
+    transform: scale(0.18);
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  22% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(1.12);
+    opacity: 0;
+  }
+}
+.stt-flare {
+  animation: stt-flare 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) var(--hit) both;
+}
+@keyframes stt-flare {
+  0% {
+    transform: scaleX(0.25);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+.stt-ember {
+  animation: stt-ember 1.3s cubic-bezier(0.2, 0.6, 0.3, 1) var(--hit) both;
+}
+@keyframes stt-ember {
+  0% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+/* ---- the circle: drawn round the hit the way IonScan circles a damage spot */
+.stt-ring {
+  fill: none;
+  stroke: #ffb45a;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: stt-ring 0.85s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--hit) + 420ms) both;
+}
+.stt-ring--glow {
+  opacity: 0.2;
+}
+.stt-ring--shade {
+  stroke: #030507;
+  opacity: 0.5;
+}
+@keyframes stt-ring {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---- sparks and dust: fast out of the hull, slowing, then frozen where time stopped */
+.stt-spark {
+  animation: stt-fly var(--dur) cubic-bezier(0.04, 0.8, 0.12, 1) var(--at) both;
+}
+@keyframes stt-fly {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(var(--d));
+  }
+}
+.stt-spark-tail {
+  animation: stt-tail var(--dur) cubic-bezier(0.04, 0.8, 0.12, 1) var(--at) both;
+}
+@keyframes stt-tail {
+  0% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+  3% {
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(0.3);
+    opacity: 0.75;
+  }
+}
+.stt-spark-dot {
+  animation: stt-dot var(--dur) linear var(--at) both;
+}
+.stt-dust {
+  animation:
+    stt-fly var(--dur) cubic-bezier(0.04, 0.8, 0.12, 1) var(--at) both,
+    stt-dot var(--dur) linear var(--at) both;
+}
+@keyframes stt-dot {
+  0% {
+    opacity: 0;
+  }
+  4% {
+    opacity: 1;
+  }
+  100% {
+    opacity: var(--rest);
+  }
+}

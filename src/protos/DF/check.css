@@ -1,7 +1,7 @@
 /* DF check page (one design for all six checks). Every rule is scoped under .df-check; the .df root gives the tokens. */
 @font-face{font-family:"JetBrains Mono";src:url("../../assets/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2");font-weight:100 800;font-display:swap}
 
-.df-check{position:absolute;inset:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:transparent;color:var(--text-1);font-family:var(--sans)}
+.df-check{position:absolute;inset:0;overflow-x:hidden;overflow-y:auto;overflow-anchor:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:transparent;color:var(--text-1);font-family:var(--sans)}
 .df-check::before{content:"";position:fixed;inset:0;pointer-events:none;
   background:radial-gradient(46% 56% at 80% 46%,color-mix(in srgb,var(--mc) 11%,transparent),transparent 72%)}
 .df-check .df-check-in{position:relative;display:flex;flex-direction:column;gap:22px;min-height:100%;padding:28px clamp(20px,3vw,48px) 32px}
@@ -48,6 +48,22 @@
 .df-check .df-check-fine{font:500 14px/1.45 var(--sans);color:var(--text-2)}
 .df-check .df-check-fine summary{display:inline-flex;align-items:center;min-height:36px;cursor:pointer;color:var(--accent);font:600 15px/1 var(--sans)}
 .df-check .df-check-fine ul{margin:6px 0 0;padding:0 0 0 18px;display:grid;gap:8px;max-height:190px;overflow-y:auto}
+/* Garn Meter's panel has room for its four lines: no box that cuts the last one off (the panel still scrolls if short). */
+.df-check[data-module="garnmeter"] .df-check-fine ul{max-height:none;overflow:visible}
+/* VeinSqueeze's result is the tallest (a 4-line action): its opened list gets a shorter box, so Start over stays in view at 1440x900. */
+@media (min-width:821px) and (min-aspect-ratio:1/1){.df-check[data-module="veinsqueeze"] .df-check-fine ul{max-height:clamp(110px,calc(100svh - 764px),190px)}}
+/* r4: the panel never makes the row taller than its box. A long result, or "How do we know?" opened, scrolls inside the
+   panel instead of stretching the stage down over the story button (VeinSqueeze at 1440x900; every panel at 1280x720). */
+.df-check .df-check-main{grid-template-rows:minmax(0,1fr)}
+.df-check .df-check-panel{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
+/* short laptop windows (1280x720, 1536x730 at 125 % scaling): a tighter panel, so a full result still fits beside the stage */
+@media (min-width:821px) and (min-aspect-ratio:1/1) and (max-height:800px){
+  .df-check .df-check-panel,.df-check .df-check-result{gap:13px}
+  .df-check .df-check-panel{padding:20px 22px 20px}
+  .df-check .df-check-big b{font-size:84px}
+  .df-check .df-check-who{padding-top:13px}
+  .df-check .df-check-action{font-size:20px}
+}
 
 .df-check .df-check-btn{margin-top:auto;display:inline-flex;align-items:center;justify-content:center;min-height:58px;padding:0 26px;border:0;border-radius:999px;cursor:pointer;
   background:var(--mc);color:#05070F;font:700 19px/1 var(--sans);letter-spacing:-.01em;box-shadow:0 0 34px color-mix(in srgb,var(--mc) 40%,transparent);
@@ -98,6 +114,8 @@
   .df-check .df-check-main{display:flex;flex-direction:column;height:auto;min-height:0;gap:14px}
   .df-check .df-check-stage{height:min(66svh,620px);min-height:420px;border-radius:14px}
   .df-check[data-module="spikecount"] .df-check-stage{height:auto;min-height:0}
+  /* r4: VeinSqueeze stacks two clips, each with its chart: a taller stage gives the pictures room (about 100 -> 140 px) */
+  .df-check[data-module="veinsqueeze"] .df-check-stage{height:min(78svh,700px)}
   .df-check .df-check-spike{padding:10px}
   .df-check .df-check-spike-field{height:auto;width:100%}
   .df-check .df-check-panel{padding:20px 18px;gap:14px}
@@ -108,7 +126,10 @@
   .df-check .df-check-arch{grid-template-columns:minmax(0,1fr);gap:12px}
   .df-check .df-check-arch figcaption{padding-bottom:0;font-size:20px}
   .df-check .df-check-head .df-check-btn.is-head{margin:4px 0 0;width:100%}
+  .df-check .df-check-head .df-check-btn.is-narrow{display:inline-flex}
 }
+/* r4: the narrow-screen copy of Garn Meter's main button (check.tsx) is hidden on wide screens */
+@media (min-width:821px) and (min-aspect-ratio:1/1){.df-check .df-check-btn.is-narrow{display:none}}
 @media (prefers-reduced-motion:reduce){
   .df-check .df-check-result,.df-check .df-check-wait i,.df-check .df-check-spike-sweep{animation:none}
   .df-check .df-check-spike-field polygon{animation-duration:.01s;animation-delay:0s!important}

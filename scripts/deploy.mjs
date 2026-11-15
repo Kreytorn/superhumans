@@ -173,8 +173,11 @@ const hard = new RegExp([...[...owner].filter((w) => w.length >= 4).map(esc), 'g
 const mail = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[a-z]{2,}/g
 const hits = []
 const mails = new Map()
+// The public GitHub login is part of the site's own address (repo and Pages URL, e.g. on the QR screen and the
+// credits page), so it is public by design: mask it before the search, or a shorter git user.name inside it would hit.
+const publicLogin = new RegExp(esc(login), 'gi')
 const scanOne = (label, buf) => {
-  const s = buf.toString('latin1')
+  const s = buf.toString('latin1').replace(publicLogin, (x) => '#'.repeat(x.length))
   for (const m of s.matchAll(hard)) {
     hits.push(`${label}: "${s.slice(Math.max(0, m.index - 30), m.index + m[0].length + 30).replace(/[^\x20-\x7e]/g, '.')}"`)
     if (hits.length > 40) return

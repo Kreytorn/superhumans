@@ -1,0 +1,207 @@
+/* Station, spikecount scene: the lab window becomes a microscope lens. Scoped under .spk-scene.
+   Only transform, opacity and stroke-dashoffset move; every animation has fill-mode both, so the shell's
+   "end" state (animations forced to their last frame) is the held picture. About 2.1 s in all:
+     0.04-0.66  the ring draws itself round the window
+     0.36-1.32  the lens opens from the window's size into a loupe; the dark halo and the glow come up
+     0.86-2.00  the blood field comes into focus (a sharp copy fades in over a blurred one)
+     1.00-1.50  the bezel (outer ring, ticks) appears;  1.15-2.15 a glint runs round the rim
+     1.25-2.05  the label slides along the rim into place */
+.spk-scene {
+  --spk-amber: #ffb45a;
+  --spk-ease: var(--st-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.spk-svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+/* the halo and everything on the rim open with the lens (and glide with it, when it moves off the window) */
+.spk-grow {
+  animation: spk-open-svg 0.96s var(--spk-ease) 0.36s both;
+}
+.spk-shade {
+  opacity: 0;
+  animation: spk-in 0.9s linear 0.36s both;
+}
+.spk-glow {
+  opacity: 0;
+  animation: spk-in 0.8s linear 0.5s both;
+}
+
+/* ------------------------------------------------------------------------------------------- the lens */
+.spk-lens {
+  position: absolute;
+  transform-origin: 50% 50%;
+  animation: spk-open 0.96s var(--spk-ease) 0.36s both;
+}
+.spk-lens-in {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  clip-path: circle(50% at 50% 50%);
+  background: #0a0e13;
+  opacity: 0;
+  animation: spk-in 0.3s linear 0.36s both;
+}
+.spk-lens-in img {
+  position: absolute;
+  left: -16%;
+  top: -16%;
+  display: block;
+  width: 132%;
+  height: 132%;
+  max-width: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* out of focus: a blurred copy that never moves (drawn once), under the sharp one */
+.spk-lens-blur {
+  filter: blur(14px) brightness(0.9);
+}
+.spk-lens-sharp {
+  opacity: 0;
+  animation: spk-focus 1.14s cubic-bezier(0.3, 0.6, 0.2, 1) 0.86s both;
+}
+/* glass: the rim darkens like an eyepiece, a faint highlight in the upper left */
+.spk-lens-glass {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(3, 5, 7, 0) 54%, rgba(3, 5, 7, 0.28) 80%, rgba(3, 5, 7, 0.7) 100%),
+    radial-gradient(ellipse 58% 40% at 31% 17%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 72%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* -------------------------------------------------------------------------------------------- the rim */
+.spk-ring {
+  fill: none;
+  stroke: var(--spk-amber);
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: spk-draw 0.62s cubic-bezier(0.3, 0.7, 0.2, 1) 0.04s both;
+}
+.spk-ring--soft {
+  opacity: 0.2;
+}
+.spk-bezel {
+  opacity: 0;
+  animation: spk-in 0.5s linear 1s both;
+}
+.spk-bezel circle,
+.spk-bezel line {
+  fill: none;
+  stroke: rgba(232, 238, 245, 0.3);
+}
+.spk-bezel circle {
+  stroke: rgba(232, 238, 245, 0.22);
+}
+.spk-bezel .spk-mark {
+  stroke: var(--spk-amber);
+  stroke-linecap: round;
+}
+/* a short bright arc runs round the rim once, the ring catching the light, and goes out */
+.spk-glint {
+  fill: none;
+  stroke: #fff6ea;
+  stroke-linecap: round;
+  stroke-dasharray: 0.045 0.955;
+  stroke-dashoffset: 0.25;
+  opacity: 0;
+  animation: spk-glint 1s cubic-bezier(0.45, 0.05, 0.25, 1) 1.15s both;
+}
+.spk-glint--soft {
+  stroke: var(--spk-amber);
+  stroke-dasharray: 0.07 0.93;
+}
+
+/* the label, engraved along the top of the rim */
+.spk-label {
+  opacity: 0;
+  animation: spk-label 0.8s var(--spk-ease) 1.25s both;
+}
+.spk-label text {
+  fill: #e8eef5;
+  font-family: var(--st-font-mono, ui-monospace, monospace);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  paint-order: stroke;
+  stroke: rgba(3, 5, 7, 0.78);
+  stroke-linejoin: round;
+}
+
+/* from the window's own place and size (--dx, --dy: % of the lens; --tx, --ty: still px) to the loupe */
+@keyframes spk-open {
+  from {
+    transform: translate(var(--dx, 0%), var(--dy, 0%)) scale(var(--s0, 0.6));
+  }
+  to {
+    transform: translate(0%, 0%) scale(1);
+  }
+}
+@keyframes spk-open-svg {
+  from {
+    transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(var(--s0, 0.6));
+  }
+  to {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+@keyframes spk-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes spk-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes spk-focus {
+  0% {
+    opacity: 0;
+    transform: scale(1.07);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes spk-glint {
+  0% {
+    stroke-dashoffset: 0.25;
+    opacity: 0;
+  }
+  14% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 0.85;
+  }
+  100% {
+    stroke-dashoffset: -0.62;
+    opacity: 0;
+  }
+}
+@keyframes spk-label {
+  from {
+    opacity: 0;
+    transform: rotate(-11deg);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+}

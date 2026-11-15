@@ -1,0 +1,975 @@
+/* Take V01, The Hall of Six Gates. Everything is scoped to .v01 (and the one sheet of light, .v01-flood). */
+.v01 {
+  --bg: #020308;
+  --ink: #f4f6fb;
+  --ink-2: #aab1c4;
+  --ink-3: #6c7388;
+  --line: rgba(190, 205, 255, 0.16);
+  --hue: #cfd8ff;
+  --display: 'Big Shoulders Variable', 'Arial Narrow', Impact, sans-serif;
+  --text: 'Instrument Sans Variable', system-ui, sans-serif;
+  --mono: 'Geist Mono Variable', ui-monospace, monospace;
+  position: relative;
+  box-sizing: border-box;
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--text);
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+.v01 *,
+.v01 *::before,
+.v01 *::after {
+  box-sizing: border-box;
+}
+:where(.v01) a {
+  color: inherit;
+  text-decoration: none;
+}
+:where(.v01) :where(p, h1, h2, figure, ul) {
+  margin: 0;
+  padding: 0;
+}
+:where(.v01) :where(i, em) {
+  font-style: normal;
+}
+
+/* the sheet of a gate's light that covers the cut between the hall and a page */
+.v01-flood {
+  --hue: #fff;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(120% 120% at 50% 50%, #fff 0%, color-mix(in srgb, var(--hue) 55%, #fff) 38%, var(--hue) 100%);
+}
+
+/* ------------------------------------------------------------ the hall */
+.v01-home {
+  height: 100svh;
+  min-height: 520px;
+  overflow: hidden;
+  background: #000;
+  user-select: none;
+}
+.v01-stage {
+  position: absolute;
+  inset: 0;
+}
+.v01-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* the name is drawn in the scene; this is the same word for readers and for the still */
+.v01-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.v01-gates {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+.v01-gate {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  will-change: transform;
+}
+.v01-gate::after {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.7), 0 0 26px var(--hue), inset 0 0 18px color-mix(in srgb, var(--hue) 50%, transparent);
+  opacity: 0;
+  transition: opacity 140ms ease;
+  pointer-events: none;
+}
+.v01-gate:focus-visible::after {
+  opacity: 1;
+}
+.v01-gate-img {
+  display: none;
+}
+.v01-gate-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 16.67%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42em;
+  font-family: var(--display);
+  font-size: var(--fs, 18px);
+  line-height: 1;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.v01-home.is-ready .v01-gate-label,
+.v01-home.is-still .v01-gate-label {
+  opacity: 1;
+}
+.v01-gate-label i {
+  font-weight: 600;
+  color: var(--hue);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--hue) 70%, transparent);
+}
+.v01-gate-label b {
+  font-weight: 700;
+  color: #eef1f8;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+  transition: color 200ms ease, text-shadow 200ms ease;
+}
+.v01-gate.is-on .v01-gate-label b {
+  color: #fff;
+  text-shadow: 0 0 18px var(--hue), 0 0 4px color-mix(in srgb, var(--hue) 60%, transparent);
+}
+.v01-home.is-ready .v01-gate.is-dim .v01-gate-label {
+  opacity: 0.5;
+}
+.v01-home.is-leaving .v01-gate-label,
+.v01-home.is-leaving .v01-readout,
+.v01-home.is-leaving .v01-aimark {
+  opacity: 0 !important;
+  transition: opacity 220ms ease;
+}
+
+/* what the hall says: the site line, or the gate in focus */
+.v01-readout {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  bottom: clamp(28px, 5.4svh, 56px);
+  width: min(900px, calc(100vw - 40px));
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+.v01-home.is-ready .v01-readout,
+.v01-home.is-still .v01-readout {
+  opacity: 1;
+}
+.v01-readout::before {
+  content: '';
+  position: absolute;
+  inset: -34px -8% -60px;
+  background: radial-gradient(closest-side, rgba(0, 0, 2, 0.62), rgba(0, 0, 2, 0.34) 55%, transparent);
+  z-index: -1;
+}
+.v01-now {
+  animation: v01-rise 460ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes v01-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(5px);
+  }
+}
+.v01-site {
+  max-width: 21em;
+  margin: 0 auto !important;
+  font-size: clamp(22px, 2.3vw, 36px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: #f1f3fa;
+  text-wrap: balance;
+}
+.v01-hint {
+  margin-top: 16px !important;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  text-transform: uppercase;
+  color: #b9c2e0;
+}
+.v01-now-name {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(46px, 5.4vw, 84px);
+  line-height: 0.92;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--hue) 38%, #fff);
+  text-shadow: 0 0 42px color-mix(in srgb, var(--hue) 75%, transparent), 0 0 2px rgba(0, 0, 0, 0.5);
+}
+.v01-now-name i {
+  margin-right: 0.3em;
+  font-weight: 500;
+  color: var(--hue);
+}
+.v01-now-sentence {
+  max-width: 34em;
+  margin: 12px auto 0 !important;
+  font-size: clamp(17px, 1.55vw, 23px);
+  font-weight: 500;
+  line-height: 1.32;
+  letter-spacing: -0.008em;
+  color: #eef0f7;
+  text-wrap: balance;
+}
+.v01-aimark {
+  position: absolute;
+  z-index: 6;
+  right: 22px;
+  bottom: 16px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(226, 232, 255, 0.72);
+  padding: 4px 8px;
+  background: rgba(0, 0, 4, 0.5);
+  pointer-events: none;
+}
+
+/* the still: no WebGL, or the context was lost. Same hall, drawn flat; the six buttons still work. */
+.v01-home.is-still {
+  background:
+    radial-gradient(90% 46% at 50% 70%, rgba(120, 60, 190, 0.28), transparent 70%),
+    linear-gradient(180deg, #010207 0%, #04040c 62%, #0a0616 70%, #020308 100%);
+}
+.v01-home.is-still .v01-stage {
+  display: none;
+}
+.v01-home.is-still .v01-name {
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  left: 0;
+  right: 0;
+  top: 6svh;
+  text-align: center;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: min(13.4vw, 22svh);
+  line-height: 0.9;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #f3f5ff;
+  text-shadow: 0 0 60px rgba(150, 175, 255, 0.6);
+}
+.v01-home.is-still .v01-gates {
+  inset: 27svh 3.2vw 27svh;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.8vw;
+  align-items: end;
+}
+.v01-home.is-still .v01-gate {
+  position: relative;
+  transform: none !important;
+  width: auto !important;
+  height: 100% !important;
+  --fs: clamp(11px, 1.5vw, 22px);
+  background: #06070c;
+  box-shadow: 0 0 70px color-mix(in srgb, var(--hue) 34%, transparent), 0 60px 60px -30px color-mix(in srgb, var(--hue) 40%, transparent);
+}
+.v01-home.is-still .v01-gate:nth-child(1),
+.v01-home.is-still .v01-gate:nth-child(6) {
+  height: 100% !important;
+}
+.v01-home.is-still .v01-gate:nth-child(2),
+.v01-home.is-still .v01-gate:nth-child(5) {
+  height: 88% !important;
+}
+.v01-home.is-still .v01-gate:nth-child(3),
+.v01-home.is-still .v01-gate:nth-child(4) {
+  height: 76% !important;
+}
+.v01-home.is-still .v01-gate-img {
+  display: block;
+  position: absolute;
+  inset: 16.67% 14.3% 0;
+  background-color: #000;
+  background-size: cover;
+  background-position: 50% 50%;
+  box-shadow: 0 0 0 2px var(--hue), 0 0 34px var(--hue);
+}
+.v01-home.is-still .v01-gate-img.is-invert {
+  filter: invert(1) hue-rotate(180deg);
+}
+.v01-home.is-still .v01-gate:hover .v01-gate-img,
+.v01-home.is-still .v01-gate:focus-visible .v01-gate-img {
+  box-shadow: 0 0 0 3px #fff, 0 0 60px var(--hue);
+}
+
+/* ------------------------------------------------------------ inside a gate */
+.v01-mod {
+  padding: 18px 44px 0;
+}
+.v01-mod-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(70% 55% at 50% -6%, color-mix(in srgb, var(--hue) 34%, transparent), transparent 70%),
+    radial-gradient(40% 60% at 0% 40%, color-mix(in srgb, var(--hue) 13%, transparent), transparent 70%),
+    radial-gradient(40% 60% at 100% 40%, color-mix(in srgb, var(--hue) 13%, transparent), transparent 70%);
+}
+.v01-mod-floor {
+  position: absolute;
+  left: -40%;
+  right: -40%;
+  top: calc(100svh - 150px);
+  height: 420px;
+  transform: perspective(520px) rotateX(74deg);
+  transform-origin: 50% 0;
+  background:
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--hue) 55%, transparent) 0 1px, transparent 1px 70px),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--hue) 40%, transparent) 0 1px, transparent 1px 70px);
+  mask-image: linear-gradient(180deg, #000, transparent 85%);
+  opacity: 0.55;
+}
+.v01-slab {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  max-width: 1320px;
+  height: calc(100svh - 36px);
+  min-height: 560px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #0a0b12, #06070c 30%, #05060a);
+  box-shadow:
+    0 0 0 1px rgba(210, 220, 255, 0.1),
+    0 0 140px color-mix(in srgb, var(--hue) 22%, transparent),
+    0 50px 120px rgba(0, 0, 0, 0.8);
+  animation: v01-slab 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes v01-slab {
+  from {
+    opacity: 0;
+    transform: scale(1.035);
+  }
+}
+/* storey seams on the slab, as on the gates in the hall */
+.v01-slab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(180deg, transparent 0 43px, rgba(190, 205, 255, 0.05) 43px 44px);
+  pointer-events: none;
+}
+.v01-lintel {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 24px;
+  padding: 16px 26px 16px;
+}
+.v01-title {
+  text-align: center;
+  min-width: 0;
+}
+.v01-title h1 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(40px, 4.6vw, 68px);
+  line-height: 0.92;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 0 40px color-mix(in srgb, var(--hue) 60%, transparent);
+}
+.v01-title h1 i {
+  margin-right: 0.28em;
+  font-weight: 500;
+  color: var(--hue);
+}
+.v01-title p {
+  max-width: 44em;
+  margin: 10px auto 0;
+  font-size: clamp(16px, 1.32vw, 19px);
+  font-weight: 500;
+  line-height: 1.34;
+  color: #dfe3ee;
+  text-wrap: balance;
+}
+.v01-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  padding: 0 18px;
+  border: 1px solid rgba(200, 212, 255, 0.24);
+  background: rgba(8, 9, 16, 0.7);
+  color: var(--ink);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 120ms ease;
+}
+.v01-btn svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  transition: transform 160ms ease;
+}
+.v01-btn:hover,
+.v01-btn:focus-visible {
+  border-color: var(--hue);
+  background: color-mix(in srgb, var(--hue) 14%, #07080e);
+  box-shadow: 0 0 26px color-mix(in srgb, var(--hue) 34%, transparent);
+}
+.v01-btn:active,
+.v01-run:active {
+  transform: scale(0.97);
+}
+.v01-mod :focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.v01-back {
+  justify-self: start;
+}
+.v01-back:hover svg {
+  transform: translateX(-4px);
+}
+.v01-next {
+  justify-self: end;
+  height: 56px;
+  text-align: right;
+}
+.v01-next:hover,
+.v01-next:focus-visible {
+  border-color: var(--h);
+  background: color-mix(in srgb, var(--h) 14%, #07080e);
+  box-shadow: 0 0 26px color-mix(in srgb, var(--h) 34%, transparent);
+}
+.v01-next:hover svg {
+  transform: translateX(4px);
+}
+.v01-next span {
+  display: grid;
+  gap: 3px;
+  line-height: 1;
+}
+.v01-next em {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  color: var(--h);
+}
+
+/* the lit window: the working stage */
+.v01-window {
+  --m-stage: #04050a;
+  --m-ink: #f1f3f9;
+  --m-ink-2: #8f97ab;
+  --m-font: 'Instrument Sans Variable', system-ui, sans-serif;
+  --m-font-mono: 'Geist Mono Variable', ui-monospace, monospace;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  margin: 0 16px;
+  background: var(--m-stage);
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--hue) 85%, #fff),
+    0 0 0 4px rgba(0, 0, 0, 0.65),
+    0 0 46px color-mix(in srgb, var(--hue) 42%, transparent),
+    0 0 130px color-mix(in srgb, var(--hue) 20%, transparent);
+}
+.v01 .v01-window .v01-fill {
+  --m-stage: #04050a;
+  --m-ink: #f1f3f9;
+  --m-ink-2: #8f97ab;
+  --m-font: 'Instrument Sans Variable', system-ui, sans-serif;
+  --m-font-mono: 'Geist Mono Variable', ui-monospace, monospace;
+}
+.v01 .v01-window[data-m='veinsqueeze'] .v01-fill {
+  --m-mark: #ffd23f;
+  --m-accent: #ffd23f;
+}
+.v01 .v01-window[data-m='garnmeter'] .v01-fill {
+  --m-mark: #8590ad;
+  --m-accent: #a58cff;
+  --m-ok: #44c08a;
+  --m-watch: #e0b040;
+  --m-alert: #ff6f5b;
+  --m-field-hi: #e6ece7;
+  --m-field-lo: #1a2238;
+}
+.v01-fill {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+}
+
+/* the sill: what you press */
+.v01-sill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 14px 26px 16px;
+}
+.v01-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.v01-run {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 52px;
+  padding: 0 26px 0 22px;
+  border: 0;
+  background: var(--hue);
+  color: #06070c;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 21px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 0 34px color-mix(in srgb, var(--hue) 55%, transparent), inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+  transition: transform 120ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+.v01-run svg {
+  width: 17px;
+  height: 17px;
+}
+.v01-run:hover,
+.v01-run:focus-visible {
+  background: color-mix(in srgb, var(--hue) 72%, #fff);
+  box-shadow: 0 0 54px color-mix(in srgb, var(--hue) 80%, transparent), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+}
+.v01-reset {
+  height: 52px;
+}
+.v01-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 14px !important;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink-2);
+}
+.v01-status i {
+  width: 8px;
+  height: 8px;
+  background: var(--ink-3);
+}
+.v01-status[data-s='running'] i {
+  background: var(--hue);
+  box-shadow: 0 0 12px var(--hue);
+  animation: v01-pulse 900ms ease-in-out infinite;
+}
+.v01-status[data-s='result'] i {
+  background: #5fe0a4;
+  box-shadow: 0 0 12px #5fe0a4;
+}
+.v01-status[data-s='error'] i {
+  background: #ff6f5b;
+}
+@keyframes v01-pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+/* six small doorways: the other gates */
+.v01-pips {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+.v01-pip {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  width: 38px;
+  padding: 4px 0 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  transition: color 160ms ease;
+}
+.v01-pip i {
+  width: 14px;
+  height: 30px;
+  border: 1.5px solid color-mix(in srgb, var(--h) 70%, transparent);
+  border-bottom: 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--h) 30%, transparent), color-mix(in srgb, var(--h) 8%, transparent));
+  transition: background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+.v01-pip:hover,
+.v01-pip:focus-visible,
+.v01-pip.is-on {
+  color: var(--ink);
+}
+.v01-pip:hover i,
+.v01-pip:focus-visible i {
+  background: color-mix(in srgb, var(--h) 70%, transparent);
+  box-shadow: 0 0 16px var(--h);
+  transform: translateY(-2px);
+}
+.v01-pip.is-on i {
+  background: var(--h);
+  border-color: #fff;
+  box-shadow: 0 0 20px var(--h);
+}
+
+.v01-tag {
+  justify-self: start;
+  white-space: nowrap;
+  margin-bottom: 14px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+/* SpikeCount's own stage */
+.v01-spike {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+  display: grid;
+  grid-template-columns: auto 300px;
+  justify-content: center;
+  align-items: center;
+  gap: 56px;
+  padding: 28px 48px;
+}
+.v01-spike-photo {
+  position: relative;
+  width: min(100cqh, calc(100cqw - 356px));
+  aspect-ratio: 1;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3), 0 0 80px color-mix(in srgb, var(--hue) 26%, transparent);
+}
+.v01-spike-photo img,
+.v01-spike-photo svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.v01-spike-photo img {
+  filter: contrast(1.12) brightness(0.9);
+}
+.v01-spike-photo polygon {
+  fill-opacity: 0.16;
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+  animation: v01-cell 420ms ease both;
+}
+@keyframes v01-cell {
+  from {
+    opacity: 0;
+    stroke-width: 7;
+  }
+}
+.v01-spike-read {
+  display: grid;
+  gap: 6px;
+  align-content: center;
+}
+.v01-spike-big {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 104px;
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.v01-spike-big small {
+  font-size: 0.42em;
+  margin-left: 4px;
+  color: var(--ink-2);
+}
+.v01-spike-cap {
+  font-size: 19px;
+  line-height: 1.35;
+  color: #e3e7f1;
+}
+.v01-spike-sub {
+  margin-top: 4px !important;
+  font-size: 15px;
+  color: var(--ink-2);
+}
+.v01-spike-key {
+  margin: 20px 0 0 !important;
+  padding: 16px 0 0 !important;
+  border-top: 1px solid var(--line);
+  list-style: none;
+  display: grid;
+  gap: 7px;
+  font-size: 14px;
+  color: #c3c9d8;
+}
+.v01-spike-key li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.v01-spike-key i {
+  width: 10px;
+  height: 10px;
+}
+
+/* TrackTrace: our own network, on a white card in a thin frame */
+.v01-arch {
+  position: relative;
+  z-index: 2;
+  max-width: 1320px;
+  margin: 72px auto 0;
+  padding-bottom: 96px;
+}
+.v01-arch figure {
+  margin: 0;
+}
+.v01-arch-card {
+  padding: 30px;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--hue) 80%, #fff),
+    0 0 0 9px #06070c,
+    0 0 0 10px rgba(210, 220, 255, 0.16),
+    0 0 120px color-mix(in srgb, var(--hue) 22%, transparent);
+}
+.v01-arch-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.v01-arch figcaption {
+  margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 24px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(22px, 2.3vw, 32px);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.v01-arch figcaption small {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: var(--ink-3);
+}
+
+/* ------------------------------------------------------------ narrow screens */
+@media (max-width: 1080px) {
+  .v01-mod {
+    padding: 14px 20px 0;
+  }
+  .v01-pips {
+    display: none;
+  }
+  .v01-next em {
+    display: none;
+  }
+}
+@media (max-width: 820px) {
+  .v01-readout {
+    bottom: clamp(30px, 4.6svh, 44px);
+    width: calc(100vw - 32px);
+  }
+  .v01-site {
+    font-size: 21px;
+    max-width: 15em;
+  }
+  .v01-hint {
+    margin-top: 12px !important;
+    font-size: 14px;
+  }
+  .v01-now-name {
+    font-size: 44px;
+  }
+  .v01-now-sentence {
+    margin-top: 8px !important;
+    font-size: 16px;
+  }
+  .v01-aimark {
+    right: auto;
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%);
+    font-size: 9px;
+    white-space: nowrap;
+  }
+  .v01-gate-label {
+    letter-spacing: 0.04em;
+    gap: 0.3em;
+  }
+  .v01-home.is-still .v01-gates {
+    inset: 20svh 16px 30svh;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 1fr 1fr;
+    gap: 14px 10px;
+  }
+  .v01-home.is-still .v01-gate {
+    height: 100% !important;
+    --fs: 12px;
+  }
+  .v01-home.is-still .v01-name {
+    top: 7svh;
+    font-size: 13.2vw;
+  }
+
+  .v01-mod {
+    padding: 10px 10px 0;
+  }
+  .v01-slab {
+    display: block;
+    height: auto;
+    min-height: 0;
+    padding-bottom: 4px;
+  }
+  .v01-lintel {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 10px;
+    padding: 10px 10px 14px;
+  }
+  .v01-title {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .v01-title h1 {
+    font-size: 42px;
+  }
+  .v01-title p {
+    font-size: 16.5px;
+  }
+  .v01-btn {
+    height: 44px;
+    padding: 0 14px;
+    font-size: 16px;
+    gap: 9px;
+  }
+  .v01-next {
+    height: 44px;
+  }
+  .v01-window {
+    height: 66svh;
+    min-height: 440px;
+    margin: 0 6px;
+  }
+  .v01-sill {
+    display: block;
+    padding: 14px 10px 14px;
+  }
+  .v01-actions {
+    flex-wrap: wrap;
+  }
+  .v01-run {
+    flex: 1 1 auto;
+    justify-content: center;
+    font-size: 19px;
+    padding: 0 16px;
+  }
+  .v01-status {
+    flex: 1 1 100%;
+    margin: 4px 0 0 2px !important;
+  }
+  .v01-pips {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .v01-pip {
+    width: 44px;
+    min-height: 48px;
+  }
+  .v01-spike {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: 16px;
+    padding: 18px 16px;
+    align-content: center;
+  }
+  .v01-spike-photo {
+    justify-self: center;
+    width: min(100%, 340px);
+  }
+  .v01-spike-big {
+    font-size: 60px;
+  }
+  .v01-spike-key {
+    display: none;
+  }
+  .v01-arch {
+    margin-top: 40px;
+    padding-bottom: 56px;
+  }
+  .v01-arch-card {
+    padding: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v01 *,
+  .v01 *::before,
+  .v01 *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

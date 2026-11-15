@@ -395,3 +395,6 @@
 @media (max-width: 820px) {
   .w1 .w1-window .ttm .ttm-promise { font-size: 15px; bottom: 12px; left: 14px; }
 }
+
+/* before the stage may start (DF: during the zoom), the window holds an empty dark frame */
+.w1-window-wait { min-height: 0; background: #04070c; border-radius: 8px 8px 0 0; }

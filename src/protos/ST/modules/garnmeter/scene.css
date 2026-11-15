@@ -1,0 +1,287 @@
+/* Garn Meter frozen scene. Scoped under .gn-scene. Only transform and opacity move, on HTML layers: each
+   layer's picture is painted once and the GPU turns it. Every animation fills both ways, so the shell's
+   "end" state (play = false) lands on the held last frame: reticle on, horizon frozen, glow, no caption. */
+.gn-scene {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --gn-amber: var(--st-amber, #ffb45a);
+  --gn-ink: var(--st-ink, #e8eef5);
+  --gn-ease: var(--st-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  /* fast at first, then a long, even slowing down to a stop: the planet tumbling, then time stopping */
+  --gn-decel: cubic-bezier(0.14, 0.62, 0.2, 1);
+  --gn-spin-ms: 1.95s;
+}
+.gn-scene .gn-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+.gn-scene svg {
+  display: block;
+  overflow: visible;
+}
+
+/* ------------------------------------------------------- time stops: the frame dims round the window */
+.gn-scrim {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  will-change: opacity;
+  animation: gn-in 0.7s linear both;
+}
+
+/* -------------------------------------------------------------------------------- the reticle */
+.gn-ret,
+.gn-echo,
+.gn-hz-wrap,
+.gn-flash,
+.gn-pulse,
+.gn-cap {
+  position: absolute;
+}
+.gn-ret {
+  will-change: transform, opacity;
+  animation: gn-ret 0.8s var(--gn-ease) both;
+}
+@keyframes gn-ret {
+  from {
+    opacity: 0;
+    transform: scale(1.18) rotate(-40deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.gn-ret-ring {
+  fill: none;
+  stroke: var(--gn-ink);
+  stroke-opacity: 0.42;
+  stroke-width: 1;
+}
+.gn-ret-minor {
+  fill: none;
+  stroke: var(--gn-ink);
+  stroke-opacity: 0.2;
+  stroke-width: 1;
+}
+.gn-ret-tick {
+  fill: none;
+  stroke: var(--gn-amber);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+}
+
+/* -------------------------------------------------------------------------------- the horizon */
+.gn-hz {
+  position: absolute;
+  inset: 0;
+  will-change: transform, opacity;
+}
+.gn-hz--main {
+  animation:
+    gn-spin-w var(--gn-spin-ms) var(--gn-decel) both,
+    gn-in 0.3s linear both;
+}
+.gn-hz--echo {
+  animation:
+    gn-spin-w var(--gn-spin-ms) var(--gn-decel) both,
+    gn-echo var(--gn-spin-ms) linear both;
+}
+.gn-scene[data-variant='tall'] .gn-hz--main {
+  animation-name: gn-spin-t, gn-in;
+}
+.gn-scene[data-variant='tall'] .gn-hz--echo {
+  animation-name: gn-spin-t, gn-echo;
+}
+/* one and a half turns, clockwise, to rest with the bright point at the lower right (wide) or right (tall) */
+@keyframes gn-spin-w {
+  from {
+    transform: rotate(-600deg);
+  }
+  to {
+    transform: rotate(-60deg);
+  }
+}
+@keyframes gn-spin-t {
+  from {
+    transform: rotate(-630deg);
+  }
+  to {
+    transform: rotate(-90deg);
+  }
+}
+@keyframes gn-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes gn-echo {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.gn-hz-core {
+  fill: none;
+  stroke: #fff7ea;
+  stroke-width: 2.2;
+}
+.gn-hz-hot {
+  fill: none;
+  stroke: #ffd59a;
+}
+.gn-hz-air {
+  fill: none;
+  stroke: var(--gn-amber);
+  stroke-opacity: 0.9;
+}
+.gn-hz-body {
+  fill: none;
+  stroke: #f0d3a0;
+  stroke-opacity: 0.16;
+}
+.gn-hz-shade {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: 0.6;
+}
+/* the flare on the frozen edge: a still layer at the resting angle; only its opacity moves */
+.gn-flash {
+  transform: rotate(-60deg);
+  opacity: 0;
+  will-change: opacity;
+  animation: gn-flash 0.5s ease-out 1.86s both;
+}
+.gn-scene[data-variant='tall'] .gn-flash {
+  transform: rotate(-90deg);
+}
+.gn-flash-line {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.6;
+}
+@keyframes gn-flash {
+  0% {
+    opacity: 0;
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.32;
+  }
+}
+
+/* --------------------------------------------------------------------- the freeze: one ring leaves */
+.gn-pulse {
+  border-radius: 50%;
+  border: 1px solid rgba(255, 200, 130, 0.75);
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: gn-pulse 0.5s cubic-bezier(0.2, 0.6, 0.3, 1) 1.9s both;
+}
+@keyframes gn-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  4% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.32);
+  }
+}
+
+/* ------------------------------------------------------------------------------------ the caption */
+/* --gn-cap-dx: set by Scene.tsx when the caption has to slide in from a screen edge */
+.gn-cap {
+  transform: translate3d(var(--gn-cap-dx, 0px), -50%, 0);
+}
+.gn-cap--under {
+  transform: translate3d(calc(-50% + var(--gn-cap-dx, 0px)), 0, 0);
+}
+/* a narrow screen: two lines */
+.gn-cap[data-wrap='1'] .gn-cap-text > span {
+  display: block;
+}
+.gn-cap[data-wrap='1'] .gn-cap-text {
+  line-height: 1.55;
+}
+.gn-cap--under .gn-cap-text {
+  text-align: center;
+}
+.gn-cap-in {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  white-space: nowrap;
+  font: 500 12px/1 var(--st-font-mono, ui-monospace, monospace);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gn-ink);
+  text-shadow:
+    0 0 2px rgba(3, 5, 7, 0.95),
+    0 0 12px rgba(3, 5, 7, 0.9),
+    0 1px 26px rgba(3, 5, 7, 0.8);
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: gn-cap 2.3s linear both;
+}
+@keyframes gn-cap {
+  0%,
+  15% {
+    opacity: 0;
+    transform: translate3d(0, 7px, 0);
+    animation-timing-function: var(--gn-ease);
+  }
+  34% {
+    opacity: 1;
+    transform: none;
+  }
+  86% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+.gn-cap-lead {
+  flex: none;
+  width: 26px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 180, 90, 0.95), rgba(255, 180, 90, 0.35));
+  box-shadow: 0 0 6px rgba(255, 180, 90, 0.5);
+  transform-origin: 0 50%;
+  animation: gn-lead 2.3s linear both;
+}
+@keyframes gn-lead {
+  0%,
+  15% {
+    transform: scaleX(0);
+    animation-timing-function: var(--gn-ease);
+  }
+  38%,
+  100% {
+    transform: none;
+  }
+}

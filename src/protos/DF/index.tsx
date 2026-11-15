@@ -5,6 +5,8 @@
 // the words dim and blur away, a glow in the check's colour fills the view, and the check's page resolves out of it.
 import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, type ComponentType, type CSSProperties, type RefObject } from 'react'
 import './df.css'
+// the credits page's styles, plus the home's two small links and the "Credits" link at the end of every check
+import './credits.css'
 import { ASK, MODS, QUIET, href, type Mod } from './data'
 import posterUrl from './body_poster.webp'
 import { END, eout, fitCam, initFigure, initSky, project, settled, stateAt, type FigState } from './figure'
@@ -14,15 +16,31 @@ interface Props {
   view: string
   params: URLSearchParams
 }
+/** What a check page reports to the root (mirrors CheckStatus in ./check.tsx). */
+interface CheckStatus {
+  id: string
+  ready: boolean
+  phase: 'idle' | 'running' | 'result' | 'error'
+}
 interface CheckProps {
   mod: Mod
   /** True once the zoom has landed: only then may the heavy stage mount and load models. */
   live: boolean
+  /** ?state=result on a check's address: its stage opens on the finished result. */
+  pin?: 'result'
+  /** ?sample=<nucleus id> on TrackTrace's address: the stage shows that nucleus (the presenter can pin any). */
+  sample?: string
+  onStatus?: (s: CheckStatus) => void
 }
 
 // The real check page lives in ./check.tsx; until that file exists a plain page stands in for it.
 const checkLoader = import.meta.glob<{ default: ComponentType<CheckProps> }>('./check.tsx')['./check.tsx']
 const RealCheck = checkLoader ? lazy(checkLoader) : null
+// Two quiet screens beside the home (r4): #/proto/DF/credits (credits and AI use) and #/proto/DF/qr (the QR end screen).
+const Credits = lazy(() => import('./credits'))
+const QrEnd = lazy(() => import('./qr'))
+/** Set once the home has played its reveal: coming back from the credits or the QR screen skips it. */
+let homeSeen = false
 
 /** The figure camera's zoom during a flight: factor z about stage point (x, y). */
 type FigZoom = { z: number; x: number; y: number; dx: number; dy: number; view: StageRect }
@@ -525,11 +543,11 @@ function Callouts({ g, hot, setHot }: HotProps & { g: Geom }) {
 }
 
 /** The instrument window: a large real sample of one check, with its name and sentence, and a strip of all six. */
-function SampleWindow({ shown, hot, setHot }: HotProps & { shown: number }) {
+function SampleWindow({ shown, hot, setHot, primary }: HotProps & { shown: number; primary: boolean }) {
   const m = MODS[shown]
   return (
     <section className="df-win" style={mc(m.color)} aria-label="Real samples of the six checks">
-      <a className="df-win-frame" data-qa="primary" href={href(m.id)} {...hotHandlers(shown, setHot)}>
+      <a className="df-win-frame" data-qa={primary ? 'primary' : undefined} href={href(m.id)} {...hotHandlers(shown, setHot)}>
         <span className="df-win-head">
           <StarIcon />
           <span className="df-win-name">{m.name}</span>
@@ -606,7 +624,42 @@ const setStyle = (el: HTMLElement | null, st: LayerStyle) => {
   if (el) Object.assign(el.style, st)
 }
 
-export default function DF({ view, params }: Props) {
+/** The QR glyph of the home's small "QR" link. */
+function QrGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M14 14h2v2h-2zM18 14h2v2h-2zM16 16h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z" fill="currentColor" />
+    </svg>
+  )
+}
+
+/** The home's links to the credits and to the QR end screen (which the Q key on the home also opens). */
+function SiteLinks({ className }: { className: string }) {
+  return (
+    <nav className={className} aria-label="About this site">
+      <a href={href('credits')}>Credits and AI use</a>
+      <a href={href('qr')} aria-keyshortcuts="Q" title="QR code to this site (key Q)">
+        <QrGlyph />
+        QR code
+      </a>
+    </nav>
+  )
+}
+
+export default function DF(props: Props) {
+  if (props.view === 'credits' || props.view === 'qr') {
+    const Screen = props.view === 'qr' ? QrEnd : Credits
+    return (
+      <Suspense fallback={<div className="df" />}>
+        <Screen params={props.params} />
+      </Suspense>
+    )
+  }
+  return <DFHome {...props} />
+}
+
+function DFHome({ view, params }: Props) {
   const reduce = useReducedMotion()
   const still = reduce || params.get('state') === 'result'
   const g = useGeom()
@@ -625,7 +678,10 @@ export default function DF({ view, params }: Props) {
   const zoomRef = useRef<FigZoom | null>(null)
   const pausedRef = useRef(!!mod)
   const fadeOnly = useRef(reduce)
-  const [intro] = useState(!mod)
+  const [intro] = useState(!mod && !homeSeen)
+  useEffect(() => {
+    homeSeen = true
+  }, [])
   const [page, setPage] = useState<Mod | null>(mod)
   const pageNow = useRef<Mod | null>(mod)
   const [landed, setLanded] = useState(!!mod)
@@ -634,6 +690,9 @@ export default function DF({ view, params }: Props) {
   const [rest, setRest] = useState(ASK_INDEX)
   const [figReady, setFigReady] = useState(false)
   const onFigReady = useCallback(() => setFigReady(true), [])
+  /** The open check's own status: the root reports ready (and its phase) only once that page's stage is on screen. */
+  const [chk, setChk] = useState<CheckStatus | null>(null)
+  const onStatus = useCallback((s: CheckStatus) => setChk((p) => (p && p.id === s.id && p.ready === s.ready && p.phase === s.phase ? p : s)), [])
 
   const setHot = useCallback((i: number) => {
     if (pausedRef.current) return
@@ -863,13 +922,30 @@ export default function DF({ view, params }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [mod])
 
+  // on the home, the Q key opens the QR end screen (for the pitch's last slide)
+  useEffect(() => {
+    if (mod) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.repeat || e.ctrlKey || e.metaKey || e.altKey || e.key.toLowerCase() !== 'q') return
+      const t = e.target as HTMLElement | null
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return
+      window.location.hash = href('qr')
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [mod])
+
   const shown = hot >= 0 ? hot : rest
-  const ready = mod ? landed : figReady
+  const chkNow = mod && chk && chk.id === mod.id ? chk : null
+  const ready = mod ? landed && !!chkNow?.ready : figReady
+  const pin = mod && params.get('state') === 'result' ? 'result' : undefined
+  const sampleParam = params.get('sample') ?? ''
+  const sample = mod?.id === 'tracktrace' && /^nucleus-\d+$/.test(sampleParam) ? sampleParam : undefined
   const cls = `df${g.phone ? ' is-phone' : ''}${still ? ' is-still' : ''}${intro ? '' : ' no-intro'}`
   const vars = { '--u': `${g.u}px`, '--k': `${g.k}px` } as CSSProperties
 
   return (
-    <div ref={rootRef} className={cls} style={vars} data-ready={ready ? '1' : undefined} data-state={mod ? undefined : still ? 'result' : 'idle'} data-view={mod ? mod.id : 'home'} data-landed={landed ? '1' : undefined}>
+    <div ref={rootRef} className={cls} style={vars} data-ready={ready ? '1' : undefined} data-state={mod ? chkNow?.phase : still ? 'result' : 'idle'} data-view={mod ? mod.id : 'home'} data-landed={landed ? '1' : undefined}>
       <Backdrop g={g} still={still} slowRef={pausedRef} farRef={farRef} />
       <div className="df-vignette" />
       {g.phone ? (
@@ -908,6 +984,7 @@ export default function DF({ view, params }: Props) {
             ))}
           </ul>
           <p className="df-credit">{PHOTO_CREDIT}</p>
+          <SiteLinks className="df-pfoot" />
         </div>
       ) : (
         <>
@@ -919,17 +996,18 @@ export default function DF({ view, params }: Props) {
               <h1 className="df-wordmark">SuperHumans</h1>
               <p className="df-tagline">Six AI health checks for astronauts, running in your browser.</p>
               <Summary />
-              <SampleWindow shown={shown} hot={hot} setHot={setHot} />
+              <SampleWindow shown={shown} hot={hot} setHot={setHot} primary={!mod} />
             </div>
             <Callouts g={g} hot={hot} setHot={setHot} />
             <AiMark />
             <p className="df-credit">{PHOTO_CREDIT}</p>
+            <SiteLinks className="df-topnav" />
           </main>
         </>
       )}
       <div className="df-glow" ref={glowRef} style={mc(page?.color ?? '#8FB8FF')} aria-hidden="true" />
       <div className="df-page" ref={pageRef}>
-        {page && <Check key={page.id} mod={page} live={landed} />}
+        {page && <Check key={page.id} mod={page} live={landed} pin={page.id === mod?.id ? pin : undefined} sample={page.id === mod?.id ? sample : undefined} onStatus={onStatus} />}
       </div>
     </div>
   )

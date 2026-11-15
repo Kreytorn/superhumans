@@ -1,0 +1,1319 @@
+/* V04 "Prism Ring". Everything is scoped under .v04. */
+.v04 {
+  --ink: #f7f4ff;
+  --ink-2: rgba(228, 222, 255, 0.74);
+  --ink-3: rgba(200, 192, 240, 0.5);
+  --line: rgba(196, 184, 255, 0.22);
+  --cy: #2be4ff;
+  --mg: #ff36bd;
+  --gd: #ffbe38;
+  --display: 'Syne Variable', 'Syne', system-ui, sans-serif;
+  --text: 'Red Hat Display Variable', 'Red Hat Display', system-ui, sans-serif;
+  --mono: 'Geist Mono Variable', ui-monospace, monospace;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #04030c;
+  color: var(--ink);
+  font-family: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.v04 *,
+.v04 *::before,
+.v04 *::after {
+  box-sizing: border-box;
+}
+/* resets carry no weight, so the working stages' own styles always win inside them */
+:where(.v04) :where(p, h1, figure) {
+  margin: 0;
+}
+:where(.v04) :where(a) {
+  color: inherit;
+  text-decoration: none;
+}
+:where(.v04) :where(button) {
+  font: inherit;
+  color: inherit;
+}
+
+/* ------------------------------------------------------------------ the scene */
+.v04-scene {
+  position: absolute;
+  inset: 0;
+}
+.v04-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.v04[data-phase='open'] .v04-scene {
+  visibility: hidden;
+}
+.v04-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(3, 2, 10, 0.55) 100%),
+    linear-gradient(180deg, rgba(3, 2, 10, 0.35) 0%, transparent 16%);
+  transition: opacity 500ms ease;
+}
+.v04[data-phase='fly'] .v04-veil,
+.v04[data-phase='land'] .v04-veil,
+.v04[data-phase='open'] .v04-veil {
+  opacity: 0;
+}
+
+/* ------------------------------------------------------------------ home: title */
+.v04-home {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity 320ms ease;
+}
+.v04[data-phase='fly'] .v04-home,
+.v04[data-phase='open'] .v04-home {
+  opacity: 0;
+}
+/* flying back out of a chamber: the title and the six places wait until the camera has landed */
+.v04[data-phase='back'] .v04-home {
+  opacity: 0;
+  transition: none;
+}
+.v04[data-phase='home'] .v04-home {
+  transition: opacity 420ms ease;
+}
+/* the title and line arrive on their own clock, never waiting on the 3D scene */
+.v04-title {
+  position: absolute;
+  left: 63.5%;
+  top: 59%;
+  width: min(60vw, 860px);
+  transform: translateX(-50%);
+  text-align: center;
+  animation: v04-in 700ms cubic-bezier(0.2, 0.7, 0.2, 1) 250ms both;
+}
+@keyframes v04-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+}
+.v04-title h1 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: clamp(34px, 4.2vw, 76px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  background: linear-gradient(96deg, #ffffff 0%, #d6fbff 22%, #ffffff 40%, #ffd6f2 58%, #fff3d2 76%, #ffffff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 34px rgba(150, 120, 255, 0.35)) drop-shadow(0 2px 0 rgba(4, 3, 12, 0.5));
+  padding-bottom: 0.08em;
+}
+.v04-read {
+  position: relative;
+  min-height: 96px;
+  margin-top: 16px;
+}
+.v04-line {
+  font-size: clamp(16px, 1.5vw, 22px);
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  color: var(--ink-2);
+  transition: opacity 220ms ease, transform 220ms ease;
+  text-shadow: 0 1px 14px rgba(4, 3, 12, 0.9);
+}
+.v04[data-lit='1'] .v04-line {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+.v04-focus {
+  position: absolute;
+  inset: 0 0 auto 0;
+  animation: v04-rise 300ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes v04-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+.v04-focus-name {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(22px, 2.1vw, 34px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--hue);
+  text-shadow: 0 0 28px color-mix(in srgb, var(--hue) 55%, transparent), 0 1px 12px rgba(4, 3, 12, 0.9);
+}
+.v04-focus-name i {
+  font-family: var(--mono);
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  vertical-align: 0.5em;
+  margin-right: 0.8em;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: none;
+}
+.v04-focus-line {
+  margin: 10px auto 0 !important;
+  max-width: 32em;
+  font-size: clamp(16px, 1.4vw, 21px);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ink);
+  text-shadow: 0 1px 14px rgba(4, 3, 12, 0.95);
+  text-wrap: balance;
+}
+
+/* ------------------------------------------------------------------ home: the six chambers */
+.v04-chambers {
+  position: absolute;
+  inset: 0;
+}
+.v04-ch {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.v04-ch[data-vis='0'] {
+  visibility: hidden;
+}
+.v04-ch-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.v04-ch-ring polygon {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  opacity: 0;
+  transition: opacity 160ms ease;
+  filter: drop-shadow(0 0 7px var(--h));
+}
+.v04-ch[data-hot='1'] .v04-ch-ring polygon {
+  opacity: 0.95;
+}
+.v04-ch:focus-visible .v04-ch-ring polygon {
+  opacity: 1;
+  stroke-width: 4;
+}
+/* each name sits on a soft dark plate of its own, so it never reads against busy glass */
+.v04-ch-tag {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translate(-50%, 4px);
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 12px 6px 10px;
+  border-radius: 7px;
+  background: rgba(8, 6, 22, 0.85);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.07) inset, 0 6px 22px rgba(4, 3, 12, 0.55);
+  white-space: nowrap;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(17px, 1.5vw, 22px);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  transition: transform 200ms cubic-bezier(0.2, 0.7, 0.2, 1), background 160ms ease, opacity 200ms ease;
+}
+/* while one chamber is hot the other names step back, so its beam never crosses a full-strength name */
+.v04[data-lit='1'] .v04-ch[data-hot='0'] .v04-ch-tag {
+  opacity: 0.45;
+}
+.v04-ch[data-vis='1'] .v04-ch-tag {
+  animation: v04-tag 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes v04-tag {
+  from {
+    opacity: 0;
+  }
+}
+.v04-ch-tag i {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--mono);
+  font-style: normal;
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: none;
+}
+.v04-ch-tag i::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--h);
+  box-shadow: 0 0 8px var(--h);
+}
+.v04-ch-tag b {
+  font-weight: inherit;
+  background: linear-gradient(var(--h), var(--h)) 0 100% / 0 2px no-repeat;
+  padding-bottom: 2px;
+  transition: background-size 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.v04-ch[data-hot='1'] .v04-ch-tag,
+.v04-ch:focus-visible .v04-ch-tag {
+  transform: translate(-50%, 6px) scale(1.06);
+  background: rgba(8, 6, 22, 0.8);
+}
+.v04-ch[data-hot='1'] .v04-ch-tag b,
+.v04-ch:focus-visible .v04-ch-tag b {
+  background-size: 100% 2px;
+}
+/* the flagship's name sits out in the dark beside its chamber, not on the foreground crystals */
+.v04-ch[data-tag='side'] .v04-ch-tag {
+  left: 100%;
+  top: 50%;
+  transform: translate(10px, -50%);
+}
+.v04-ch[data-tag='side'][data-hot='1'] .v04-ch-tag,
+.v04-ch[data-tag='side']:focus-visible .v04-ch-tag {
+  transform: translate(14px, -50%) scale(1.06);
+}
+/* the second and fourth chambers' names sit above them, in the dark past the band's rim, well clear of the flagship's
+   name. The rim rises to the right there, so the plate leans left of the chamber's centre and never sits on the rim. */
+.v04-ch[data-tag='top'] .v04-ch-tag {
+  top: 0;
+  transform: translate(calc(-50% - 2em), calc(-100% - 26px));
+}
+.v04-ch[data-tag='top'][data-hot='1'] .v04-ch-tag,
+.v04-ch[data-tag='top']:focus-visible .v04-ch-tag {
+  transform: translate(calc(-50% - 2em), calc(-100% - 28px)) scale(1.06);
+}
+
+.v04-hint {
+  position: absolute;
+  left: 63.5%;
+  bottom: 3.2%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #c9c3e6;
+  white-space: nowrap;
+}
+.v04-hint span {
+  width: 7px;
+  height: 7px;
+  transform: rotate(45deg);
+  background: var(--cy);
+  box-shadow: 0 0 12px var(--cy);
+  animation: v04-pulse 2.4s ease-in-out infinite;
+}
+@keyframes v04-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+.v04-mark {
+  position: absolute;
+  right: 22px;
+  bottom: 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(214, 206, 255, 0.46);
+  pointer-events: none;
+  z-index: 2;
+}
+.v04[data-phase='land'] .v04-mark,
+.v04[data-phase='open'] .v04-mark {
+  display: none;
+}
+
+/* the chamber's light at the end of the flight: a white-hot window with the hue round it, never a flat sheet */
+.v04-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse 75% 70% at 50% 50%,
+    #fff 0%,
+    rgba(255, 255, 255, 0.92) 14%,
+    color-mix(in srgb, var(--hue) 70%, rgba(255, 255, 255, 0.85)) 34%,
+    color-mix(in srgb, var(--hue) 55%, transparent) 70%,
+    color-mix(in srgb, var(--hue) 30%, transparent) 100%
+  );
+}
+/* at the end of the flight the light holds for 80 ms, then clears over the page, which is already drawn under it */
+.v04-flash[data-out='1'] {
+  opacity: 0 !important;
+  transition: opacity 200ms ease-out 80ms;
+}
+
+/* ------------------------------------------------------------------ no WebGL: a still ring, the six buttons work */
+.v04-still {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1.1vmin 1.1vmin at 72% 34%, #fff 0, #fff 60%, transparent 100%),
+    radial-gradient(22vmin 22vmin at 72% 34%, rgba(170, 150, 255, 0.5), transparent 70%),
+    radial-gradient(120vmax 4px at 72% 34%, rgba(120, 200, 255, 0.5), transparent 70%),
+    radial-gradient(90% 70% at 20% 80%, rgba(8, 60, 80, 0.5), transparent 70%),
+    radial-gradient(80% 70% at 80% 10%, rgba(60, 16, 130, 0.55), transparent 70%), #04030c;
+}
+.v04-still::before {
+  content: '';
+  position: absolute;
+  left: -32%;
+  top: 14%;
+  width: 150%;
+  height: 120%;
+  border-radius: 50%;
+  border: 9vmin solid transparent;
+  background: conic-gradient(from 200deg, var(--cy), var(--mg), var(--gd), #7d6bff, var(--cy)) border-box;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) padding-box exclude, linear-gradient(#000 0 0);
+  opacity: 0.38;
+  transform: rotate(-14deg);
+}
+.v04[data-webgl='0'] .v04-ch {
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--h);
+  box-shadow: 0 0 34px color-mix(in srgb, var(--h) 60%, transparent);
+  overflow: visible;
+}
+.v04-ch-img {
+  position: absolute;
+  inset: 0;
+  background-color: #06050e;
+  background-repeat: no-repeat;
+}
+.v04[data-webgl='0'] .v04-ch:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+
+/* ------------------------------------------------------------------ the check's page */
+.v04-mod {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200, 190, 255, 0.28) transparent;
+  animation: v04-open 380ms ease both;
+  /* heights the stage's frame leaves for the bar, the head and the next-step line */
+  --bar: 62px;
+  --head: 124px;
+  --act: 96px;
+  /* the run button keeps one width in every state and on every page, so nothing in the head moves */
+  --runw: 344px;
+}
+@keyframes v04-open {
+  from {
+    opacity: 0;
+  }
+}
+/* a near-transparent copy of the page, painted once under the settled home so the first flight never waits on it */
+.v04-ghost {
+  position: absolute;
+  inset: 0;
+  /* under one step of colour: drawn by the browser, never seen */
+  opacity: 0.003;
+  pointer-events: none;
+}
+.v04-ghost .v04-mod {
+  animation: none;
+}
+/* the page is mounted while the camera is still going through the window: hidden until the light covers it */
+.v04[data-phase='land'] .v04-mod {
+  visibility: hidden;
+  animation: none;
+}
+/* reached by the flight: the page is simply there when the chamber's light clears (no second fade) */
+.v04[data-via='fly'] .v04-mod {
+  animation: none;
+}
+.v04-mod-bg {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(70% 55% at 50% -8%, color-mix(in srgb, var(--hue) 34%, transparent), transparent 70%),
+    radial-gradient(60% 50% at 100% 100%, rgba(43, 228, 255, 0.1), transparent 70%),
+    radial-gradient(60% 50% at 0% 100%, rgba(255, 54, 189, 0.09), transparent 70%), #05040d;
+}
+.v04-mod-bg i {
+  position: absolute;
+  inset: -12%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(64px) saturate(1.7) brightness(0.9);
+  opacity: 0.2;
+}
+.v04-mod-bg::after {
+  /* facets of the chamber wall */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(115deg, transparent 0 62%, rgba(255, 255, 255, 0.035) 62% 62.2%, transparent 62.2%),
+    linear-gradient(62deg, transparent 0 18%, color-mix(in srgb, var(--hue) 9%, transparent) 18% 38%, transparent 38%),
+    linear-gradient(-28deg, transparent 0 70%, rgba(43, 228, 255, 0.045) 70% 86%, transparent 86%);
+}
+.v04-mod-in {
+  position: relative;
+  max-width: 1640px;
+  min-height: 100%;
+  margin: 0 auto;
+  /* no bottom padding: bar + head + frame + next-step line add up to exactly one screen, so nothing scrolls */
+  padding: 0 44px;
+  display: flex;
+  flex-direction: column;
+}
+.v04-bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: var(--bar);
+  flex: none;
+}
+.v04-back,
+.v04-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-self: start;
+  height: 40px;
+  padding: 0 16px 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.005em;
+  background: rgba(10, 8, 26, 0.5);
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+.v04-next {
+  justify-self: end;
+  padding: 0 10px 0 16px;
+}
+.v04-next span {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #c9c3e6;
+}
+.v04-back svg,
+.v04-next svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.v04-back:hover,
+.v04-next:hover,
+.v04-back:focus-visible,
+.v04-next:focus-visible {
+  border-color: #fff;
+  background: rgba(30, 24, 70, 0.7);
+}
+.v04 a:focus-visible,
+.v04-mod button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.v04-steps {
+  display: flex;
+  gap: 8px;
+}
+.v04-steps a {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 36px;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #c9c3e6;
+  border: 1px solid var(--line);
+  clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
+  background: rgba(10, 8, 26, 0.5);
+  transition: background 160ms ease, color 160ms ease;
+}
+.v04-steps a:hover,
+.v04-steps a:focus-visible {
+  background: color-mix(in srgb, var(--h) 38%, #0a081a);
+  color: #fff;
+}
+.v04-steps a.is-on {
+  background: var(--h);
+  color: #07060f;
+  font-weight: 700;
+}
+
+/* a fixed grid of one height: the frame below starts at the same place on all six pages, before and after a run */
+.v04-head {
+  flex: none;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) var(--runw);
+  align-items: end;
+  gap: 34px;
+  height: var(--head);
+  padding: 6px 2px 20px;
+}
+.v04-kicker {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #c9c3e6;
+}
+.v04-kicker b {
+  color: var(--hue);
+  font-weight: 600;
+}
+.v04-kicker i {
+  font-style: normal;
+  margin-left: 14px;
+  padding-left: 14px;
+  border-left: 1px solid var(--line);
+  color: var(--ink-2);
+}
+.v04-head h1 {
+  margin-top: 6px;
+  font-family: var(--display);
+  font-weight: 800;
+  /* Syne is wide: at 54 px the longest name (BubbleGrade) is about 550 px, leaving the sentence two or three lines */
+  font-size: clamp(40px, 3.7vw, 54px);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  background: linear-gradient(96deg, #fff 0%, #fff 45%, color-mix(in srgb, var(--hue) 60%, #fff) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding-bottom: 0.06em;
+}
+.v04-sentence {
+  align-self: end;
+  max-width: 31em;
+  padding-bottom: 7px;
+  font-size: clamp(17px, 1.38vw, 21px);
+  font-weight: 500;
+  line-height: 1.32;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.v04-ctl {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  padding-bottom: 5px;
+}
+.v04-run {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  width: var(--runw);
+  height: 54px;
+  padding: 0 20px 0 16px;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: -0.005em;
+  color: #07060f !important;
+  background: linear-gradient(100deg, #fff 0%, color-mix(in srgb, var(--hue) 78%, #fff) 55%, var(--hue) 100%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5) inset, 0 10px 40px color-mix(in srgb, var(--hue) 45%, transparent);
+  transition: transform 140ms ease, filter 140ms ease, opacity 160ms ease;
+  white-space: nowrap;
+}
+.v04-run svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+.v04-run:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.v04-run:active {
+  transform: translateY(1px) scale(0.985);
+}
+/* running: the same light, with a glint passing through it */
+.v04-run:disabled {
+  cursor: progress;
+  opacity: 0.9;
+  filter: none;
+  transform: none;
+}
+.v04-run:disabled::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.75) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: v04-shimmer 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes v04-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+.v04-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #c9c3e6;
+}
+.v04-status i {
+  width: 7px;
+  height: 7px;
+  transform: rotate(45deg);
+  background: #c9c3e6;
+}
+.v04-status[data-s='running'] i {
+  background: var(--gd);
+  box-shadow: 0 0 10px var(--gd);
+  animation: v04-pulse 0.9s ease-in-out infinite;
+}
+.v04-status[data-s='result'] i {
+  background: var(--cy);
+  box-shadow: 0 0 10px var(--cy);
+}
+.v04-status[data-s='error'] i {
+  background: #ff5a52;
+}
+
+/* the stage in its prismatic frame */
+.v04-frame {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 430px;
+  height: calc(100svh - var(--bar) - var(--head) - var(--act));
+  --cut: 26px;
+}
+.v04-frame-glow {
+  position: absolute;
+  inset: -3px;
+  background: conic-gradient(from 215deg, var(--cy), #7d6bff, var(--mg), var(--gd), var(--cy));
+  filter: blur(26px);
+  opacity: 0.3;
+  pointer-events: none;
+}
+.v04-stage {
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: conic-gradient(from 215deg at 50% 50%, var(--cy), #8d7bff 18%, var(--mg) 36%, #fff 50%, var(--gd) 64%, var(--mg) 82%, var(--cy));
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+}
+.v04-stage-in {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #06050e;
+  clip-path: polygon(calc(var(--cut) - 0.8px) 0, 100% 0, 100% calc(100% - var(--cut) + 0.8px), calc(100% - var(--cut) + 0.8px) 100%, 0 100%, 0 calc(var(--cut) - 0.8px));
+}
+.v04 .v04-fill {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  aspect-ratio: auto !important;
+}
+/* after a flight the stage starts once the light has cleared, so it rises into the frame */
+.v04[data-via='fly'] .v04-stage-in > * {
+  animation: v04-open 320ms ease both;
+}
+/* light laid over the stage (never catches the pointer) */
+.v04-stage-in::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+/* TrackTrace before the run: the nucleus glows out of the dark instead of showing its cropped, stepped edge.
+   The stage's own "Next nucleus" pill in the bottom-left corner is left out of the shade. */
+.v04-mod[data-id='tracktrace'] .v04-stage {
+  container-type: size;
+}
+.v04-mod[data-id='tracktrace'] .v04-stage-in::after {
+  /* sized to the nucleus: at idle the stage draws its bounding circle at 1.25 x the stage's short side (1.55 when the
+     stage is taller than wide), so 62.5cqmin is that circle's radius. The foci stay clear, the stepped rim falls into
+     the dark. */
+  --nr: 62.5cqmin;
+  /* a little below the centre: the foci sit low, the stepped cut of the mask sits high */
+  background: radial-gradient(circle var(--nr) at 50% 54%, transparent 54%, rgba(6, 5, 14, 0.92) 78%, #06050e 92%);
+  -webkit-mask: radial-gradient(ellipse 150px 54px at 100px calc(100% - 40px), transparent 55%, #000 100%);
+  mask: radial-gradient(ellipse 150px 54px at 100px calc(100% - 40px), transparent 55%, #000 100%);
+}
+.v04-mod[data-id='tracktrace'][data-state='idle'] .v04-stage-in::after {
+  opacity: 1;
+}
+/* BrainDrift: a soft light of the check's colour behind the brain, so it never floats in flat black */
+.v04-mod[data-id='braindrift'] .v04-stage-in::after {
+  background: radial-gradient(circle at 58% 50%, color-mix(in srgb, var(--hue) 20%, transparent) 0, transparent 45%);
+  mix-blend-mode: screen;
+  opacity: 1;
+}
+/* VeinSqueeze: the stage's own hold control is the one press, so the head is the name and the sentence only */
+.v04-mod[data-id='veinsqueeze'] .v04-head {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+/* what to do next, with the way back and on */
+.v04-act {
+  flex: none;
+  display: grid;
+  place-items: center;
+  min-height: var(--act);
+  padding-top: 14px;
+}
+.v04-act-mid {
+  text-align: center;
+  max-width: 100%;
+  animation: v04-rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.v04-act-mid span {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--hue);
+}
+.v04-act-mid p {
+  margin: 4px auto 0 !important;
+  max-width: 52em;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(17px, 1.4vw, 22px);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: #fff;
+  text-wrap: balance;
+}
+.v04-act-mid small {
+  display: block;
+  margin-top: 4px;
+  font-size: 15px;
+  color: #c9c3e6;
+}
+
+/* TrackTrace: our own network on a white card */
+.v04-arch {
+  flex: none;
+  width: min(100%, 880px);
+  margin: 56px auto 64px !important;
+}
+.v04-arch-card {
+  padding: 22px 26px;
+  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  outline: 1px solid var(--line);
+  outline-offset: 7px;
+}
+.v04-arch-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.v04-arch figcaption {
+  margin-top: 20px;
+  text-align: center;
+  font-family: var(--text);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.005em;
+  color: #c9c3e6;
+}
+
+/* ------------------------------------------------------------------ SpikeCount stage */
+.v04-spike {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  align-items: center;
+  gap: 64px;
+  padding: 24px 48px 24px 24px;
+}
+.v04-spike-field {
+  position: relative;
+  height: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+.v04-spike-field img,
+.v04-spike-field svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.v04-spike-field img {
+  filter: contrast(1.15) brightness(0.86);
+}
+.v04-spike-field polygon {
+  fill: rgba(79, 208, 255, 0.1);
+  stroke: #7fe0ff;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: v04-draw 520ms ease forwards;
+}
+.v04-spike-field polygon.is-spiky {
+  fill: rgba(255, 90, 82, 0.2);
+  stroke: #ff6a5e;
+  stroke-width: 2.6;
+}
+@keyframes v04-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.v04-spike-sweep {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: #fff;
+  box-shadow: 0 0 22px 4px var(--hue);
+  animation: v04-sweep 3.2s linear forwards;
+}
+@keyframes v04-sweep {
+  to {
+    left: 100%;
+  }
+}
+.v04-spike-read {
+  display: grid;
+  gap: 20px;
+  align-content: center;
+  justify-items: start;
+  max-width: 30em;
+}
+.v04-spike-hint {
+  font-size: clamp(18px, 1.5vw, 22px);
+  line-height: 1.4;
+  color: #e4defc;
+}
+.v04-spike-big {
+  display: grid;
+  gap: 4px;
+}
+.v04-spike-big b {
+  font-family: var(--text);
+  font-weight: 800;
+  font-size: clamp(64px, 6.4vw, 104px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.v04-spike-big span {
+  font-size: 19px;
+  color: #e4defc;
+}
+.v04-spike-big.is-hot b {
+  color: #ff6a5e;
+}
+.v04-spike-big.is-hot {
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+.v04-spike-big.is-hot[data-show='1'] {
+  opacity: 1;
+}
+.v04-spike-key {
+  display: flex;
+  gap: 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 16px;
+  color: #e4defc;
+}
+.v04-spike-key li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.v04-spike-key i {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #7fe0ff;
+}
+.v04-spike-key i.k-hot {
+  border-color: #ff6a5e;
+  background: rgba(255, 90, 82, 0.3);
+}
+.v04-tag {
+  justify-self: start;
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: #c9c3e6;
+}
+
+/* ------------------------------------------------------------------ phones */
+/* the home on a tall screen (phones, tablets upright): the ring is a tall arc, the header sits on top */
+.v04[data-tall='1'] .v04-title {
+  left: 0;
+  top: 0;
+  width: 100%;
+  padding: 34px 16px 40px;
+  transform: none;
+  animation-name: v04-in-tall;
+  /* a soft dark backing keeps the header off the glass */
+  background: radial-gradient(ellipse 70% 62% at 50% 38%, rgba(8, 6, 22, 0.82), rgba(8, 6, 22, 0.4) 55%, transparent 78%);
+}
+@keyframes v04-in-tall {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+.v04[data-tall='1'] .v04-title h1 {
+  font-size: clamp(28px, 8.1vw, 48px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+.v04[data-tall='1'] .v04-veil {
+  background:
+    linear-gradient(180deg, rgba(3, 2, 10, 0.7) 0%, rgba(3, 2, 10, 0.35) 14%, transparent 26%),
+    linear-gradient(0deg, rgba(3, 2, 10, 0.6) 0%, transparent 12%);
+}
+.v04[data-tall='1'][data-webgl='1'] .v04-ch-tag {
+  left: 100%;
+  top: var(--ty, 50%);
+  transform: translate(8px, -50%);
+  transform-origin: 0 50%;
+  font-size: 16px;
+  padding: 4px 10px 5px 8px;
+}
+.v04[data-tall='1'][data-webgl='1'] .v04-ch[data-hot='1'] .v04-ch-tag,
+.v04[data-tall='1'][data-webgl='1'] .v04-ch:focus-visible .v04-ch-tag {
+  transform: translate(10px, -50%) scale(1.04);
+}
+.v04[data-tall='1'] .v04-ch-tag i {
+  font-size: 12px;
+}
+.v04[data-tall='1'] .v04-read {
+  min-height: 66px;
+  margin-top: 10px;
+}
+.v04[data-tall='1'] .v04-line {
+  max-width: 18em;
+  margin: 0 auto !important;
+  font-size: 16px;
+  line-height: 1.3;
+}
+/* the hot chamber's own label already names it: show only its sentence here */
+.v04[data-tall='1'] .v04-focus-name {
+  display: none;
+}
+.v04[data-tall='1'] .v04-focus-line {
+  margin-top: 0 !important;
+  font-size: 16px;
+  max-width: 21em;
+}
+.v04[data-tall='1'] .v04-hint {
+  display: none;
+}
+.v04[data-tall='1'] .v04-mark {
+  left: 14px;
+  right: auto;
+  top: 12px;
+  bottom: auto;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ phones: the check's page */
+@media (max-width: 760px) {
+  .v04-focus-name {
+    display: none;
+  }
+  .v04-mod-in {
+    padding: 0 14px 22px;
+  }
+  .v04-bar {
+    grid-template-columns: auto 1fr;
+    height: 58px;
+  }
+  .v04-steps {
+    display: none;
+  }
+  .v04-back,
+  .v04-next {
+    font-size: 14px;
+    height: 40px;
+  }
+  .v04-next span {
+    display: none;
+  }
+  .v04-head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    height: auto;
+    padding: 4px 2px 16px;
+  }
+  /* one line, never broken mid-word: the longest name (BubbleGrade) fits at 390 */
+  .v04-head h1 {
+    font-size: min(40px, 8.6vw);
+    white-space: nowrap;
+  }
+  .v04-sentence {
+    font-size: 17px;
+    padding-bottom: 0;
+  }
+  /* the status on its own line, then a full-width run button whose label always fits */
+  .v04-ctl {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding-bottom: 0;
+  }
+  .v04-mod[data-id='veinsqueeze'] .v04-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .v04-run {
+    width: 100%;
+    height: 52px;
+    font-size: 16px;
+    padding: 0 18px;
+  }
+  .v04-frame {
+    flex: none;
+    height: 66svh;
+    min-height: 460px;
+    margin: 0 -6px;
+    --cut: 16px;
+  }
+  /* the stage is taller than wide here, so the idle nucleus is drawn at 1.55 x its short side */
+  .v04-mod[data-id='tracktrace'] .v04-stage-in::after {
+    --nr: 77.5cqmin;
+    background: radial-gradient(circle var(--nr) at 50% 54%, transparent 48%, rgba(6, 5, 14, 0.93) 66%, #06050e 80%);
+    /* the nucleus reaches the corner here: the clear spot is held tight round the pill */
+    -webkit-mask: radial-gradient(ellipse 118px 34px at 86px calc(100% - 38px), transparent 62%, #000 100%);
+    mask: radial-gradient(ellipse 118px 34px at 86px calc(100% - 38px), transparent 62%, #000 100%);
+  }
+  .v04-act {
+    min-height: 0;
+    padding-top: 16px;
+  }
+  .v04-arch {
+    margin: 36px auto 40px !important;
+  }
+  .v04-arch-card {
+    padding: 12px;
+    overflow-x: auto;
+  }
+  .v04-arch-card img {
+    min-width: 640px;
+  }
+  .v04-spike {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    gap: 16px;
+    padding: 18px 14px;
+    align-content: center;
+    justify-items: center;
+  }
+  .v04-spike-field {
+    width: min(100%, 330px);
+    height: auto;
+  }
+  .v04-spike-read {
+    gap: 10px;
+    width: 100%;
+  }
+  .v04-spike-big b {
+    font-size: 52px;
+  }
+  .v04-spike-read {
+    max-width: none;
+  }
+  .v04-tag {
+    font-size: 12px;
+    letter-spacing: 0.03em;
+  }
+  .v04-spike-big {
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .v04-spike-hint {
+    font-size: 16px;
+  }
+}
+
+/* a real browser window at laptop width is about 730 px tall: a compact head gives the stage the height */
+@media (min-width: 761px) and (max-height: 800px) {
+  .v04-mod {
+    --bar: 52px;
+    --head: 90px;
+    --act: 66px;
+  }
+  .v04-back,
+  .v04-next {
+    height: 36px;
+  }
+  .v04-steps a {
+    height: 32px;
+  }
+  .v04-head {
+    gap: 34px;
+    padding: 0 2px 14px;
+  }
+  /* TrackTrace's result column (count, line, tag, "Next nucleus") fits inside the shorter frame */
+  .v04-mod[data-id='tracktrace'] .v04-stage-in {
+    --m-size: 13.5px;
+  }
+  .v04-head h1 {
+    margin-top: 2px;
+    font-size: clamp(40px, 3.5vw, 50px);
+  }
+  .v04-kicker {
+    font-size: 13px;
+  }
+  .v04-sentence {
+    font-size: 17px;
+    padding-bottom: 4px;
+  }
+  .v04-run {
+    height: 48px;
+    font-size: 17px;
+  }
+  .v04-ctl {
+    gap: 8px;
+    padding-bottom: 2px;
+  }
+  .v04-act {
+    padding-top: 10px;
+    place-items: start center;
+  }
+  /* two lines that always fit: the label and the next step on one, who acts on the other (cut short, never wrapped) */
+  .v04-act-mid span {
+    display: inline;
+    margin-right: 14px;
+    vertical-align: 0.12em;
+  }
+  .v04-act-mid p {
+    display: inline;
+  }
+  .v04-act-mid small {
+    display: block;
+    max-width: 62em;
+    margin: 4px auto 0;
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* narrower laptops: a smaller run button keeps the sentence its room */
+@media (min-width: 761px) and (max-width: 1360px) {
+  .v04-mod {
+    --runw: 300px;
+  }
+  .v04-run {
+    font-size: 15px;
+    gap: 9px;
+    padding: 0 14px 0 12px;
+  }
+  .v04-head h1 {
+    font-size: clamp(40px, 3.5vw, 50px);
+  }
+}
+/* tablets: the sentence takes its own row under the name */
+@media (min-width: 761px) and (max-width: 1180px) {
+  .v04-mod {
+    --head: 176px;
+  }
+  .v04-head {
+    grid-template-columns: minmax(0, 1fr) var(--runw);
+    grid-template-rows: auto auto;
+    row-gap: 12px;
+  }
+  .v04-head-name {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .v04-ctl {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .v04-sentence {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    max-width: 44em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v04 *,
+  .v04 *::before,
+  .v04 *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}

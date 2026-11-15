@@ -73,6 +73,9 @@ const SKIM = 0.15
 /** Hand-check note from the model brief (work/VeinSqueeze/LOG.md): what the lowest point of a clip is when it is not
  *  a squeeze. Clip A: "dip only when the view shifts at 3.4 s". */
 const LOWEST_NOTE: Record<string, string> = { 'clip-a': 'view shifts here' }
+/** r4: how long a press waits for the live model before it shows the stored outputs instead (fetchOutcomes). The
+ *  value lands at 3.85 s into a press, so this leaves about 2 s of waiting at most. */
+const LIVE_WAIT_MS = 6000
 /** Clips where the word "artery" may follow the vein outline's centre after the first frame: hand-checked on the
  *  frames that it stays on the artery (clip A, whose view shifts as one piece). On every other clip the word is shown
  *  only at rest, at SAM 2's stored artery click, and leaves when the press starts. */
@@ -395,9 +398,12 @@ export const VeinSqueezeMoment = forwardRef<VeinSqueezeMomentHandle, VeinSqueeze
       if (c.veinLabel) e.click?.setAttribute('transform', `translate(${c.veinLabel[0].toFixed(1)} ${c.veinLabel[1].toFixed(1)}) scale(${u.toFixed(4)})`)
       e.expert?.setAttribute('transform', `translate(${(wx + 12 * u).toFixed(1)} ${(wy + 25 * u).toFixed(1)}) scale(${u.toFixed(4)})`)
       if (c.startLabel) {
-        // keep the word inside the picture
-        const lx = clamp(c.startLabel.x, wx + 24 * u, wx + ww - 24 * u)
-        const ly = clamp(c.startLabel.y + (c.startLabel.below ? 17 : -8) * u, wy + 14 * u, wy + wh - 6 * u)
+        // keep the word inside the picture, and its note line ("view shifts here", 16 px under or over it) too: on a
+        // short picture (a phone) the note used to fall off the bottom edge
+        const note = e.note ? 16 : 0
+        const half = e.note ? 60 : 24
+        const lx = clamp(c.startLabel.x, wx + half * u, wx + ww - half * u)
+        const ly = clamp(c.startLabel.y + (c.startLabel.below ? 17 : -8) * u, wy + (14 + (c.startLabel.below ? 0 : note)) * u, wy + wh - (6 + (c.startLabel.below ? note : 0)) * u)
         e.start?.setAttribute('transform', `translate(${lx.toFixed(1)} ${ly.toFixed(1)}) scale(${u.toFixed(4)})`)
       }
       return { x: (b.left - cr.left) * dpr, y: (b.top - cr.top) * dpr, w: b.width * dpr, h: b.height * dpr, r: radius * dpr, wx, wy, ww, wh, u }
@@ -597,15 +603,35 @@ export const VeinSqueezeMoment = forwardRef<VeinSqueezeMomentHandle, VeinSqueeze
     [draw, setPhaseBoth],
   )
 
-  /** Runs the real model on every clip on stage (one after the other: one shared worker), or reads the stored outputs. */
+  /** Runs the real model on every clip on stage (one after the other: one shared worker), or reads the stored outputs.
+   *  r4: a live run that has not answered LIVE_WAIT_MS after the press (the 20 MB model still loading on a slow network)
+   *  gives way, for this press only, to the stored outputs of the same model, tagged REPLAY; the model keeps loading for
+   *  the next press. Without it the stage could sit at "Reading the clips" for as long as the download takes. */
   const fetchOutcomes = useCallback(() => {
     const sc = sceneRef.current
     if (!sc) return
     const run = ++clock.current.run
     outcomesRef.current = null
     setOutcomes(null)
+    let shown = false
+    const show = (results: VsResult[], useLive: boolean) => {
+      if (shown || run !== clock.current.run || sceneRef.current !== sc) return
+      shown = true
+      const all = results.map((r, i) => ({ sampleId: sc.clips[i].sample.id, result: r, act: vs.act(r) }))
+      outcomesRef.current = all
+      setOutcomes(all)
+      setUsedMode(useLive ? 'live' : 'replay')
+      kick()
+    }
+    if (wantLive())
+      window.setTimeout(() => {
+        if (shown || run !== clock.current.run) return
+        Promise.all(sc.clips.map((c) => vs.replay(c.sample.id)))
+          .then((r) => show(r, false))
+          .catch(() => undefined) // the live run below still answers, or fails into its own replay
+      }, LIVE_WAIT_MS)
     queue.current = queue.current.then(async () => {
-      if (run !== clock.current.run) return
+      if (run !== clock.current.run || shown) return
       let useLive = wantLive()
       let results: VsResult[] | null = null
       if (useLive) {
@@ -623,16 +649,11 @@ export const VeinSqueezeMoment = forwardRef<VeinSqueezeMomentHandle, VeinSqueeze
         try {
           results = await Promise.all(sc.clips.map((c) => vs.replay(c.sample.id)))
         } catch (err) {
-          if (run === clock.current.run) fail(err)
+          if (run === clock.current.run && !shown) fail(err)
           return
         }
       }
-      if (run !== clock.current.run || sceneRef.current !== sc) return
-      const all = results.map((r, i) => ({ sampleId: sc.clips[i].sample.id, result: r, act: vs.act(r) }))
-      outcomesRef.current = all
-      setOutcomes(all)
-      setUsedMode(useLive ? 'live' : 'replay')
-      kick()
+      show(results, useLive)
     })
   }, [fail, kick])
 

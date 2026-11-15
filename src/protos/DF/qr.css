@@ -1,0 +1,45 @@
+/* DF's QR end screen (#/proto/DF/qr): the wordmark and the address on the left, one big QR code on a white card on
+   the right; stacked on a phone. The shared sky and bar are in credits.css (.df-xs). */
+.df-qr-page{position:relative;min-height:100%;display:flex;flex-direction:column;padding:28px clamp(16px,4.2vw,72px) 28px}
+.df-qr-page .df-xs-bar{opacity:.78;transition:opacity .2s var(--ease-out)}
+.df-qr-page .df-xs-bar:hover,.df-qr-page .df-xs-bar:focus-within{opacity:1}
+.df-qr-main{flex:1;display:flex;align-items:center;justify-content:center;gap:clamp(40px,6vw,120px);padding:clamp(20px,4vh,48px) 0}
+.df-qr-text{flex:0 1 auto;max-width:640px;min-width:0}
+.df-qr-word{margin:0;font:700 clamp(46px,7.2vw,112px)/.9 var(--sans);letter-spacing:-.045em;color:var(--text-1)}
+.df-qr-tag{margin:clamp(14px,2.2vh,24px) 0 0;max-width:17em;font:500 clamp(19px,2.1vw,32px)/1.24 var(--sans);letter-spacing:-.01em;color:var(--text-1);text-wrap:balance}
+.df-qr-kicker{display:flex;align-items:center;gap:12px;margin:clamp(32px,6vh,64px) 0 0;font:600 15px/1 "JetBrains Mono",ui-monospace,Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.df-qr-kicker::before{content:"";width:28px;height:2px;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+.df-qr-url{display:inline-flex;flex-wrap:wrap;margin-top:14px;font:600 clamp(22px,2.5vw,38px)/1.2 "JetBrains Mono",ui-monospace,Consolas,monospace;letter-spacing:-.02em;color:var(--text-1);
+  text-decoration:none;border-bottom:2px solid rgba(143,184,255,.35);padding-bottom:6px;transition:border-color .2s var(--ease-out)}
+.df-qr-url span:last-child{color:var(--accent)}
+.df-qr-url:hover{border-color:var(--accent)}
+.df-qr-team{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;margin:clamp(22px,3.4vh,36px) 0 0;font:500 clamp(15px,1.25vw,19px)/1.4 var(--sans);color:var(--text-2)}
+.df-qr-dots{display:inline-flex;gap:7px}
+.df-qr-dots i{display:block;width:8px;height:8px;border-radius:50%}
+
+/* the card: white, so every phone camera reads it; a thin instrument frame and a soft glow around it */
+.df-qr-card{position:relative;flex:none;margin:0;display:grid;place-items:center;border-radius:22px;background:#fff;
+  box-shadow:0 0 0 1px rgba(255,255,255,.5),0 40px 100px rgba(0,0,10,.6),0 0 140px rgba(143,184,255,.28),0 0 60px rgba(120,90,255,.18);animation:dfQrIn .9s var(--ease-out) both}
+.df-qr-card img{display:block;image-rendering:pixelated;user-select:none}
+.df-qr-tick{position:absolute;width:26px;height:26px;border:2px solid rgba(207,224,255,.85);pointer-events:none;filter:drop-shadow(0 0 6px rgba(143,184,255,.8))}
+.df-qr-tick.tl{left:-16px;top:-16px;border-right:0;border-bottom:0;border-top-left-radius:8px}
+.df-qr-tick.tr{right:-16px;top:-16px;border-left:0;border-bottom:0;border-top-right-radius:8px}
+.df-qr-tick.bl{left:-16px;bottom:-16px;border-right:0;border-top:0;border-bottom-left-radius:8px}
+.df-qr-tick.br{right:-16px;bottom:-16px;border-left:0;border-top:0;border-bottom-right-radius:8px}
+@keyframes dfQrIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.df.is-still .df-qr-card{animation:none}
+@media (prefers-reduced-motion:reduce){.df-qr-card{animation:none}}
+
+@media (max-width:759px){
+  .df-qr-page{padding:16px 16px 28px}
+  .df-qr-main{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:0;padding:24px 0 8px}
+  .df-qr-text{display:contents}
+  .df-qr-word{order:0;font-size:46px;line-height:.95}
+  .df-qr-tag{order:1;margin-top:12px;font-size:19px;line-height:1.3}
+  .df-qr-card{order:2;align-self:center;margin:36px 0 34px;border-radius:18px}
+  .df-qr-kicker{order:3;margin:0;font-size:13px}
+  .df-qr-url{order:4;margin-top:12px;font-size:21px}
+  .df-qr-team{order:5;margin-top:18px;font-size:15px}
+  .df-qr-tick{width:20px;height:20px}
+  .df-qr-tick.tl{left:-11px;top:-11px}.df-qr-tick.tr{right:-11px;top:-11px}.df-qr-tick.bl{left:-11px;bottom:-11px}.df-qr-tick.br{right:-11px;bottom:-11px}
+}

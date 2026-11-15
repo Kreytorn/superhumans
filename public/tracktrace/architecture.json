@@ -1,0 +1,6 @@
+{
+  "src": "ionscan_architecture.svg",
+  "title": "IonScan, our own 3.2\u00a0M-\u2060parameter network",
+  "caption": "It reads the nucleus along four directions, finds every damage spot, then decides what hit the cell.",
+  "alt": "Diagram of the IonScan network: the layers a nucleus image passes through, and one IonScan block with its four scan directions"
+}
